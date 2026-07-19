@@ -1,49 +1,48 @@
-# Swaccha Parisara
+# Swaccha Parisara 🌿
+> Reporting waste is only half the job - real change happens when it actually gets cleaned up and recycled.
 
-**Status:** 🚧 In Progress — actively evolving from prototype to a focused product direction.
-
-A civic-tech platform for Dakshina Kannada, built to tackle two problems together instead of separately: **garbage accountability** and **plastic waste recycling**. Built in partnership with the Swaccha Parisara NGO, which works toward a plastic-free coastal Karnataka.
-
----
-
-## Why This Exists
-
-Most civic reporting apps stop at "someone dumped trash here, tell the local representative." That raises visibility, but plastic — PET bottles, packaging, wrappers — doesn't go away because it was reported. It persists for decades regardless of who gets tagged in a complaint.
-
-Swaccha Parisara is being redesigned around a simpler idea: **a report should lead to a cleanup, and a cleanup should lead to verified recycling.** Not a complaints board — a working loop between citizens who spot the problem and an NGO that has the field capacity to actually resolve it.
+![Platform](https://img.shields.io/badge/Platform-Web%20(PWA)-green) ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow) ![Language](https://img.shields.io/badge/Language-JavaScript-orange)
 
 ---
 
-## Current State
+## What is Swaccha Parisara?
 
-A working prototype exists today: photo-based waste reporting, GPS-to-ward resolution using real Dakshina Kannada boundary data, an interactive map, offline-friendly submission, and multi-language support. It's functional, but it's shaped like a standard complaint-tracker — and that's exactly what's being rethought.
-
----
-
-## Where This Is Headed
-
-The next phase moves away from "complaint against a politician" and toward **Sites and Drives**:
-
-- **Sites** — physical locations where waste accumulates. Multiple citizen reports at the same spot strengthen a single site's priority instead of creating duplicate tickets, giving a real signal of where plastic is actually piling up.
-- **Drives** — organized NGO-led cleanups, where nearby high-priority sites are bundled, volunteers are coordinated, and collected material is logged.
-- **Processing & Proof** — verified chain-of-custody from collection to recycler, so impact is provable, not just claimed. This is the piece that makes the platform fundable and the NGO's work auditable.
-
-The citizen experience stays fast and simple — report in seconds. The payoff changes from "here's who's to blame" to "here's proof it got cleaned up, because you flagged it."
+Dakshina Kannada generates waste faster than it's tracked, and plastic waste in particular doesn't go away on its own - it just piles up. Swaccha Parisara is a civic-tech platform built to close that gap: citizens report waste in seconds, and the system is being built to turn those reports into actual cleanup and recycling outcomes, not just tickets that sit unresolved.
 
 ---
 
-## Design Principles Guiding the Rebuild
+## Objective
 
-- **Two real users, from day one** — citizens who report, and NGO coordinators who operate. Neither is an afterthought.
-- **Plastic-first, not complaint-first** — the platform exists because plastic doesn't biodegrade, not just to route grievances.
-- **Built for the district, not just the city** — offline-capable, multi-lingual (Kannada, Tulu, Konkani, Beary, English), and designed with rural Gram Panchayats and the Western Ghats' connectivity constraints in mind, not just urban Mangaluru.
-- **Non-adversarial by design** — no leaderboard shaming officials. The public-facing win is cleanup proof, not blame.
+Move beyond simple complaint-reporting toward a platform that connects citizen reports directly to on-ground cleanup and plastic recycling, so that every report has a visible, verifiable outcome.
 
 ---
 
-## Contributing / Following Along
+## Features
 
-This project is under active redesign. Expect the schema, flows, and UI to change significantly over the coming weeks as the Sites → Drives → Processing model gets built out. Issues and discussion are welcome.
+- 📍 **Geo-Tagged Reporting** - Snap a photo, auto-detect location, submit in seconds
+- 🗺️ **Live Waste Map** - Real ward-boundary data for Dakshina Kannada with interactive markers
+- 📶 **Offline-First Submission** - Reports queue locally and sync when connectivity returns
+- 🌐 **Multi-Language Support** - Built for Kannada, Tulu, Konkani, Beary, and English speakers
+- 🏷️ **Waste Type Classification** - Tag reports by type for better prioritization
+- 🔍 **Filter & Track** - Browse reports by status, ward, and type
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| Frontend | React 19 + Vite |
+| Maps & Geo | Leaflet, OpenStreetMap, GeoJSON |
+| Backend & DB | Supabase (PostgreSQL + PostGIS) |
+| Localization | i18next |
+| Offline Support | LocalStorage-backed queue |
+
+---
+
+## Status
+
+🚧 **In Progress** - Core reporting and mapping are functional. The platform is actively being redesigned to focus on closing the loop between reporting, cleanup, and plastic recycling.
 
 ---
 
