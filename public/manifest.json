@@ -1,0 +1,26 @@
+{
+  "name": "Swaccha Parisara",
+  "short_name": "Swaccha",
+  "description": "Report and track plastic waste across Dakshina Kannada. Request home pickups, earn recycling points, and learn proper plastic segregation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#38761d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["environment", "utilities"],
+  "lang": "en"
+}
