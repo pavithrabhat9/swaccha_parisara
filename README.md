@@ -1,16 +1,49 @@
-# React + Vite
+# Swaccha Parisara 🌿
+> Reporting waste is only half the job - real change happens when it actually gets cleaned up and recycled.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Platform](https://img.shields.io/badge/Platform-Web%20(PWA)-green) ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow) ![Language](https://img.shields.io/badge/Language-JavaScript-orange)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What is Swaccha Parisara?
 
-## React Compiler
+Dakshina Kannada generates waste faster than it's tracked, and plastic waste in particular doesn't go away on its own - it just piles up. Swaccha Parisara is a civic-tech platform built to close that gap: citizens report waste in seconds, and the system is being built to turn those reports into actual cleanup and recycling outcomes, not just tickets that sit unresolved.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Objective
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Move beyond simple complaint-reporting toward a platform that connects citizen reports directly to on-ground cleanup and plastic recycling, so that every report has a visible, verifiable outcome.
+
+---
+
+## Features
+
+- 📍 **Geo-Tagged Reporting** - Snap a photo, auto-detect location, submit in seconds
+- 🗺️ **Live Waste Map** - Real ward-boundary data for Dakshina Kannada with interactive markers
+- 📶 **Offline-First Submission** - Reports queue locally and sync when connectivity returns
+- 🌐 **Multi-Language Support** - Built for Kannada, Tulu, Konkani, Beary, and English speakers
+- 🏷️ **Waste Type Classification** - Tag reports by type for better prioritization
+- 🔍 **Filter & Track** - Browse reports by status, ward, and type
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| Frontend | React 19 + Vite |
+| Maps & Geo | Leaflet, OpenStreetMap, GeoJSON |
+| Backend & DB | Supabase (PostgreSQL + PostGIS) |
+| Localization | i18next |
+| Offline Support | LocalStorage-backed queue |
+
+---
+
+## Status
+
+🚧 **In Progress** - Core reporting and mapping are functional. The platform is actively being redesigned to focus on closing the loop between reporting, cleanup, and plastic recycling.
+
+---
+
+*Our waste. Our responsibility. Our recovery.*
