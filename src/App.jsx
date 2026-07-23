@@ -9,7 +9,7 @@ import LearnPage from './pages/LearnPage';
 import BusinessPage from './pages/BusinessPage';
 
 /**
- * Swaccha Parisara — Phase 0 PWA
+ * Swachha Parisara — Phase 0 PWA
  * Plastic Waste Reporting & Recycling for Dakshina Kannada
  *
  * Routes:

@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { mockPickupHistory, mockUserProfile, getBadgeForPoints, QUANTITY_TIERS } from '../data/mockPickups';
 
-const PICKUP_STORAGE_KEY = 'swaccha_pickups';
-const PROFILE_STORAGE_KEY = 'swaccha_profile';
+const PICKUP_STORAGE_KEY = 'swachha_pickups';
+const PROFILE_STORAGE_KEY = 'swachha_profile';
 
 function loadPickups() {
   try {

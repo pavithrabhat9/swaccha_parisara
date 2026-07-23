@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { initialMockReports, generateReportId } from '../data/mockReports';
 
-const STORAGE_KEY = 'swaccha_reports';
+const STORAGE_KEY = 'swachha_reports';
 
 function loadReports() {
   try {

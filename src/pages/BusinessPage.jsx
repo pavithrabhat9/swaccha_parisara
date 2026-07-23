@@ -16,7 +16,7 @@ export default function BusinessPage() {
   // Check if business is already set up (localStorage)
   const [business, setBusiness] = useState(() => {
     try {
-      const stored = localStorage.getItem('swaccha_business');
+      const stored = localStorage.getItem('swachha_business');
       return stored ? JSON.parse(stored) : null;
     } catch { return null; }
   });
@@ -58,7 +58,7 @@ export default function BusinessPage() {
       history: [],
     };
     setBusiness(newBusiness);
-    localStorage.setItem('swaccha_business', JSON.stringify(newBusiness));
+    localStorage.setItem('swachha_business', JSON.stringify(newBusiness));
     setStep('dashboard');
     showToast(`Your recurring ${cadenceLabel.toLowerCase()} pickup is set. You can pause anytime.`, 'success', 4000);
   };
@@ -67,14 +67,14 @@ export default function BusinessPage() {
     const updated = { ...business, history: [{ date: business.nextPickup, status: 'Skipped' }, ...business.history] };
     updated.nextPickup = getNextPickupDate();
     setBusiness(updated);
-    localStorage.setItem('swaccha_business', JSON.stringify(updated));
+    localStorage.setItem('swachha_business', JSON.stringify(updated));
     showToast('This pickup has been skipped — we\'ve been notified.', 'info');
   };
 
   const handleTogglePause = () => {
     const updated = { ...business, isPaused: !business.isPaused };
     setBusiness(updated);
-    localStorage.setItem('swaccha_business', JSON.stringify(updated));
+    localStorage.setItem('swachha_business', JSON.stringify(updated));
     showToast(updated.isPaused ? 'Subscription paused.' : 'Subscription resumed!', updated.isPaused ? 'info' : 'success');
   };
 
@@ -92,7 +92,7 @@ export default function BusinessPage() {
         {/* Back link */}
         <button onClick={() => navigate('/learn')} className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-primary transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"/>
+            <polyline points="15 18 9 12 15 6" />
           </svg>
           Back to Learn
         </button>
@@ -165,7 +165,7 @@ export default function BusinessPage() {
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
         <button onClick={() => navigate('/learn')} className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-primary transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"/>
+            <polyline points="15 18 9 12 15 6" />
           </svg>
           Back to Learn
         </button>
@@ -232,7 +232,7 @@ export default function BusinessPage() {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
       <button onClick={() => setStep('signup')} className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-primary transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="15 18 9 12 15 6"/>
+          <polyline points="15 18 9 12 15 6" />
         </svg>
         Back
       </button>

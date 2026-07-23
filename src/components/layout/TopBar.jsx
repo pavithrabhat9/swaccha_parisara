@@ -15,7 +15,7 @@ const PAGE_TITLES = {
  */
 export default function TopBar() {
   const location = useLocation();
-  const pageTitle = PAGE_TITLES[location.pathname] || 'Swaccha Parisara';
+  const pageTitle = PAGE_TITLES[location.pathname] || 'Swachha Parisara';
 
   // Hide on map page (map takes full screen)
   if (location.pathname === '/') return null;
@@ -26,7 +26,7 @@ export default function TopBar() {
     >
       <div className="flex-1 min-w-0">
         <h1 className="text-sm font-bold text-primary tracking-tight truncate">
-          Swaccha Parisara
+          Swachha Parisara
         </h1>
         <p className="text-[11px] font-medium text-muted -mt-0.5 truncate">
           {pageTitle}

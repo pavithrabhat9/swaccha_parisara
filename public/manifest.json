@@ -1,6 +1,6 @@
 {
-  "name": "Swaccha Parisara",
-  "short_name": "Swaccha",
+  "name": "Swachha Parisara",
+  "short_name": "Swachha",
   "description": "Report and track plastic waste across Dakshina Kannada. Request home pickups, earn recycling points, and learn proper plastic segregation.",
   "start_url": "/",
   "display": "standalone",
@@ -21,6 +21,9 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["environment", "utilities"],
+  "categories": [
+    "environment",
+    "utilities"
+  ],
   "lang": "en"
 }

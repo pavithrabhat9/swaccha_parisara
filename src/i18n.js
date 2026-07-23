@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 /**
- * i18next configuration for Swaccha Parisara.
+ * i18next configuration for Swachha Parisara.
  * English has full content for Phase 0.
  * Kannada, Tulu, Konkani, Beary are scaffolded as empty — can be filled later without refactoring.
  */
@@ -20,7 +20,7 @@ i18n
       en: {
         translation: {
           // App
-          appTitle: 'Swaccha Parisara',
+          appTitle: 'Swachha Parisara',
           appSubtitle: 'Plastic Waste · Dakshina Kannada',
 
           // Navigation

@@ -1,13 +1,13 @@
-# Swaccha Parisara 🌿
+# Swachha Parisara 🌿
 > Reporting waste is only half the job - real change happens when it actually gets cleaned up and recycled.
 
 ![Platform](https://img.shields.io/badge/Platform-Web%20(PWA)-green) ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow) ![Language](https://img.shields.io/badge/Language-JavaScript-orange)
 
 ---
 
-## What is Swaccha Parisara?
+## What is Swachha Parisara?
 
-Dakshina Kannada generates waste faster than it's tracked, and plastic waste in particular doesn't go away on its own - it just piles up. Swaccha Parisara is a civic-tech platform built to close that gap: citizens report waste in seconds, and the system is being built to turn those reports into actual cleanup and recycling outcomes, not just tickets that sit unresolved.
+Dakshina Kannada generates waste faster than it's tracked, and plastic waste in particular doesn't go away on its own - it just piles up. Swachha Parisara is a civic-tech platform built to close that gap: citizens report waste in seconds, and the system is being built to turn those reports into actual cleanup and recycling outcomes, not just tickets that sit unresolved.
 
 ---
 

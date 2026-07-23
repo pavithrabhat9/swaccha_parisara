@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* =============================================
-   SWACCHA PARISARA — Tailwind v4 Design System
+   SWACHHA PARISARA — Tailwind v4 Design System
    Warm, grounded, environmental civic-tech PWA
    ============================================= */
 
@@ -57,7 +57,9 @@
 /* =============================================
    BASE STYLES
    ============================================= */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -69,7 +71,8 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-cream);  /* #ffffff */
+  background: var(--color-cream);
+  /* #ffffff */
   color: var(--color-black);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -85,8 +88,14 @@ body {
 }
 
 /* Hide scrollbar but keep functionality */
-::-webkit-scrollbar { width: 0; height: 0; }
-* { scrollbar-width: none; }
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+* {
+  scrollbar-width: none;
+}
 
 /* =============================================
    LEAFLET OVERRIDES
@@ -155,69 +164,155 @@ body {
    ANIMATIONS & KEYFRAMES
    ============================================= */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideDown {
-  from { transform: translateY(-8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes checkmark {
-  0% { stroke-dashoffset: 24; }
-  100% { stroke-dashoffset: 0; }
+  0% {
+    stroke-dashoffset: 24;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes toastIn {
-  from { transform: translateY(-100%) scale(0.95); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+  from {
+    transform: translateY(-100%) scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes toastOut {
-  from { transform: translateY(0) scale(1); opacity: 1; }
-  to { transform: translateY(-100%) scale(0.95); opacity: 0; }
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-100%) scale(0.95);
+    opacity: 0;
+  }
 }
 
 /* Utility animation classes */
-.animate-fade-in { animation: fadeIn 0.3s ease-out; }
-.animate-fade-in-up { animation: fadeInUp 0.4s ease-out; }
-.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
-.animate-slide-down { animation: slideDown 0.25s ease-out; }
-.animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.animate-slide-down {
+  animation: slideDown 0.25s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .animate-shimmer {
   background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
-.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-.animate-toast-in { animation: toastIn 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
-.animate-toast-out { animation: toastOut 0.3s ease-in forwards; }
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-toast-in {
+  animation: toastIn 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.animate-toast-out {
+  animation: toastOut 0.3s ease-in forwards;
+}
 
 /* Page transition */
 .page-enter {
@@ -238,6 +333,7 @@ body {
 .press-scale {
   transition: transform 0.15s ease;
 }
+
 .press-scale:active {
   transform: scale(0.97);
 }

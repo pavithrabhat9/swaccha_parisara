@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 
-const AUTH_STORAGE_KEY = 'swaccha_auth';
+const AUTH_STORAGE_KEY = 'swachha_auth';
 
 /**
  * Lightweight phone auth stub for Phase 0.
