@@ -102,7 +102,7 @@ export default function MapPage() {
   return (
     <div className="fixed inset-0 md:top-16 z-0">
       {/* Filter bar overlay */}
-      <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-col gap-2">
+      <div className="absolute top-3 left-3 right-3 md:right-auto md:w-80 z-[1000] flex flex-col gap-2">
         {/* Filter toggle button */}
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -230,7 +230,7 @@ export default function MapPage() {
             position={[report.lat, report.lng]}
             icon={report.icon}
           >
-            <Popup>
+            <Popup closeButton={false}>
               <div className="min-w-[180px]">
                 {/* Photo thumbnail */}
                 <img
