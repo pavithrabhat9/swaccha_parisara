@@ -8,24 +8,6 @@ import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
 import { QUANTITY_TIERS, TIME_WINDOWS, DK_LOCALITIES, BADGES } from '../data/mockPickups';
 
 /* --- Professional SVG Icon Components --- */
-const RecycleIcon = ({ className = "w-5 h-5" }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5" />
-    <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12" />
-    <path d="m14 16-3 3 3 3" />
-    <path d="M8.293 13.596 7.196 9.5 3.1 10.598" />
-    <path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843" />
-    <path d="m13.378 9.633 4.096 1.098 1.097-4.096" />
-  </svg>
-);
-
-const AwardIcon = ({ className = "w-4 h-4" }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="8" r="7" />
-    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-  </svg>
-);
-
 const BagSmallIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
@@ -44,11 +26,18 @@ const BagMediumIcon = ({ className = "w-5 h-5" }) => (
 
 const BagLargeIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 6h18" />
-    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-    <line x1="10" y1="11" x2="10" y2="17" />
-    <line x1="14" y1="11" x2="14" y2="17" />
+    <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
+    <path d="m7 16.5-4.74-2.85" />
+    <path d="m7 16.5 5-3" />
+    <path d="M7 16.5v5.17" />
+    <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
+    <path d="m17 16.5-5-3" />
+    <path d="m17 16.5 4.74-2.85" />
+    <path d="M17 16.5v5.17" />
+    <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
+    <path d="M12 8 7.26 5.15" />
+    <path d="m12 8 4.74-2.85" />
+    <path d="M12 13.5V8" />
   </svg>
 );
 
@@ -203,11 +192,6 @@ export default function PickupPage() {
             <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5" />
             <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-white/5" />
 
-            {/* Floating professional icon */}
-            <div className="flex absolute top-4 right-4 w-11 h-11 rounded-2xl bg-white/10 border border-white/15 items-center justify-center text-white/85 shadow-sm" title="Recycling Rewards">
-              <RecycleIcon className="w-6 h-6" />
-            </div>
-
             <div className="relative">
               <p className="text-xs font-medium text-white/70 uppercase tracking-wide mb-1">Your Points</p>
               <p className="text-4xl font-extrabold tracking-tight mb-3">
@@ -216,8 +200,7 @@ export default function PickupPage() {
 
               <div className="flex items-center gap-3">
                 <span className="bg-white/15 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
-                  <AwardIcon className="w-3.5 h-3.5 text-yellow" />
-                  <span>{badge?.label}</span>
+                  <span>{badge?.icon}</span> {badge?.label}
                 </span>
                 <span className="text-xs text-white/70 font-medium">
                   {totalKgDiverted}kg diverted
@@ -227,11 +210,10 @@ export default function PickupPage() {
               {/* Supporting visual & next-tier progress */}
               <div className="block mt-4 pt-3.5 border-t border-white/15 space-y-2">
                 <div className="flex items-center justify-between text-xs font-medium text-white/90">
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1">
                     <span>Next Tier:</span>
-                    <span className="font-semibold text-white flex items-center gap-1">
-                      <AwardIcon className="w-3.5 h-3.5 text-yellow inline" />
-                      <span>{nextBadge ? nextBadge.label : 'Top Tier Reached!'}</span>
+                    <span className="font-semibold text-white">
+                      {nextBadge ? `${nextBadge.icon} ${nextBadge.label}` : 'Top Tier Reached! 🏆'}
                     </span>
                   </span>
                   <span className="text-white/70">
@@ -248,10 +230,7 @@ export default function PickupPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-white/70">
-                  <span className="flex items-center gap-1">
-                    <AwardIcon className="w-3.5 h-3.5" />
-                    <span>{badge?.label}</span>
-                  </span>
+                  <span>{badge?.icon} {badge?.label}</span>
                   <span>{nextBadge ? `${progressPercent}%` : '100%'}</span>
                 </div>
               </div>
