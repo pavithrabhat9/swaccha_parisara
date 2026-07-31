@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DK_LOCALITIES } from '../../data/mockPickups';
+import ErrorState from '../ui/ErrorState';
 
 /**
  * Lightweight phone auth flow for Phase 0.
@@ -9,12 +10,22 @@ import { DK_LOCALITIES } from '../../data/mockPickups';
 export default function LoginFlow({ authHook }) {
   const { authStep, sendOtp, verifyOtp, completeSetup } = authHook;
   const [phone, setPhone] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
   const [locality, setLocality] = useState('');
   const [error, setError] = useState('');
 
+  const handlePhoneBlur = () => {
+    if (phone.length > 0 && phone.length < 10) {
+      setPhoneError('Please enter a valid 10-digit mobile number');
+    } else {
+      setPhoneError('');
+    }
+  };
+
   const handleSendOtp = () => {
+    setPhoneError('');
     setError('');
     const result = sendOtp(phone);
     if (!result.success) setError(result.error);
@@ -69,6 +80,7 @@ export default function LoginFlow({ authHook }) {
                 type="tel"
                 value={phone}
                 onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                onBlur={handlePhoneBlur}
                 placeholder="Enter 10-digit number"
                 maxLength={10}
                 className="flex-1 px-4 py-3 border border-border rounded-r-lg text-sm font-medium
@@ -76,6 +88,7 @@ export default function LoginFlow({ authHook }) {
                   bg-surface text-black placeholder:text-muted-light"
               />
             </div>
+            {phoneError && <p className="text-xs text-orange-red mt-1 font-medium">{phoneError}</p>}
           </div>
           <button
             onClick={handleSendOtp}
@@ -171,10 +184,14 @@ export default function LoginFlow({ authHook }) {
         </div>
       )}
 
-      {/* Error message */}
+      {/* Recoverable Error State */}
       {error && (
-        <div className="w-full mt-3 bg-orange-red-light border border-orange-red/20 rounded-lg px-3 py-2 text-sm text-orange-red font-medium text-center animate-fade-in">
-          {error}
+        <div className="w-full mt-4">
+          <ErrorState
+            title="Authentication Error"
+            description={error}
+            onRetry={() => setError('')}
+          />
         </div>
       )}
     </div>

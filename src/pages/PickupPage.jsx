@@ -5,6 +5,10 @@ import { useToast } from '../components/ui/Toast';
 import LoginFlow from '../components/auth/LoginFlow';
 import StatusBadge from '../components/ui/StatusBadge';
 import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
+import SuccessState from '../components/ui/SuccessState';
+import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
+import ErrorState from '../components/ui/ErrorState';
 import { QUANTITY_TIERS, TIME_WINDOWS, DK_LOCALITIES, BADGES } from '../data/mockPickups';
 
 /* --- Professional SVG Icon Components --- */
@@ -96,9 +100,14 @@ export default function PickupPage() {
   const { showToast } = useToast();
 
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [quantity, setQuantity] = useState('');
   const [locality, setLocality] = useState(() => user?.locality || '');
   const [timeWindow, setTimeWindow] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
+  const [showSlowNetwork, setShowSlowNetwork] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // Initialize locality from user profile
   React.useEffect(() => {
@@ -117,8 +126,8 @@ export default function PickupPage() {
     );
   }
 
-  // Loading state
-  if (loading) {
+  // Loading state (initial load only)
+  if (loading && pickups.length === 0) {
     return (
       <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
         <Skeleton width="200px" height="28px" rounded="lg" />
@@ -130,20 +139,34 @@ export default function PickupPage() {
   }
 
   const handleRequestPickup = () => {
-    if (!quantity) {
-      showToast('Please select a bag size', 'error');
-      return;
-    }
-    if (!timeWindow) {
-      showToast('Please select a time window', 'error');
+    const newErrors = {};
+    if (!quantity) newErrors.quantity = 'Please select a bag size';
+    if (!timeWindow) newErrors.timeWindow = 'Please select a preferred time';
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    requestPickup({ quantity, locality: locality || user?.locality || 'Kadri', timeWindow });
-    setShowRequestForm(false);
-    setQuantity('');
-    setTimeWindow('');
-    showToast('Pickup requested — we\'ll batch this with nearby requests and notify you of your pickup window.', 'success', 4000);
+    setSubmitting(true);
+    setSubmissionError(null);
+    setShowSlowNetwork(false);
+
+    const slowTimer = setTimeout(() => {
+      setShowSlowNetwork(true);
+    }, 5000);
+
+    setTimeout(() => {
+      clearTimeout(slowTimer);
+      setShowSlowNetwork(false);
+      requestPickup({ quantity, locality: locality || user?.locality || 'Kadri', timeWindow });
+      setSubmitting(false);
+      setShowRequestForm(false);
+      setShowSuccessModal(true);
+      setQuantity('');
+      setTimeWindow('');
+      setErrors({});
+      showToast('Pickup requested successfully!', 'success', 3000);
+    }, 700);
   };
 
   // Compute next badge tier for desktop visual polish
@@ -269,7 +292,7 @@ export default function PickupPage() {
                   {QUANTITY_TIERS.map(tier => (
                     <button
                       key={tier.id}
-                      onClick={() => setQuantity(tier.id)}
+                      onClick={() => { setQuantity(tier.id); setErrors(prev => ({ ...prev, quantity: null })); }}
                       className={`py-3 rounded-xl border text-center transition-all press-scale cursor-pointer
                         ${quantity === tier.id
                           ? 'border-primary bg-primary-light'
@@ -283,6 +306,7 @@ export default function PickupPage() {
                     </button>
                   ))}
                 </div>
+                {errors.quantity && <p className="text-xs text-orange-red mt-1 font-medium">{errors.quantity}</p>}
               </div>
 
               {/* Locality */}
@@ -311,7 +335,7 @@ export default function PickupPage() {
                   {TIME_WINDOWS.map(tw => (
                     <button
                       key={tw.id}
-                      onClick={() => setTimeWindow(tw.id)}
+                      onClick={() => { setTimeWindow(tw.id); setErrors(prev => ({ ...prev, timeWindow: null })); }}
                       className={`py-2.5 rounded-xl border text-xs font-semibold transition-all press-scale cursor-pointer
                         ${timeWindow === tw.id
                           ? 'border-primary bg-primary-light text-primary'
@@ -322,14 +346,41 @@ export default function PickupPage() {
                     </button>
                   ))}
                 </div>
+                {errors.timeWindow && <p className="text-xs text-orange-red mt-1 font-medium">{errors.timeWindow}</p>}
               </div>
+
+              {/* Slow Network Alert */}
+              {showSlowNetwork && (
+                <SlowNetworkAlert
+                  onRetry={handleRequestPickup}
+                  onCancel={() => { setShowSlowNetwork(false); setSubmitting(false); }}
+                />
+              )}
+
+              {/* Recoverable Error State */}
+              {submissionError && (
+                <ErrorState
+                  title="Request Failed"
+                  description={submissionError}
+                  onRetry={handleRequestPickup}
+                />
+              )}
 
               <button
                 onClick={handleRequestPickup}
+                disabled={submitting}
                 className="w-full py-3 bg-primary text-white font-semibold rounded-xl text-sm
-                  hover:bg-primary-dark active:scale-[0.98] transition-all shadow-fab cursor-pointer"
+                  hover:bg-primary-dark active:scale-[0.98] transition-all shadow-fab cursor-pointer
+                  disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Confirm Pickup
+                {submitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Scheduling…
+                  </>
+                ) : (
+                  'Confirm Pickup'
+                )}
               </button>
             </div>
           )}
@@ -368,11 +419,21 @@ export default function PickupPage() {
 
           {/* History list container */}
           <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-            {pickups.length === 0 ? (
-              <div className="text-center py-10 md:col-span-full md:bg-white md:rounded-2xl md:border md:border-border md:p-12">
-                <BagMediumIcon className="w-11 h-11 text-muted-light mx-auto mb-3" />
-                <p className="text-sm font-medium text-muted">No pickups yet</p>
-                <p className="text-xs text-muted-light">Request your first pickup above!</p>
+            {loading ? (
+              <>
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+              </>
+            ) : pickups.length === 0 ? (
+              <div className="md:col-span-full">
+                <EmptyState
+                  title="No pickups yet"
+                  description="Request a doorstep pickup for your dry recyclable plastic waste."
+                  actionLabel="Request Home Pickup"
+                  onAction={() => setShowRequestForm(true)}
+                />
               </div>
             ) : (
               pickups.map(pickup => {
@@ -453,6 +514,20 @@ export default function PickupPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Confirmation Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[2000] bg-black/60 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-elevated border border-border">
+            <SuccessState
+              title="Pickup Scheduled!"
+              description="Our collection vehicle will visit your locality during the selected window. We'll send an SMS when the driver is nearby."
+              actionLabel="Done"
+              onAction={() => setShowSuccessModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

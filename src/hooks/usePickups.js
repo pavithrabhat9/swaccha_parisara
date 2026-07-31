@@ -59,6 +59,7 @@ export function usePickups() {
       status: 'Requested',
       pointsEarned: null,
       locality: locality,
+      timeWindow: timeWindow,
     };
     setPickups(prev => [newPickup, ...prev]);
     return newPickup;

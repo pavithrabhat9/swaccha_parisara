@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/ui/Toast';
 import StatusBadge from '../components/ui/StatusBadge';
+import EmptyState from '../components/ui/EmptyState';
+import SuccessState from '../components/ui/SuccessState';
+import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
+import ErrorState from '../components/ui/ErrorState';
 import { CADENCE_OPTIONS, VOLUME_OPTIONS } from '../data/mockBusinesses';
 
 /**
@@ -22,6 +26,10 @@ export default function BusinessPage() {
   });
 
   const [step, setStep] = useState(business ? 'dashboard' : 'signup'); // 'signup' | 'schedule' | 'dashboard'
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [showSlowNetwork, setShowSlowNetwork] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
   const [form, setForm] = useState({
     name: '', address: '', contactPerson: '', phone: '',
     cadence: '', preferredDate: '', volumeEstimate: '',
@@ -49,18 +57,32 @@ export default function BusinessPage() {
     if (!form.preferredDate.trim()) newErrors.preferredDate = 'Enter preferred date';
     if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
 
-    const cadenceLabel = CADENCE_OPTIONS.find(c => c.id === form.cadence)?.label || form.cadence;
-    const newBusiness = {
-      ...form,
-      id: `BIZ-${Date.now()}`,
-      isPaused: false,
-      nextPickup: getNextPickupDate(),
-      history: [],
-    };
-    setBusiness(newBusiness);
-    localStorage.setItem('swachha_business', JSON.stringify(newBusiness));
-    setStep('dashboard');
-    showToast(`Your recurring ${cadenceLabel.toLowerCase()} pickup is set. You can pause anytime.`, 'success', 4000);
+    setSubmitting(true);
+    setSubmissionError(null);
+    setShowSlowNetwork(false);
+
+    const slowTimer = setTimeout(() => {
+      setShowSlowNetwork(true);
+    }, 5000);
+
+    setTimeout(() => {
+      clearTimeout(slowTimer);
+      setShowSlowNetwork(false);
+      const cadenceLabel = CADENCE_OPTIONS.find(c => c.id === form.cadence)?.label || form.cadence;
+      const newBusiness = {
+        ...form,
+        id: `BIZ-${Date.now()}`,
+        isPaused: false,
+        nextPickup: getNextPickupDate(),
+        history: [],
+      };
+      setBusiness(newBusiness);
+      localStorage.setItem('swachha_business', JSON.stringify(newBusiness));
+      setSubmitting(false);
+      setStep('dashboard');
+      setShowSuccessModal(true);
+      showToast(`Your recurring ${cadenceLabel.toLowerCase()} pickup is set. You can pause anytime.`, 'success', 4000);
+    }, 600);
   };
 
   const handleSkip = () => {
@@ -140,9 +162,14 @@ export default function BusinessPage() {
         </div>
 
         {/* History */}
-        {business.history && business.history.length > 0 && (
-          <div>
-            <h3 className="text-sm font-bold text-black mb-3">Pickup History</h3>
+        <div>
+          <h3 className="text-sm font-bold text-black mb-3">Pickup History</h3>
+          {!business.history || business.history.length === 0 ? (
+            <EmptyState
+              title="No pickups yet"
+              description="Your collection history will appear here once your scheduled cycles begin."
+            />
+          ) : (
             <div className="space-y-2">
               {business.history.map((entry, idx) => (
                 <div key={idx} className="bg-surface rounded-xl border border-border p-3 flex items-center justify-between shadow-xs">
@@ -153,8 +180,8 @@ export default function BusinessPage() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
@@ -305,13 +332,53 @@ export default function BusinessPage() {
         </div>
       </div>
 
+      {/* Slow Network Alert */}
+      {showSlowNetwork && (
+        <SlowNetworkAlert
+          onRetry={handleScheduleSubmit}
+          onCancel={() => { setShowSlowNetwork(false); setSubmitting(false); }}
+        />
+      )}
+
+      {/* Recoverable Error State */}
+      {submissionError && (
+        <ErrorState
+          title="Schedule Failed"
+          description={submissionError}
+          onRetry={handleScheduleSubmit}
+        />
+      )}
+
       <button
         onClick={handleScheduleSubmit}
+        disabled={submitting}
         className="w-full py-3.5 bg-primary text-white font-semibold rounded-xl text-sm
-          hover:bg-primary-dark active:scale-[0.98] transition-all shadow-fab"
+          hover:bg-primary-dark active:scale-[0.98] transition-all shadow-fab
+          disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        Confirm Schedule
+        {submitting ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Saving Schedule…
+          </>
+        ) : (
+          'Confirm Schedule'
+        )}
       </button>
+
+      {/* Success Confirmation Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[2000] bg-black/60 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-elevated border border-border">
+            <SuccessState
+              title="Schedule Active!"
+              description="Your recurring commercial plastic waste collection has been scheduled. Our vehicle will arrive on the selected frequency."
+              actionLabel="Go to Dashboard"
+              onAction={() => setShowSuccessModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,6 +3,11 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { useReports } from '../hooks/useReports';
 import { useToast } from '../components/ui/Toast';
+import SuccessState from '../components/ui/SuccessState';
+import ErrorState from '../components/ui/ErrorState';
+import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
+import PermissionAlert from '../components/ui/PermissionAlert';
+import { useNetworkStatus } from '../components/ui/OfflineBanner';
 import { WASTE_TYPE_OPTIONS } from '../data/mockReports';
 import 'leaflet/dist/leaflet.css';
 
@@ -37,22 +42,22 @@ function LocationPicker({ position, setPosition }) {
 export default function ReportPage() {
   const { addReport } = useReports();
   const { showToast } = useToast();
+  const { isOnline } = useNetworkStatus();
   const fileInputRef = useRef(null);
 
-  const [step, setStep] = useState('form'); // 'form' | 'success'
+  const [step, setStep] = useState('form'); // 'form' | 'success' | 'offlineSaved'
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [location, setLocation] = useState(null);
-  const [locationStatus, setLocationStatus] = useState('idle'); // 'idle' | 'detecting' | 'done' | 'manual'
+  const [locationStatus, setLocationStatus] = useState(() =>
+    typeof navigator !== 'undefined' && navigator.geolocation ? 'detecting' : 'manual'
+  ); // 'idle' | 'detecting' | 'done' | 'manual'
   const [wasteType, setWasteType] = useState('');
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
+  const [showSlowNetwork, setShowSlowNetwork] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // Auto-detect GPS on mount
-  useEffect(() => {
-    detectLocation();
-  }, []);
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
@@ -72,6 +77,22 @@ export default function ReportPage() {
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   };
+
+  // Auto-detect GPS on mount without synchronous setState
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationStatus('done');
+      },
+      () => {
+        setLocationStatus('manual');
+        setLocation({ lat: 12.9141, lng: 74.8560 }); // Default Mangaluru
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
 
   const handlePhotoSelect = (e) => {
     const file = e.target.files?.[0];
@@ -96,8 +117,27 @@ export default function ReportPage() {
     }
 
     setSubmitting(true);
-    // Simulate brief submission delay
+    setSubmissionError(null);
+    setShowSlowNetwork(false);
+
+    // If offline, save to offline queue state
+    if (!isOnline) {
+      setTimeout(() => {
+        setSubmitting(false);
+        setStep('offlineSaved');
+        showToast('Report saved offline. It will submit automatically when you reconnect.', 'info', 4000);
+      }, 500);
+      return;
+    }
+
+    const slowTimer = setTimeout(() => {
+      setShowSlowNetwork(true);
+    }, 5000);
+
+    // Simulate submission
     setTimeout(() => {
+      clearTimeout(slowTimer);
+      setShowSlowNetwork(false);
       addReport({
         lat: location?.lat || 12.9141,
         lng: location?.lng || 74.8560,
@@ -105,6 +145,7 @@ export default function ReportPage() {
         wasteType,
         note: note.trim(),
         photoUrl: photoPreview || 'https://picsum.photos/seed/newreport/400/300',
+        photoName: photo?.name,
       });
       setSubmitting(false);
       setStep('success');
@@ -118,37 +159,41 @@ export default function ReportPage() {
     setWasteType('');
     setNote('');
     setErrors({});
+    setSubmissionError(null);
+    setShowSlowNetwork(false);
     detectLocation();
   };
+
+  // === OFFLINE SAVED SCREEN ===
+  if (step === 'offlineSaved') {
+    return (
+      <SuccessState
+        title="Saved Offline"
+        description="We've saved your report locally. It will be automatically submitted to our tracking map as soon as you're back online."
+        actionLabel="Report Another"
+        onAction={resetForm}
+      />
+    );
+  }
 
   // === SUCCESS SCREEN ===
   if (step === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] px-6 animate-fade-in-up">
-        {/* Checkmark animation */}
-        <div className="w-24 h-24 rounded-full bg-primary-light flex items-center justify-center mb-6 animate-scale-in">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#38761d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" style={{ strokeDasharray: 24, strokeDashoffset: 0, animation: 'checkmark 0.5s ease-out 0.3s both' }}/>
-          </svg>
-        </div>
-
-        <h2 className="text-2xl font-bold text-black mb-2 text-center">
-          Report Added
-        </h2>
-        <p className="text-sm text-muted text-center max-w-xs mb-2 leading-relaxed">
-          Thanks — this has been added to our tracking map. We'll notify you if you're logged in when it's cleared.
-        </p>
-
-        {/* Photo preview */}
+      <SuccessState
+        title="Report Added"
+        description="Thanks — this has been added to our tracking map. We'll notify you if you're logged in when it's cleared."
+        actionLabel="Report Another"
+        onAction={resetForm}
+      >
         {photoPreview && (
           <img
             src={photoPreview}
             alt="Reported waste"
-            className="w-full max-w-xs h-40 object-cover rounded-xl shadow-card border border-border mb-6"
+            className="w-full max-w-xs h-40 object-cover rounded-xl shadow-card border border-border mb-4 mx-auto"
           />
         )}
 
-        <div className="bg-surface rounded-xl border border-border p-4 w-full max-w-xs mb-6 shadow-card">
+        <div className="bg-surface rounded-xl border border-border p-4 w-full max-w-xs mx-auto shadow-card">
           <div className="flex justify-between items-center py-1.5 border-b border-border-light">
             <span className="text-xs text-muted">Type</span>
             <span className="text-xs font-semibold text-black">{wasteType}</span>
@@ -164,17 +209,7 @@ export default function ReportPage() {
             </span>
           </div>
         </div>
-
-        <div className="flex gap-3 w-full max-w-xs">
-          <button
-            onClick={resetForm}
-            className="flex-1 py-3 bg-surface border border-border rounded-xl text-sm font-semibold text-black
-              hover:bg-border-light active:scale-[0.98] transition-all"
-          >
-            Report Another
-          </button>
-        </div>
-      </div>
+      </SuccessState>
     );
   }
 
@@ -250,21 +285,28 @@ export default function ReportPage() {
             </button>
           </div>
         )}
-        {(locationStatus === 'manual' || locationStatus === 'done') && locationStatus === 'manual' && (
-          <div className="rounded-xl overflow-hidden border border-border shadow-card" style={{ height: '160px' }}>
-            <MapContainer
-              center={[location?.lat || 12.9141, location?.lng || 74.8560]}
-              zoom={14}
-              scrollWheelZoom={true}
-              zoomControl={false}
-              style={{ height: '100%', width: '100%' }}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <LocationPicker position={location} setPosition={setLocation} />
-            </MapContainer>
-            <p className="text-[10px] text-muted text-center py-1 bg-surface border-t border-border">
-              Tap the map to place your pin
-            </p>
+        {locationStatus === 'manual' && (
+          <div className="space-y-2">
+            <PermissionAlert
+              title="Location access denied"
+              message="We couldn't detect your GPS automatically. Tap on the map to place a pin manually."
+              fallbackLabel="Place Pin Below"
+            />
+            <div className="rounded-xl overflow-hidden border border-border shadow-card" style={{ height: '160px' }}>
+              <MapContainer
+                center={[location?.lat || 12.9141, location?.lng || 74.8560]}
+                zoom={14}
+                scrollWheelZoom={true}
+                zoomControl={false}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <LocationPicker position={location} setPosition={setLocation} />
+              </MapContainer>
+              <p className="text-[10px] text-muted text-center py-1 bg-surface border-t border-border">
+                Tap the map to place your pin
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -309,6 +351,23 @@ export default function ReportPage() {
         />
         <p className="text-[10px] text-muted-light text-right mt-0.5">{note.length}/200</p>
       </div>
+
+      {/* Slow Network Alert */}
+      {showSlowNetwork && (
+        <SlowNetworkAlert
+          onRetry={handleSubmit}
+          onCancel={() => { setShowSlowNetwork(false); setSubmitting(false); }}
+        />
+      )}
+
+      {/* Recoverable Submission Error State */}
+      {submissionError && (
+        <ErrorState
+          title="Submission Failed"
+          description={submissionError}
+          onRetry={handleSubmit}
+        />
+      )}
 
       {/* === SUBMIT === */}
       <button

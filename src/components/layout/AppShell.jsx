@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import TopBar from './TopBar';
+import OfflineBanner from '../ui/OfflineBanner';
 
 /**
  * App shell layout wrapper.
@@ -14,6 +15,9 @@ export default function AppShell({ children }) {
 
   return (
     <div className="flex flex-col min-h-screen min-h-dvh bg-cream">
+      {/* Persistent Offline Banner */}
+      <OfflineBanner />
+
       {/* Top bar (mobile only, hidden on map page) */}
       <TopBar />
 

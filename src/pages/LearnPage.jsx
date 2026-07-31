@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { plasticTypes, commonlyConfused, localCoastalContent } from '../data/learnContent';
+import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
 
 /**
  * LearnPage — Educational content about plastic segregation and recycling.
@@ -9,6 +10,26 @@ import { plasticTypes, commonlyConfused, localCoastalContent } from '../data/lea
  */
 export default function LearnPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto px-5 pt-6 pb-8 space-y-6">
+        <Skeleton width="180px" height="28px" rounded="lg" />
+        <Skeleton width="100%" height="20px" rounded="lg" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
 
   const recyclableBadge = (type) => {
     const colors = {

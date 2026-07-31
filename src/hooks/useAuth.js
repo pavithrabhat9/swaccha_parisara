@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 const AUTH_STORAGE_KEY = 'swachha_auth';
 
@@ -8,24 +8,24 @@ const AUTH_STORAGE_KEY = 'swachha_auth';
  * Session persists in localStorage so refreshing doesn't log out.
  */
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authStep, setAuthStep] = useState('phone'); // 'phone' | 'otp' | 'setup' | 'done'
-
-  // Restore session on mount
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed?.phone) {
-          setUser(parsed);
-          setIsLoggedIn(true);
-          setAuthStep('done');
-        }
-      }
-    } catch { /* ignore */ }
-  }, []);
+      return stored ? JSON.parse(stored) : null;
+    } catch { return null; }
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      return Boolean(stored && JSON.parse(stored)?.phone);
+    } catch { return false; }
+  });
+  const [authStep, setAuthStep] = useState(() => {
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      return stored && JSON.parse(stored)?.phone ? 'done' : 'phone';
+    } catch { return 'phone'; }
+  });
 
   // "Send" OTP (stub — just advances step)
   const sendOtp = useCallback((phone) => {

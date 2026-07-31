@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useReports } from '../hooks/useReports';
 import StatusBadge from '../components/ui/StatusBadge';
 import { SkeletonMap } from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
+import ErrorState from '../components/ui/ErrorState';
 import { WASTE_TYPE_OPTIONS, STATUS_OPTIONS } from '../data/mockReports';
 import 'leaflet/dist/leaflet.css';
 
@@ -71,6 +74,7 @@ function MapSetup() {
  * Filter bar overlay for waste type and status filtering.
  */
 export default function MapPage() {
+  const navigate = useNavigate();
   const { filteredReports, loading, filters, setFilters } = useReports();
   const [userLocation, setUserLocation] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -99,8 +103,33 @@ export default function MapPage() {
     return <SkeletonMap className="fixed inset-0 md:top-16" />;
   }
 
+  if (!filteredReports) {
+    return (
+      <div className="fixed inset-0 md:top-16 flex items-center justify-center p-4">
+        <ErrorState
+          title="Map Unreachable"
+          description="Could not load plastic waste reports for the map."
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 md:top-16 z-0">
+      {/* Empty State overlay if 0 reports match current filters */}
+      {markers.length === 0 && (
+        <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 z-[900] max-w-sm mx-auto">
+          <EmptyState
+            title="No reports here yet"
+            description="Try adjusting your filters or be the first to report plastic waste in this area!"
+            actionLabel="Report Plastic Waste"
+            onAction={() => navigate('/report')}
+            className="bg-white/95 glass shadow-elevated"
+          />
+        </div>
+      )}
+
       {/* Filter bar overlay */}
       <div className="absolute top-3 left-3 right-3 md:right-auto md:w-80 z-[1000] flex flex-col gap-2">
         {/* Filter toggle button */}
