@@ -100,12 +100,12 @@ export default function MapPage() {
   );
 
   if (loading) {
-    return <SkeletonMap className="fixed inset-0 md:top-16" />;
+    return <SkeletonMap className="fixed inset-0 top-[52px] md:top-16" />;
   }
 
   if (!filteredReports) {
     return (
-      <div className="fixed inset-0 md:top-16 flex items-center justify-center p-4">
+      <div className="fixed inset-0 top-[52px] md:top-16 flex items-center justify-center p-4">
         <ErrorState
           title="Map Unreachable"
           description="Could not load plastic waste reports for the map."
@@ -116,7 +116,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="fixed inset-0 md:top-16 z-0">
+    <div className="fixed inset-0 top-[52px] md:top-16 z-0">
       {/* Empty State overlay if 0 reports match current filters */}
       {markers.length === 0 && (
         <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 z-[900] max-w-sm mx-auto">
