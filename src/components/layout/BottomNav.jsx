@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const NAV_ITEMS = [
   {
     path: '/',
-    label: 'Map',
+    labelKey: 'map',
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#38761d' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   },
   {
     path: '/report',
-    label: 'Report',
+    labelKey: 'report',
     isAction: true,
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#fff' : '#38761d'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -25,7 +25,7 @@ const NAV_ITEMS = [
   },
   {
     path: '/pickup',
-    label: 'Pickup',
+    labelKey: 'pickup',
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#38761d' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -36,7 +36,7 @@ const NAV_ITEMS = [
   },
   {
     path: '/learn',
-    label: 'Learn',
+    labelKey: 'learn',
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#38761d' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
@@ -63,7 +63,7 @@ const LANGUAGES = [
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showLangMenu, setShowLangMenu] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
 
@@ -95,7 +95,7 @@ export default function BottomNav() {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-white text-sm font-bold">♻</span>
           </div>
-          <span className="text-lg font-bold text-primary tracking-tight">Swachha Parisara</span>
+          <span className="text-lg font-bold text-primary tracking-tight">{t('appTitle')}</span>
         </button>
 
         {/* Nav items */}
@@ -115,7 +115,7 @@ export default function BottomNav() {
               `}
             >
               {item.icon(isActive)}
-              {item.label}
+              {t(item.labelKey)}
             </button>
           );
         })}
@@ -183,7 +183,7 @@ export default function BottomNav() {
                     flex flex-col items-center justify-center -mt-4 press-scale touch-target
                     ${isActive ? '' : ''}
                   `}
-                  aria-label={item.label}
+                  aria-label={t(item.labelKey)}
                 >
                   <div className={`
                     w-14 h-14 rounded-2xl flex items-center justify-center shadow-fab
@@ -193,7 +193,7 @@ export default function BottomNav() {
                     {item.icon(true)}
                   </div>
                   <span className={`text-[10px] font-semibold mt-0.5 ${isActive ? 'text-primary' : 'text-muted'}`}>
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </button>
               );
@@ -204,11 +204,11 @@ export default function BottomNav() {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 touch-target press-scale"
-                aria-label={item.label}
+                aria-label={t(item.labelKey)}
               >
                 {item.icon(isActive)}
                 <span className={`text-[10px] font-semibold transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-light'}`}>
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
                 {/* Active dot indicator */}
                 <div className={`w-1 h-1 rounded-full transition-all duration-200 ${isActive ? 'bg-primary scale-100' : 'scale-0'}`} />

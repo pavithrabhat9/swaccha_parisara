@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useReports } from '../hooks/useReports';
@@ -74,6 +75,7 @@ function MapSetup() {
  * Filter bar overlay for waste type and status filtering.
  */
 export default function MapPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { filteredReports, loading, filters, setFilters } = useReports();
   const [userLocation, setUserLocation] = useState(null);
@@ -107,8 +109,8 @@ export default function MapPage() {
     return (
       <div className="fixed inset-0 top-[52px] md:top-16 flex items-center justify-center p-4">
         <ErrorState
-          title="Map Unreachable"
-          description="Could not load plastic waste reports for the map."
+          title={t('map_unavailable_title')}
+          description={t('map_unavailable_description')}
           onRetry={() => window.location.reload()}
         />
       </div>
@@ -121,9 +123,9 @@ export default function MapPage() {
       {markers.length === 0 && (
         <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 z-[900] max-w-sm mx-auto">
           <EmptyState
-            title="No reports here yet"
-            description="Try adjusting your filters or be the first to report plastic waste in this area!"
-            actionLabel="Report Plastic Waste"
+            title={t('map_no_reports_title')}
+            description={t('map_no_reports_description')}
+            actionLabel={t('map_report_plastic_waste')}
             onAction={() => navigate('/report')}
             className="bg-white/95 glass shadow-elevated"
           />
@@ -142,7 +144,7 @@ export default function MapPage() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
           </svg>
-          Filter
+          {t('filter')}
           {(filters.wasteType !== 'All' || filters.status !== 'All') && (
             <span className="w-2 h-2 rounded-full bg-primary" />
           )}
@@ -153,7 +155,7 @@ export default function MapPage() {
           <div className="bg-surface/95 glass rounded-xl shadow-elevated border border-border p-3 animate-slide-down space-y-3">
             {/* Waste type pills */}
             <div>
-              <p className="text-[10px] font-semibold text-muted uppercase tracking-wide mb-1.5">Waste Type</p>
+              <p className="text-[10px] font-semibold text-muted uppercase tracking-wide mb-1.5">{t('map_filter_waste_type')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {['All', ...WASTE_TYPE_OPTIONS].map(type => (
                   <button
@@ -173,7 +175,7 @@ export default function MapPage() {
 
             {/* Status pills */}
             <div>
-              <p className="text-[10px] font-semibold text-muted uppercase tracking-wide mb-1.5">Status</p>
+              <p className="text-[10px] font-semibold text-muted uppercase tracking-wide mb-1.5">{t('map_filter_status')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {['All', ...STATUS_OPTIONS].map(status => (
                   <button
@@ -197,7 +199,7 @@ export default function MapPage() {
                 onClick={() => setFilters({ wasteType: 'All', status: 'All' })}
                 className="text-xs font-semibold text-orange-red hover:underline"
               >
-                Clear all filters
+                {t('clearFilters')}
               </button>
             )}
           </div>
@@ -207,26 +209,26 @@ export default function MapPage() {
       {/* Report count badge */}
       <div className="absolute bottom-22 md:bottom-6 left-3 z-[1000]">
         <div className="bg-surface/95 glass px-3 py-1.5 rounded-full shadow-elevated border border-border text-xs font-semibold text-muted">
-          {filteredReports.length} report{filteredReports.length !== 1 ? 's' : ''}
+          {filteredReports.length} {t('reports')}
         </div>
       </div>
 
       {/* Legend */}
       <div className="absolute bottom-22 md:bottom-6 right-3 z-[1000]">
         <div className="bg-surface/95 glass px-3 py-2 rounded-xl shadow-elevated border border-border space-y-1">
-          <p className="text-[9px] font-bold text-muted uppercase tracking-wider">Density</p>
+          <p className="text-[9px] font-bold text-muted uppercase tracking-wider">{t('density')}</p>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               <div className="w-2.5 h-2.5 rounded-full bg-yellow border-2 border-yellow" />
-              <span className="text-[10px] text-muted">Low</span>
+              <span className="text-[10px] text-muted">{t('low')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-[#f0851e] border-2 border-[#d4710f]" />
-              <span className="text-[10px] text-muted">Mid</span>
+              <span className="text-[10px] text-muted">{t('mid')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3.5 h-3.5 rounded-full bg-orange-red border-2 border-[#d9431a]" />
-              <span className="text-[10px] text-muted">High</span>
+              <span className="text-[10px] text-muted">{t('high')}</span>
             </div>
           </div>
         </div>
@@ -274,12 +276,12 @@ export default function MapPage() {
                 <div className="flex items-center justify-between mb-1.5">
                   <StatusBadge status={report.status} />
                   <span className="text-[10px] font-semibold text-[#9ca3af]">
-                    {report.reportCount} report{report.reportCount !== 1 ? 's' : ''}
+                    {report.reportCount} {t('reports')}
                   </span>
                 </div>
 
                 <p className="text-[10px] text-[#9ca3af]">
-                  First reported {report.daysSinceFirst} day{report.daysSinceFirst !== 1 ? 's' : ''} ago
+                  {t('firstReported')} {report.daysSinceFirst} {t('daysAgo')}
                 </p>
               </div>
             </Popup>

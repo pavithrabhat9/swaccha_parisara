@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-const PAGE_TITLES = {
-  '/': 'Waste Map',
-  '/report': 'Report Plastic Waste',
-  '/pickup': 'Home Pickup',
-  '/learn': 'Learn & Segregate',
-  '/business': 'Business Pickup',
+const PAGE_TITLE_KEYS = {
+  '/': 'wasteMap',
+  '/report': 'reportPlasticWaste',
+  '/pickup': 'homePickup',
+  '/learn': 'learnAndSegregate',
+  '/business': 'business',
 };
 
 const LANGUAGES = [
@@ -24,9 +24,9 @@ const LANGUAGES = [
  */
 export default function TopBar() {
   const location = useLocation();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showLangMenu, setShowLangMenu] = useState(false);
-  const pageTitle = PAGE_TITLES[location.pathname] || 'Swachha Parisara';
+  const pageTitle = PAGE_TITLE_KEYS[location.pathname] ? t(PAGE_TITLE_KEYS[location.pathname]) : t('appTitle');
   const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
 
   // Close dropdown when clicking outside
@@ -51,7 +51,7 @@ export default function TopBar() {
     >
       <div className="flex-1 min-w-0">
         <h1 className="text-sm font-bold text-primary tracking-tight truncate">
-          Swachha Parisara
+          {t('appTitle')}
         </h1>
         <p className="text-[11px] font-medium text-muted -mt-0.5 truncate">
           {pageTitle}
