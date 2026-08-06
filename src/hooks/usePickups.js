@@ -1,24 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { mockPickupHistory, mockUserProfile, getBadgeForPoints, QUANTITY_TIERS } from '../data/mockPickups';
-
-const PICKUP_STORAGE_KEY = 'swachha_pickups';
-const PROFILE_STORAGE_KEY = 'swachha_profile';
-
-function loadPickups() {
-  try {
-    const stored = localStorage.getItem(PICKUP_STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
-  return [...mockPickupHistory];
-}
-
-function loadProfile() {
-  try {
-    const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
-  return { ...mockUserProfile };
-}
+import { getBadgeForPoints, QUANTITY_TIERS } from '../data/mockPickups';
+import { pickupApi } from '../services/pickupApi';
 
 /**
  * Custom hook for managing home pickup requests and points.
@@ -31,20 +13,33 @@ export function usePickups() {
 
   // Initial load with simulated delay
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setPickups(loadPickups());
-      setProfile(loadProfile());
-      setLoading(false);
-    }, 350);
-    return () => clearTimeout(timer);
+    let mounted = true;
+    const load = async () => {
+      const [loadedPickups, loadedProfile] = await Promise.all([
+        pickupApi.getPickups(),
+        pickupApi.getProfile()
+      ]);
+      if (mounted) {
+        // Keep the simulated delay just to not change behavior
+        setTimeout(() => {
+          if (mounted) {
+            setPickups(loadedPickups);
+            setProfile(loadedProfile);
+            setLoading(false);
+          }
+        }, 350);
+      }
+    };
+    load();
+    return () => { mounted = false; };
   }, []);
 
   // Persist changes
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem(PICKUP_STORAGE_KEY, JSON.stringify(pickups));
+      pickupApi.savePickups(pickups);
       if (profile) {
-        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+        pickupApi.saveProfile(profile);
       }
     }
   }, [pickups, profile, loading]);

@@ -7,6 +7,8 @@ import SuccessState from '../components/ui/SuccessState';
 import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
 import ErrorState from '../components/ui/ErrorState';
 import { CADENCE_OPTIONS, VOLUME_OPTIONS } from '../data/mockBusinesses';
+import { getNextPickupDate } from '../utils/dateUtils';
+import { businessApi } from '../services/businessApi';
 
 /**
  * BusinessPage — Industry/Business recurring pickup schedule.
@@ -17,12 +19,8 @@ export default function BusinessPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  // Check if business is already set up (localStorage)
   const [business, setBusiness] = useState(() => {
-    try {
-      const stored = localStorage.getItem('swachha_business');
-      return stored ? JSON.parse(stored) : null;
-    } catch { return null; }
+    return businessApi.getSubscription();
   });
 
   const [step, setStep] = useState(business ? 'dashboard' : 'signup'); // 'signup' | 'schedule' | 'dashboard'
@@ -77,7 +75,7 @@ export default function BusinessPage() {
         history: [],
       };
       setBusiness(newBusiness);
-      localStorage.setItem('swachha_business', JSON.stringify(newBusiness));
+      businessApi.createSubscription(newBusiness);
       setSubmitting(false);
       setStep('dashboard');
       setShowSuccessModal(true);
@@ -89,22 +87,17 @@ export default function BusinessPage() {
     const updated = { ...business, history: [{ date: business.nextPickup, status: 'Skipped' }, ...business.history] };
     updated.nextPickup = getNextPickupDate();
     setBusiness(updated);
-    localStorage.setItem('swachha_business', JSON.stringify(updated));
+    businessApi.updateSubscription(updated);
     showToast('This pickup has been skipped — we\'ve been notified.', 'info');
   };
 
   const handleTogglePause = () => {
     const updated = { ...business, isPaused: !business.isPaused };
     setBusiness(updated);
-    localStorage.setItem('swachha_business', JSON.stringify(updated));
+    businessApi.updateSubscription(updated);
     showToast(updated.isPaused ? 'Subscription paused.' : 'Subscription resumed!', updated.isPaused ? 'info' : 'success');
   };
 
-  function getNextPickupDate() {
-    const d = new Date();
-    d.setDate(d.getDate() + 14);
-    return d.toISOString().split('T')[0];
-  }
 
   // === DASHBOARD VIEW ===
   if (step === 'dashboard' && business) {

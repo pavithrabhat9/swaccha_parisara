@@ -1,6 +1,5 @@
-import { useState, useCallback } from 'react';
-
-const AUTH_STORAGE_KEY = 'swachha_auth';
+import { useState, useCallback, useEffect } from 'react';
+import { authApi } from '../services/authApi';
 
 /**
  * Lightweight phone auth stub for Phase 0.
@@ -8,24 +7,27 @@ const AUTH_STORAGE_KEY = 'swachha_auth';
  * Session persists in localStorage so refreshing doesn't log out.
  */
 export function useAuth() {
-  const [user, setUser] = useState(() => {
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch { return null; }
-  });
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return Boolean(stored && JSON.parse(stored)?.phone);
-    } catch { return false; }
-  });
-  const [authStep, setAuthStep] = useState(() => {
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return stored && JSON.parse(stored)?.phone ? 'done' : 'phone';
-    } catch { return 'phone'; }
-  });
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authStep, setAuthStep] = useState('phone'); // 'phone' | 'otp' | 'setup' | 'done'
+
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      const storedUser = await authApi.getUser();
+      if (mounted) {
+        if (storedUser) {
+          setUser(storedUser);
+          if (storedUser.phone) {
+            setIsLoggedIn(true);
+            setAuthStep('done');
+          }
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
+  }, []);
 
   // "Send" OTP (stub — just advances step)
   const sendOtp = useCallback((phone) => {
@@ -39,25 +41,20 @@ export function useAuth() {
   }, []);
 
   // Verify OTP (stub — accepts any 4 digits)
-  const verifyOtp = useCallback((code) => {
+  const verifyOtp = useCallback(async (code) => {
     // Phase 0 stub: accept any 4-digit code
     if (!code || code.length !== 4 || !/^\d{4}$/.test(code)) {
       return { success: false, error: 'Please enter a 4-digit code' };
     }
 
-    // Check if user already exists (returning user)
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed?.name) {
-          setUser(parsed);
-          setIsLoggedIn(true);
-          setAuthStep('done');
-          return { success: true, isReturning: true };
-        }
-      }
-    } catch { /* ignore */ }
+    // We check the API asynchronously
+    const storedUser = await authApi.getUser();
+    if (storedUser && storedUser.name) {
+      setUser(storedUser);
+      setIsLoggedIn(true);
+      setAuthStep('done');
+      return { success: true, isReturning: true };
+    }
 
     setAuthStep('setup');
     return { success: true, isReturning: false };
@@ -75,7 +72,7 @@ export function useAuth() {
     setUser(fullUser);
     setIsLoggedIn(true);
     setAuthStep('done');
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(fullUser));
+    authApi.saveUser(fullUser);
     return { success: true };
   }, [user]);
 
@@ -83,7 +80,7 @@ export function useAuth() {
     setUser(null);
     setIsLoggedIn(false);
     setAuthStep('phone');
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    authApi.removeUser();
   }, []);
 
   return {

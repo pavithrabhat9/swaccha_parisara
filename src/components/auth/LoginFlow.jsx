@@ -31,9 +31,9 @@ export default function LoginFlow({ authHook }) {
     if (!result.success) setError(result.error);
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     setError('');
-    const result = verifyOtp(otp);
+    const result = await verifyOtp(otp);
     if (!result.success) setError(result.error);
   };
 

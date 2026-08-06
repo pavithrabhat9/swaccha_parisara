@@ -1,24 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { initialMockReports, generateReportId } from '../data/mockReports';
-
-const STORAGE_KEY = 'swachha_reports';
-
-function loadReports() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed.length > 0) return parsed;
-    }
-  } catch { /* ignore */ }
-  return [...initialMockReports];
-}
-
-function saveReports(reports) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
-  } catch { /* ignore */ }
-}
+import { reportApi } from '../services/reportApi';
 
 /**
  * Custom hook for managing plastic waste reports.
@@ -32,24 +13,35 @@ export function useReports() {
 
   // Initial load with simulated delay for skeleton states
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setReports(loadReports());
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
+    let mounted = true;
+    const load = async () => {
+      const loadedReports = await reportApi.getReports();
+      if (mounted) {
+        setTimeout(() => {
+          if (mounted) {
+            setReports(loadedReports);
+            setLoading(false);
+          }
+        }, 400);
+      }
+    };
+    load();
+    return () => { mounted = false; };
   }, []);
 
   // Persist whenever reports change
   useEffect(() => {
     if (!loading && reports.length > 0) {
-      saveReports(reports);
+      reportApi.saveReports(reports);
     }
   }, [reports, loading]);
 
   // Add a new report
   const addReport = useCallback((reportData) => {
+    // Generate a simple ID locally
+    const generateId = () => `RP-${String(Date.now()).slice(-6)}`;
     const newReport = {
-      id: generateReportId(),
+      id: generateId(),
       lat: reportData.lat || 12.9141,
       lng: reportData.lng || 74.8560,
       placeName: reportData.placeName || 'Unknown Location',
