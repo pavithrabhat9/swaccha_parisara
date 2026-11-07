@@ -79,19 +79,20 @@ export const GlobeIcon = ({ className = "w-4 h-4" }) => (
 );
 
 /**
- * BrandMark — custom Swachha Parisara mark (leaf + circular loop in brand green).
+ * BrandMark — custom Swachha Parisara mark (leaf + circular loop).
+ * Supports `inverted` for placement on the primary green top header.
  */
-export const BrandMark = ({ className = "w-9 h-9" }) => (
+export const BrandMark = ({ className = "w-9 h-9", inverted = false }) => (
   <svg className={className} viewBox="0 0 36 36" fill="none" aria-hidden="true">
-    <rect width="36" height="36" rx="11" fill="#38761d" />
+    <rect width="36" height="36" rx="11" fill={inverted ? "#ffffff" : "#38761d"} />
     <path
       d="M25.5 13.5C25.5 19.5 20.5 24.5 13.5 24.5C11.8 24.5 10.5 23.8 10.5 22C10.5 16 15.5 11 22.5 11C24.2 11 25.5 11.8 25.5 13.5Z"
-      fill="#e3eedd"
-      fillOpacity="0.22"
+      fill={inverted ? "#38761d" : "#e3eedd"}
+      fillOpacity={inverted ? "0.16" : "0.22"}
     />
     <path
       d="M12 23.5C14.5 19.5 18.5 16.5 24 14.5M24 14.5C24 20.2 19.6 24.2 13.5 24.2C11.9 24.2 11 23.1 11 21.5C11 15.6 15.6 11.5 22 11.5C23.4 11.5 24 12.4 24 14.5Z"
-      stroke="#ffffff"
+      stroke={inverted ? "#38761d" : "#ffffff"}
       strokeWidth="2.2"
       strokeLinecap="round"
       strokeLinejoin="round"

@@ -27,7 +27,7 @@ export default function AppShell({ children }) {
           flex-1 relative w-full min-w-0 max-w-full
           ${isMapPage
             ? 'md:pt-16'
-            : 'pb-24 md:pb-10 md:pt-16'
+            : 'pt-[52px] pb-20 md:pb-10 md:pt-16'
           }
         `}
       >

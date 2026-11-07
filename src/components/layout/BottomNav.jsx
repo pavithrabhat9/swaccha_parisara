@@ -48,9 +48,9 @@ const NAV_ITEMS = [
 ];
 
 /**
- * Single responsive navigation component (icons only — all 4 items styled uniformly):
- * - Mobile (<768px): fixed floating rounded bottom bar with active green pill for whichever tab is active.
- * - Desktop (≥768px): slim top bar with stylish brand wordmark on left, uniform icon dock centered, language menu on right.
+ * Single responsive navigation component (all 4 items styled uniformly):
+ * - Mobile (<768px): fixed full-width pure-white bottom bar with icon + tab name.
+ * - Desktop (≥768px): slim green top bar with white wordmark on left, uniform nav dock centered, language menu on right.
  */
 export default function BottomNav() {
   const location = useLocation();
@@ -61,32 +61,31 @@ export default function BottomNav() {
 
   return (
     <>
-      {/* === DESKTOP NAV (≥768px) — slim top bar === */}
+      {/* === DESKTOP NAV (≥768px) — slim green top bar === */}
       <nav
         aria-label="Primary"
-        className="hidden md:flex fixed top-0 left-0 right-0 z-[1200] bg-white/95 glass border-t-2 border-t-primary border-b border-b-border h-16 px-6 items-center justify-between shadow-xs"
+        className="hidden md:flex fixed top-0 left-0 right-0 z-[1200] bg-primary h-16 px-6 items-center justify-between shadow-sm"
       >
-        {/* Brand Logo + Stylish Wordmark (no subtitle) */}
+        {/* Brand Logo + Stylish Wordmark (inverted on green header) */}
         <button
           type="button"
           onClick={() => navigate('/')}
           className="flex items-center gap-3 press-scale cursor-pointer text-left"
         >
-          <BrandMark className="w-9 h-9 shadow-xs rounded-xl" />
+          <BrandMark inverted className="w-9 h-9 shadow-xs rounded-xl" />
           {isEnglish ? (
-            <span className="font-brand text-[21px] font-extrabold tracking-[-0.03em] leading-none">
-              <span className="text-black">Swaccha</span>{' '}
-              <span className="text-primary">Parisara</span>
+            <span className="font-brand text-[21px] font-extrabold tracking-[-0.03em] leading-none text-white">
+              Swaccha Parisara
             </span>
           ) : (
-            <span className="font-brand text-xl font-extrabold text-primary tracking-tight leading-none">
+            <span className="font-brand text-xl font-extrabold text-white tracking-tight leading-none">
               {title}
             </span>
           )}
         </button>
 
-        {/* Center Icon-Only Dock — all 4 tabs treated uniformly */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-sunken p-1.5 rounded-full border border-border">
+        {/* Center Nav Dock — all 4 tabs treated uniformly */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white p-1.5 rounded-full shadow-xs">
           {NAV_ITEMS.map(item => {
             const isActive = location.pathname === item.path;
             const label = t(item.labelKey);
@@ -99,21 +98,16 @@ export default function BottomNav() {
                 aria-label={label}
                 aria-current={isActive ? 'page' : undefined}
                 className={`
-                  group relative touch-target h-10 px-4 rounded-full flex items-center justify-center
-                  transition-all duration-200 press-scale cursor-pointer
+                  touch-target h-10 px-4 rounded-full flex items-center justify-center gap-2
+                  text-caption font-semibold transition-all duration-200 press-scale cursor-pointer
                   ${isActive
                     ? 'bg-primary text-white shadow-pill'
-                    : 'text-muted hover:text-primary hover:bg-white'
+                    : 'text-muted hover:text-primary hover:bg-primary-lighter'
                   }
                 `}
               >
                 {item.icon(isActive)}
-                <span
-                  role="tooltip"
-                  className="nav-tooltip px-2.5 py-1 rounded-lg bg-primary-dark text-white text-[11px] font-semibold shadow-elevated z-50"
-                >
-                  {label}
-                </span>
+                <span>{label}</span>
               </button>
             );
           })}
@@ -125,15 +119,13 @@ export default function BottomNav() {
         </div>
       </nav>
 
-      {/* === MOBILE NAV (<768px) — floating rounded icon-only bottom bar (all 4 tabs uniform) === */}
-      <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] pointer-events-none px-3 pb-2.5"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)' }}
+      {/* === MOBILE NAV (<768px) — fixed edge-to-edge white bottom bar with icons + tab names === */}
+      <nav
+        aria-label="Primary"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] bg-white border-t border-black/8 shadow-[0_-2px_10px_rgba(0,0,0,0.04)]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <nav
-          aria-label="Primary"
-          className="pointer-events-auto w-full max-w-sm mx-auto bg-white/95 glass rounded-full shadow-nav border border-border px-2.5 h-15 flex items-center justify-around"
-        >
+        <div className="flex items-center justify-around h-16 px-1 bg-white">
           {NAV_ITEMS.map(item => {
             const isActive = location.pathname === item.path;
             const label = t(item.labelKey);
@@ -146,20 +138,27 @@ export default function BottomNav() {
                 aria-label={label}
                 aria-current={isActive ? 'page' : undefined}
                 className={`
-                  touch-target h-11 px-4 rounded-full flex items-center justify-center
-                  transition-all duration-200 press-scale cursor-pointer
+                  flex-1 flex flex-col items-center justify-center gap-1 py-1.5 px-2
+                  touch-target transition-colors duration-200 press-scale cursor-pointer
                   ${isActive
-                    ? 'bg-primary text-white shadow-pill'
-                    : 'text-muted hover:text-primary'
+                    ? 'text-primary'
+                    : 'text-muted-light hover:text-primary'
                   }
                 `}
               >
                 {item.icon(isActive)}
+                <span
+                  className={`text-[11px] leading-none tracking-tight ${
+                    isActive ? 'font-bold text-primary' : 'font-medium text-muted-light'
+                  }`}
+                >
+                  {label}
+                </span>
               </button>
             );
           })}
-        </nav>
-      </div>
+        </div>
+      </nav>
     </>
   );
 }

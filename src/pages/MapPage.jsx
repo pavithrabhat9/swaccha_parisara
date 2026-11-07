@@ -181,12 +181,12 @@ export default function MapPage() {
     (filters.wasteType !== 'All' ? 1 : 0) + (filters.status !== 'All' ? 1 : 0);
 
   if (loading) {
-    return <SkeletonMap className="fixed inset-x-0 top-[52px] md:top-16 bottom-0 z-0" />;
+    return <SkeletonMap className="fixed inset-x-0 top-[52px] md:top-16 bottom-16 md:bottom-0 z-0" />;
   }
 
   if (!filteredReports) {
     return (
-      <div className="fixed inset-x-0 top-[52px] md:top-16 bottom-0 z-0 flex items-center justify-center p-4">
+      <div className="fixed inset-x-0 top-[52px] md:top-16 bottom-16 md:bottom-0 z-0 flex items-center justify-center p-4">
         <ErrorState
           title={t('map_unavailable_title')}
           description={t('map_unavailable_description')}
@@ -197,7 +197,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="fixed inset-x-0 top-[52px] md:top-16 bottom-0 z-0 overflow-hidden select-none">
+    <div className="fixed inset-x-0 top-[52px] md:top-16 bottom-16 md:bottom-0 z-0 overflow-hidden select-none">
       {/* === TOP FLOATING BAR === */}
       <div className="absolute top-3 md:top-4 left-3 right-3 md:left-6 md:right-auto md:w-84 z-[900] flex flex-col gap-2 pointer-events-none">
         {/* Top row: Filter button + active filter pills */}
@@ -350,7 +350,7 @@ export default function MapPage() {
           Responsive compact sizing on mobile so both fit side-by-side cleanly on 360px+ phones */}
       <div
         className={`
-          absolute left-3 right-3 md:left-6 md:right-6 bottom-22 md:bottom-6 z-[850]
+          absolute left-3 right-3 md:left-6 md:right-6 bottom-3 md:bottom-6 z-[850]
           flex items-end justify-between gap-2 pointer-events-none
           transition-opacity duration-200
           ${selectedReport ? 'opacity-0 md:opacity-100' : 'opacity-100'}
@@ -406,7 +406,7 @@ export default function MapPage() {
           role="dialog"
           aria-label={selectedReport.placeName}
           className="
-            absolute inset-x-3 bottom-22 md:inset-x-auto md:right-6 md:bottom-6 md:w-96
+            absolute inset-x-3 bottom-3 md:inset-x-auto md:right-6 md:bottom-6 md:w-96
             z-[950] bg-white rounded-3xl shadow-modal border border-border
             p-4 animate-slide-up
           "

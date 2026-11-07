@@ -41,14 +41,13 @@ export default function LanguageMenu({ compact = false }) {
         aria-expanded={open}
         aria-haspopup="listbox"
         className={`
-          touch-target inline-flex items-center justify-center gap-1.5 rounded-full
-          border border-border bg-white text-ink font-semibold
-          hover:border-primary/40 hover:bg-primary-lighter transition-colors cursor-pointer
-          ${compact ? 'h-9 px-3 text-caption' : 'h-10 px-3.5 text-caption'}
+          touch-target inline-flex items-center justify-center gap-1.5 rounded-lg
+          text-white font-semibold hover:bg-white/15 transition-colors cursor-pointer
+          ${compact ? 'h-9 px-2.5 text-caption' : 'h-10 px-3 text-caption'}
         `}
       >
-        <GlobeIcon className="w-3.5 h-3.5 text-primary" />
-        <span>{current.code === 'kn' ? 'ಕನ್ನಡ' : 'EN'}</span>
+        <GlobeIcon className="w-4 h-4 text-white" />
+        <span className="text-white">{current.code === 'kn' ? 'ಕನ್ನಡ' : 'EN'}</span>
       </button>
 
       {open && (
