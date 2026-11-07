@@ -1,8 +1,8 @@
 import React from 'react';
+import Button from './Button';
 
 /**
- * Reusable EmptyState component for lists or collections with zero items.
- * Uses a professional SVG icon, clear title, description, and optional CTA button.
+ * Reusable EmptyState component with a palette-only inline SVG illustration.
  */
 export default function EmptyState({
   icon,
@@ -13,42 +13,46 @@ export default function EmptyState({
   className = "",
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center text-center py-12 px-6 bg-surface rounded-2xl border border-border shadow-xs ${className}`}>
-      {/* Professional Icon Container */}
-      <div className="w-14 h-14 rounded-2xl bg-border-light/80 flex items-center justify-center text-muted-light mb-4 shadow-xs">
-        {icon ? (
-          icon
-        ) : (
-          <svg className="w-7 h-7 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-            <path d="m3.3 7 8.7 5 8.7-5" />
-            <path d="M12 22V12" />
+    <div className={`flex flex-col items-center justify-center text-center py-12 px-6 bg-white rounded-3xl border border-border/80 shadow-card ${className}`}>
+      {icon ? (
+        <div className="w-16 h-16 rounded-2xl bg-primary-lighter border border-primary/15 flex items-center justify-center text-primary mb-5">
+          {icon}
+        </div>
+      ) : (
+        <div className="mb-5 animate-float" aria-hidden="true">
+          <svg width="88" height="72" viewBox="0 0 88 72" fill="none">
+            <ellipse cx="44" cy="62" rx="30" ry="5" fill="#e3eedd" />
+            <rect x="22" y="20" width="44" height="36" rx="10" fill="#f2f7ef" stroke="#38761d" strokeWidth="2" />
+            <path d="M22 30H66" stroke="#e4e9e1" strokeWidth="2" />
+            <circle cx="62" cy="18" r="9" fill="#fab328" />
+            <path d="M59 18.2L61.2 20.4L65.5 16" stroke="#10180c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M44 48V38M44 40C44 36.5 47 34.5 50 34.5C50 38 47.5 40 44 40ZM44 42C44 39 41.5 37 38.5 37C38.5 40 41 42 44 42Z" stroke="#38761d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Title */}
-      <h3 className="text-base font-bold text-black mb-1">
+      <h3 className="text-heading text-ink mb-1.5">
         {title}
       </h3>
 
-      {/* Description */}
-      <p className="text-xs text-muted max-w-xs leading-relaxed mb-5">
+      <p className="text-body-sm text-muted max-w-xs leading-relaxed mb-6">
         {description}
       </p>
 
-      {/* Optional Call-to-Action button */}
       {actionLabel && onAction && (
-        <button
+        <Button
+          variant="primary"
+          size="md"
           onClick={onAction}
-          className="px-5 py-2.5 bg-primary text-white text-xs font-semibold rounded-xl hover:bg-primary-dark active:scale-[0.98] transition-all shadow-card flex items-center gap-1.5 cursor-pointer"
+          rightIcon={
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          }
         >
-          <span>{actionLabel}</span>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </button>
+          {actionLabel}
+        </Button>
       )}
     </div>
   );

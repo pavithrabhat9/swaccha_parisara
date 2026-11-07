@@ -42,7 +42,7 @@ export default function LearnPage() {
   };
 
   return (
-    <div className="mx-auto pb-8 space-y-10 animate-fade-in-up overflow-hidden">
+    <div className="w-full max-w-full mx-auto pb-8 space-y-10 animate-fade-in-up overflow-x-hidden">
       
       {/* Header */}
       <div className="px-5 pt-6 max-w-5xl mx-auto">

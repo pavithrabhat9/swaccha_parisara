@@ -1,105 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-const PAGE_TITLE_KEYS = {
-  '/': 'wasteMap',
-  '/report': 'reportPlasticWaste',
-  '/pickup': 'homePickup',
-  '/learn': 'learnAndSegregate',
-  '/business': 'business',
-};
-
-const LANGUAGES = [
-  { code: 'en', name: 'English', disabled: false },
-  { code: 'kn', name: 'ಕನ್ನಡ', fullName: 'Kannada', disabled: false },
-  { code: 'tcy', name: 'Tulu', disabled: true },
-  { code: 'kok', name: 'Konkani', disabled: true },
-  { code: 'bea', name: 'Beary', disabled: true },
-];
+import { BrandMark } from '../ui/Icons';
+import LanguageMenu from './LanguageMenu';
 
 /**
- * Mobile top bar — shows app name and page context.
- * Hidden on desktop where the header nav includes the logo.
+ * Mobile top bar — fixed at the very top of the viewport (52px) so it never scrolls out of view.
+ * Shows brand mark + stylish Swaccha Parisara wordmark + language switcher.
  */
 export default function TopBar() {
-  const location = useLocation();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const [showLangMenu, setShowLangMenu] = useState(false);
-  const pageTitle = PAGE_TITLE_KEYS[location.pathname] ? t(PAGE_TITLE_KEYS[location.pathname]) : t('appTitle');
-  const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setShowLangMenu(false);
-    if (showLangMenu) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [showLangMenu]);
-
-  const handleLanguageChange = (lang) => {
-    if (lang.disabled) return;
-    i18n.changeLanguage(lang.code);
-    localStorage.setItem('i18nextLng', lang.code);
-    setShowLangMenu(false);
-  };
+  const title = t('appTitle');
+  const isEnglish = !i18n.language || i18n.language.startsWith('en');
 
   return (
-    <header className="md:hidden sticky top-0 z-40 bg-surface/95 glass border-b border-border px-4 flex items-center gap-3"
-      style={{ minHeight: '52px' }}
+    <header
+      className="md:hidden fixed top-0 left-0 right-0 z-[1200] h-[52px] bg-white/95 glass border-t-2 border-t-primary border-b border-b-border px-4 flex items-center justify-between gap-3 shadow-xs"
     >
-      <div className="flex-1 min-w-0">
-        <h1 className="text-sm font-bold text-primary tracking-tight truncate">
-          {t('appTitle')}
-        </h1>
-        <p className="text-[11px] font-medium text-muted -mt-0.5 truncate">
-          {pageTitle}
-        </p>
-      </div>
-      {/* Language selector */}
-      <div className="relative">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowLangMenu(!showLangMenu);
-          }}
-          className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold text-muted hover:bg-border-light transition-colors"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-          {currentLang.code === 'en' ? 'EN' : 'KN'}
-        </button>
-        {showLangMenu && (
-          <div className="absolute right-0 top-full mt-1 bg-surface border border-border rounded-md shadow-elevated py-2 min-w-[140px] z-50">
-            {LANGUAGES.map(lang => (
-              <button
-                key={lang.code}
-                onClick={() => handleLanguageChange(lang)}
-                disabled={lang.disabled}
-                className={`w-full px-4 py-2 text-left text-xs font-semibold flex items-center justify-between
-                  ${lang.disabled 
-                    ? 'text-muted-light cursor-not-allowed' 
-                    : i18n.language === lang.code 
-                      ? 'text-primary bg-primary-light' 
-                      : 'text-muted hover:bg-border-light'
-                  }`}
-              >
-                <span>{lang.name}</span>
-                
-                {i18n.language === lang.code && !lang.disabled && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>
+      <button
+        type="button"
+        onClick={() => navigate('/')}
+        className="flex items-center gap-2.5 min-w-0 press-scale cursor-pointer text-left"
+      >
+        <BrandMark className="w-8 h-8 shrink-0 shadow-xs rounded-xl" />
+        {isEnglish ? (
+          <span className="font-brand text-[19px] font-extrabold tracking-[-0.03em] leading-none truncate">
+            <span className="text-black">Swaccha</span>{' '}
+            <span className="text-primary">Parisara</span>
+          </span>
+        ) : (
+          <span className="font-brand text-[18px] font-extrabold text-primary tracking-tight leading-none truncate">
+            {title}
+          </span>
         )}
-      </div>
+      </button>
+
+      <LanguageMenu compact />
     </header>
   );
 }

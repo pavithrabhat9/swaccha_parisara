@@ -7,8 +7,7 @@ import SuccessState from '../components/ui/SuccessState';
 import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
 import ErrorState from '../components/ui/ErrorState';
 import { CADENCE_OPTIONS, VOLUME_OPTIONS } from '../data/mockBusinesses';
-import { getNextPickupDate } from '../utils/dateUtils';
-import { businessApi } from '../services/businessApi';
+import { useBusinessSubscription } from '../hooks/useBusinessSubscription';
 
 /**
  * BusinessPage — Industry/Business recurring pickup schedule.
@@ -19,84 +18,52 @@ export default function BusinessPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [business, setBusiness] = useState(() => {
-    return businessApi.getSubscription();
-  });
+  const {
+    business,
+    loading,
+    step,
+    setStep,
+    form,
+    errors,
+    updateForm,
+    handleSignupNext,
+    handleScheduleSubmit,
+    handleSkip,
+    handleTogglePause,
+    handleBackToSignup,
+    showSuccessModal,
+    dismissSuccessModal,
+    submitting,
+    showSlowNetwork,
+    dismissSlowNetwork,
+    submissionError,
+  } = useBusinessSubscription();
 
-  const [step, setStep] = useState(business ? 'dashboard' : 'signup'); // 'signup' | 'schedule' | 'dashboard'
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [showSlowNetwork, setShowSlowNetwork] = useState(false);
-  const [submissionError, setSubmissionError] = useState(null);
-  const [form, setForm] = useState({
-    name: '', address: '', contactPerson: '', phone: '',
-    cadence: '', preferredDate: '', volumeEstimate: '',
-  });
-  const [errors, setErrors] = useState({});
-
-  const updateForm = (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: null }));
+  const handleTogglePauseClick = async () => {
+    const isPaused = await handleTogglePause();
+    showToast(isPaused ? 'Subscription paused.' : 'Subscription resumed!', isPaused ? 'info' : 'success');
   };
 
-  const handleSignupNext = () => {
-    const newErrors = {};
-    if (!form.name.trim()) newErrors.name = 'Required';
-    if (!form.address.trim()) newErrors.address = 'Required';
-    if (!form.contactPerson.trim()) newErrors.contactPerson = 'Required';
-    if (!form.phone || form.phone.length < 10) newErrors.phone = 'Enter valid phone';
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
-    setStep('schedule');
-  };
-
-  const handleScheduleSubmit = () => {
-    const newErrors = {};
-    if (!form.cadence) newErrors.cadence = 'Select a cadence';
-    if (!form.preferredDate.trim()) newErrors.preferredDate = 'Enter preferred date';
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
-
-    setSubmitting(true);
-    setSubmissionError(null);
-    setShowSlowNetwork(false);
-
-    const slowTimer = setTimeout(() => {
-      setShowSlowNetwork(true);
-    }, 5000);
-
-    setTimeout(() => {
-      clearTimeout(slowTimer);
-      setShowSlowNetwork(false);
-      const cadenceLabel = CADENCE_OPTIONS.find(c => c.id === form.cadence)?.label || form.cadence;
-      const newBusiness = {
-        ...form,
-        id: `BIZ-${Date.now()}`,
-        isPaused: false,
-        nextPickup: getNextPickupDate(),
-        history: [],
-      };
-      setBusiness(newBusiness);
-      businessApi.createSubscription(newBusiness);
-      setSubmitting(false);
-      setStep('dashboard');
-      setShowSuccessModal(true);
-      showToast(`Your recurring ${cadenceLabel.toLowerCase()} pickup is set. You can pause anytime.`, 'success', 4000);
-    }, 600);
-  };
-
-  const handleSkip = () => {
-    const updated = { ...business, history: [{ date: business.nextPickup, status: 'Skipped' }, ...business.history] };
-    updated.nextPickup = getNextPickupDate();
-    setBusiness(updated);
-    businessApi.updateSubscription(updated);
+  const handleSkipClick = async () => {
+    await handleSkip();
     showToast('This pickup has been skipped — we\'ve been notified.', 'info');
   };
 
-  const handleTogglePause = () => {
-    const updated = { ...business, isPaused: !business.isPaused };
-    setBusiness(updated);
-    businessApi.updateSubscription(updated);
-    showToast(updated.isPaused ? 'Subscription paused.' : 'Subscription resumed!', updated.isPaused ? 'info' : 'success');
+  const handleScheduleSubmitClick = async () => {
+    const result = await handleScheduleSubmit();
+    if (result && result.success) {
+      const cadenceLabel = CADENCE_OPTIONS.find(c => c.id === result.cadenceId)?.label || result.cadenceId;
+      showToast(`Your recurring ${cadenceLabel.toLowerCase()} pickup is set. You can pause anytime.`, 'success', 4000);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-6 flex justify-center items-center h-64">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
 
   // === DASHBOARD VIEW ===
@@ -134,7 +101,7 @@ export default function BusinessPage() {
           <div className="flex gap-2 mt-4">
             {!business.isPaused && (
               <button
-                onClick={handleSkip}
+                onClick={handleSkipClick}
                 className="flex-1 py-2.5 bg-surface border border-border rounded-xl text-xs font-semibold text-muted
                   hover:border-yellow hover:text-yellow active:scale-[0.98] transition-all"
               >
@@ -142,7 +109,7 @@ export default function BusinessPage() {
               </button>
             )}
             <button
-              onClick={handleTogglePause}
+              onClick={handleTogglePauseClick}
               className={`flex-1 py-2.5 rounded-xl text-xs font-semibold active:scale-[0.98] transition-all
                 ${business.isPaused
                   ? 'bg-primary text-white hover:bg-primary-dark shadow-fab'
@@ -250,7 +217,7 @@ export default function BusinessPage() {
   // === SCHEDULE SETUP ===
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
-      <button onClick={() => setStep('signup')} className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-primary transition-colors">
+      <button onClick={handleBackToSignup} className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-primary transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
@@ -328,8 +295,8 @@ export default function BusinessPage() {
       {/* Slow Network Alert */}
       {showSlowNetwork && (
         <SlowNetworkAlert
-          onRetry={handleScheduleSubmit}
-          onCancel={() => { setShowSlowNetwork(false); setSubmitting(false); }}
+          onRetry={handleScheduleSubmitClick}
+          onCancel={dismissSlowNetwork}
         />
       )}
 
@@ -338,12 +305,12 @@ export default function BusinessPage() {
         <ErrorState
           title="Schedule Failed"
           description={submissionError}
-          onRetry={handleScheduleSubmit}
+          onRetry={handleScheduleSubmitClick}
         />
       )}
 
       <button
-        onClick={handleScheduleSubmit}
+        onClick={handleScheduleSubmitClick}
         disabled={submitting}
         className="w-full py-3.5 bg-primary text-white font-semibold rounded-xl text-sm
           hover:bg-primary-dark active:scale-[0.98] transition-all shadow-fab
@@ -367,7 +334,7 @@ export default function BusinessPage() {
               title="Schedule Active!"
               description="Your recurring commercial plastic waste collection has been scheduled. Our vehicle will arrive on the selected frequency."
               actionLabel="Go to Dashboard"
-              onAction={() => setShowSuccessModal(false)}
+              onAction={dismissSuccessModal}
             />
           </div>
         </div>

@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { BrandMark } from '../ui/Icons';
+import LanguageMenu from './LanguageMenu';
 
 const NAV_ITEMS = [
   {
     path: '/',
     labelKey: 'map',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#38761d' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    icon: () => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
         <circle cx="12" cy="10" r="3" />
       </svg>
@@ -16,9 +18,8 @@ const NAV_ITEMS = [
   {
     path: '/report',
     labelKey: 'report',
-    isAction: true,
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#fff' : '#38761d'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    icon: () => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M12 5v14M5 12h14" />
       </svg>
     ),
@@ -26,8 +27,8 @@ const NAV_ITEMS = [
   {
     path: '/pickup',
     labelKey: 'pickup',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#38761d' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    icon: () => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
         <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
         <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -37,8 +38,8 @@ const NAV_ITEMS = [
   {
     path: '/learn',
     labelKey: 'learn',
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#38761d' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    icon: () => (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
       </svg>
@@ -46,177 +47,119 @@ const NAV_ITEMS = [
   },
 ];
 
-const LANGUAGES = [
-  { code: 'en', name: 'English', disabled: false },
-  { code: 'kn', name: 'ಕನ್ನಡ', fullName: 'Kannada', disabled: false },
-  { code: 'tcy', name: 'Tulu', disabled: true },
-  { code: 'kok', name: 'Konkani', disabled: true },
-  { code: 'bea', name: 'Beary', disabled: true },
-];
-
 /**
- * Responsive navigation component:
- * - Mobile: Fixed bottom tab bar (thumb-reachable)
- * - Desktop (≥768px): Top header navigation bar
- * Single component, responsive styling — no duplicated logic.
+ * Single responsive navigation component (icons only — all 4 items styled uniformly):
+ * - Mobile (<768px): fixed floating rounded bottom bar with active green pill for whichever tab is active.
+ * - Desktop (≥768px): slim top bar with stylish brand wordmark on left, uniform icon dock centered, language menu on right.
  */
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const [showLangMenu, setShowLangMenu] = useState(false);
-  const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setShowLangMenu(false);
-    if (showLangMenu) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [showLangMenu]);
-
-  const handleLanguageChange = (lang) => {
-    if (lang.disabled) return;
-    i18n.changeLanguage(lang.code);
-    localStorage.setItem('i18nextLng', lang.code);
-    setShowLangMenu(false);
-  };
+  const title = t('appTitle');
+  const isEnglish = !i18n.language || i18n.language.startsWith('en');
 
   return (
     <>
-      {/* === DESKTOP NAV (≥768px) — shown as top bar === */}
-      <nav className="hidden md:flex fixed top-0 left-0 right-0 z-50 bg-surface/95 glass border-b border-border h-16 items-center px-6 gap-1">
-        {/* Logo */}
+      {/* === DESKTOP NAV (≥768px) — slim top bar === */}
+      <nav
+        aria-label="Primary"
+        className="hidden md:flex fixed top-0 left-0 right-0 z-[1200] bg-white/95 glass border-t-2 border-t-primary border-b border-b-border h-16 px-6 items-center justify-between shadow-xs"
+      >
+        {/* Brand Logo + Stylish Wordmark (no subtitle) */}
         <button
+          type="button"
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 mr-auto press-scale"
+          className="flex items-center gap-3 press-scale cursor-pointer text-left"
         >
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-sm font-bold">♻</span>
-          </div>
-          <span className="text-lg font-bold text-primary tracking-tight">{t('appTitle')}</span>
+          <BrandMark className="w-9 h-9 shadow-xs rounded-xl" />
+          {isEnglish ? (
+            <span className="font-brand text-[21px] font-extrabold tracking-[-0.03em] leading-none">
+              <span className="text-black">Swaccha</span>{' '}
+              <span className="text-primary">Parisara</span>
+            </span>
+          ) : (
+            <span className="font-brand text-xl font-extrabold text-primary tracking-tight leading-none">
+              {title}
+            </span>
+          )}
         </button>
 
-        {/* Nav items */}
-        {NAV_ITEMS.map(item => {
-          const isActive = location.pathname === item.path;
-          return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                transition-all duration-200 press-scale touch-target
-                ${isActive
-                  ? (item.isAction ? 'bg-primary text-white shadow-fab' : 'bg-primary-light text-primary')
-                  : 'text-muted hover:bg-border-light hover:text-black'
-                }
-              `}
-            >
-              {item.icon(isActive)}
-              {t(item.labelKey)}
-            </button>
-          );
-        })}
-
-        {/* Language selector */}
-        <div className="relative ml-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowLangMenu(!showLangMenu);
-            }}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-muted hover:bg-border-light transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-            {currentLang.code === 'en' ? 'EN' : 'KN'}
-          </button>
-          {showLangMenu && (
-            <div className="absolute right-0 top-full mt-2 bg-surface border border-border rounded-md shadow-elevated py-2 min-w-[160px] z-50">
-              {LANGUAGES.map(lang => (
-                <button
-                  key={lang.code}
-                  onClick={() => handleLanguageChange(lang)}
-                  disabled={lang.disabled}
-                  className={`w-full px-4 py-2.5 text-left text-sm font-semibold flex items-center justify-between
-                    ${lang.disabled 
-                      ? 'text-muted-light cursor-not-allowed' 
-                      : i18n.language === lang.code 
-                        ? 'text-primary bg-primary-light' 
-                        : 'text-muted hover:bg-border-light'
-                    }`}
-                >
-                  <span>{lang.name}</span>
-
-                  {i18n.language === lang.code && !lang.disabled && (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </nav>
-
-      {/* === MOBILE NAV (<768px) — fixed bottom tab bar === */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface/95 glass border-t border-border"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        <div className="flex items-end justify-around h-16 px-2">
+        {/* Center Icon-Only Dock — all 4 tabs treated uniformly */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-sunken p-1.5 rounded-full border border-border">
           {NAV_ITEMS.map(item => {
             const isActive = location.pathname === item.path;
-
-            // Report tab gets special treatment — raised action button
-            if (item.isAction) {
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`
-                    flex flex-col items-center justify-center -mt-4 press-scale touch-target
-                    ${isActive ? '' : ''}
-                  `}
-                  aria-label={t(item.labelKey)}
-                >
-                  <div className={`
-                    w-14 h-14 rounded-2xl flex items-center justify-center shadow-fab
-                    transition-all duration-200
-                    ${isActive ? 'bg-primary-dark scale-110' : 'bg-primary'}
-                  `}>
-                    {item.icon(true)}
-                  </div>
-                  <span className={`text-[10px] font-semibold mt-0.5 ${isActive ? 'text-primary' : 'text-muted'}`}>
-                    {t(item.labelKey)}
-                  </span>
-                </button>
-              );
-            }
+            const label = t(item.labelKey);
 
             return (
               <button
                 key={item.path}
+                type="button"
                 onClick={() => navigate(item.path)}
-                className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 touch-target press-scale"
-                aria-label={t(item.labelKey)}
+                aria-label={label}
+                aria-current={isActive ? 'page' : undefined}
+                className={`
+                  group relative touch-target h-10 px-4 rounded-full flex items-center justify-center
+                  transition-all duration-200 press-scale cursor-pointer
+                  ${isActive
+                    ? 'bg-primary text-white shadow-pill'
+                    : 'text-muted hover:text-primary hover:bg-white'
+                  }
+                `}
               >
                 {item.icon(isActive)}
-                <span className={`text-[10px] font-semibold transition-colors duration-200 ${isActive ? 'text-primary' : 'text-muted-light'}`}>
-                  {t(item.labelKey)}
+                <span
+                  role="tooltip"
+                  className="nav-tooltip px-2.5 py-1 rounded-lg bg-primary-dark text-white text-[11px] font-semibold shadow-elevated z-50"
+                >
+                  {label}
                 </span>
-                {/* Active dot indicator */}
-                <div className={`w-1 h-1 rounded-full transition-all duration-200 ${isActive ? 'bg-primary scale-100' : 'scale-0'}`} />
               </button>
             );
           })}
         </div>
+
+        {/* Right actions: Language switcher — stays in exact same place */}
+        <div className="flex items-center gap-2">
+          <LanguageMenu />
+        </div>
       </nav>
+
+      {/* === MOBILE NAV (<768px) — floating rounded icon-only bottom bar (all 4 tabs uniform) === */}
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] pointer-events-none px-3 pb-2.5"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)' }}
+      >
+        <nav
+          aria-label="Primary"
+          className="pointer-events-auto w-full max-w-sm mx-auto bg-white/95 glass rounded-full shadow-nav border border-border px-2.5 h-15 flex items-center justify-around"
+        >
+          {NAV_ITEMS.map(item => {
+            const isActive = location.pathname === item.path;
+            const label = t(item.labelKey);
+
+            return (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => navigate(item.path)}
+                aria-label={label}
+                aria-current={isActive ? 'page' : undefined}
+                className={`
+                  touch-target h-11 px-4 rounded-full flex items-center justify-center
+                  transition-all duration-200 press-scale cursor-pointer
+                  ${isActive
+                    ? 'bg-primary text-white shadow-pill'
+                    : 'text-muted hover:text-primary'
+                  }
+                `}
+              >
+                {item.icon(isActive)}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
     </>
   );
 }

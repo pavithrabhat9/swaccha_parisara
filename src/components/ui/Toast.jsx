@@ -17,12 +17,10 @@ export function ToastProvider({ children }) {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, message, type, exiting: false }]);
 
-    // Start exit animation before removal
     setTimeout(() => {
       setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
     }, duration - 300);
 
-    // Remove from DOM after animation
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, duration);
@@ -38,27 +36,44 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {/* Toast container */}
-      <div className="fixed top-0 left-0 right-0 z-[9999] flex flex-col items-center gap-2 p-4 pointer-events-none">
+      <div
+        aria-live="polite"
+        className="fixed top-3 left-0 right-0 z-[9999] flex flex-col items-center gap-2 px-4 pointer-events-none"
+      >
         {toasts.map(toast => (
           <div
             key={toast.id}
+            role="status"
             onClick={() => dismissToast(toast.id)}
             className={`
-              pointer-events-auto cursor-pointer max-w-sm w-full px-4 py-3 rounded-xl
-              shadow-elevated flex items-center gap-3 text-sm font-medium
+              pointer-events-auto cursor-pointer max-w-sm w-full px-4 py-3 rounded-2xl
+              shadow-elevated flex items-center gap-3 text-body-sm font-semibold
               ${toast.exiting ? 'animate-toast-out' : 'animate-toast-in'}
               ${toast.type === 'success' ? 'bg-primary text-white' : ''}
-              ${toast.type === 'info' ? 'bg-yellow text-black' : ''}
+              ${toast.type === 'info' ? 'bg-yellow text-ink' : ''}
               ${toast.type === 'error' ? 'bg-orange-red text-white' : ''}
             `}
           >
-            <span className="text-base flex-shrink-0">
-              {toast.type === 'success' && '✓'}
-              {toast.type === 'info' && 'ℹ'}
-              {toast.type === 'error' && '!'}
+            <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0" aria-hidden="true">
+              {toast.type === 'success' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+              {toast.type === 'info' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+              )}
+              {toast.type === 'error' && (
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              )}
             </span>
-            <span className="flex-1">{toast.message}</span>
+            <span className="flex-1 leading-snug">{toast.message}</span>
           </div>
         ))}
       </div>

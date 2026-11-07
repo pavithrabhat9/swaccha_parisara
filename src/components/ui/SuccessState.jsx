@@ -1,8 +1,8 @@
 import React from 'react';
+import Button from './Button';
 
 /**
- * Reusable SuccessState component for confirming completed actions.
- * Displays a unified animated green SVG checkmark, title, description, and optional action buttons.
+ * Reusable SuccessState component with animated badge illustration + ring burst.
  */
 export default function SuccessState({
   title = "Success!",
@@ -15,54 +15,61 @@ export default function SuccessState({
   className = "",
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center min-h-[70vh] px-6 animate-fade-in-up ${className}`}>
-      {/* Animated Checkmark Icon */}
-      <div className="w-20 h-20 rounded-full bg-primary-light flex items-center justify-center mb-5 animate-scale-in shadow-xs">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#38761d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline
-            points="20 6 9 17 4 12"
-            style={{
-              strokeDasharray: 24,
-              strokeDashoffset: 0,
-              animation: 'checkmark 0.5s ease-out 0.3s both',
-            }}
-          />
-        </svg>
+    <div className={`flex flex-col items-center justify-center min-h-[65vh] px-6 py-8 animate-fade-in-up ${className}`}>
+      {/* Animated Celebration Emblem */}
+      <div className="relative w-24 h-24 flex items-center justify-center mb-6" aria-hidden="true">
+        <span className="absolute inset-0 rounded-full border-2 border-primary/35 animate-ring-burst" />
+        <span className="absolute inset-2 rounded-full bg-primary-light/70" />
+        <div className="relative w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-fab animate-scale-in">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline
+              points="20 6 9 17 4 12"
+              style={{
+                strokeDasharray: 24,
+                strokeDashoffset: 0,
+                animation: 'checkmark 0.55s ease-out 0.25s both',
+              }}
+            />
+          </svg>
+        </div>
+        {/* Accent sparkles in brand yellow */}
+        <span className="absolute -top-1 right-1 w-3 h-3 rounded-full bg-yellow animate-scale-in" />
+        <span className="absolute bottom-1 -left-1 w-2.5 h-2.5 rounded-full bg-primary-dark animate-scale-in" />
       </div>
 
-      <h2 className="text-xl font-bold text-black mb-1.5 text-center">
+      <h2 className="text-title text-ink mb-2 text-center">
         {title}
       </h2>
-      <p className="text-xs sm:text-sm text-muted text-center max-w-xs mb-6 leading-relaxed">
+      <p className="text-body-sm text-muted text-center max-w-sm mb-6 leading-relaxed">
         {description}
       </p>
 
-      {/* Optional detail slots (e.g., summary table or photo preview) */}
       {children && (
-        <div className="w-full max-w-xs mb-6">
+        <div className="w-full max-w-sm mb-6">
           {children}
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
         {actionLabel && onAction && (
-          <button
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
             onClick={onAction}
-            className="flex-1 py-3 px-4 bg-primary text-white font-semibold rounded-xl text-xs sm:text-sm
-              hover:bg-primary-dark active:scale-[0.98] transition-all shadow-card cursor-pointer text-center"
           >
             {actionLabel}
-          </button>
+          </Button>
         )}
         {secondaryActionLabel && onSecondaryAction && (
-          <button
+          <Button
+            variant="secondary"
+            size="lg"
+            fullWidth
             onClick={onSecondaryAction}
-            className="flex-1 py-3 px-4 bg-surface border border-border rounded-xl text-xs sm:text-sm font-semibold text-black
-              hover:bg-border-light active:scale-[0.98] transition-all cursor-pointer text-center"
           >
             {secondaryActionLabel}
-          </button>
+          </Button>
         )}
       </div>
     </div>
