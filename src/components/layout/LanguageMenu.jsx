@@ -55,7 +55,7 @@ export default function LanguageMenu({ compact = false }) {
           role="listbox"
           aria-label="Select language"
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-full mt-2 bg-white border border-border rounded-2xl shadow-elevated py-1.5 min-w-[176px] z-50 animate-slide-down"
+          className="absolute right-0 top-full mt-2 bg-white border border-border rounded-[8px] shadow-elevated py-1.5 min-w-[168px] z-50 animate-slide-down"
         >
           {LANGUAGES.map(lang => {
             const active = i18n.language === lang.code;
@@ -73,19 +73,17 @@ export default function LanguageMenu({ compact = false }) {
                   ${lang.disabled
                     ? 'text-muted-light/60 cursor-not-allowed'
                     : active
-                      ? 'text-primary-dark bg-primary-light/70 cursor-pointer'
-                      : 'text-ink hover:bg-sunken cursor-pointer'
+                        ? 'text-primary cursor-pointer'
+                        : 'text-ink hover:bg-sunken cursor-pointer'
                   }
                 `}
               >
                 <span>{lang.name}</span>
-                {lang.disabled ? (
-                  <span className="text-[10px] font-medium text-muted-light">Soon</span>
-                ) : active ? (
-                  <svg className="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                ) : null}
+                  { active && !lang.disabled ? (
+                    <svg className="w-3.5 h-3.5 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : null}
               </button>
             );
           })}
@@ -94,4 +92,3 @@ export default function LanguageMenu({ compact = false }) {
     </div>
   );
 }
-
