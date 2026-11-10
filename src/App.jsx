@@ -6,6 +6,7 @@ import ReportPage from './pages/ReportPage';
 import PickupPage from './pages/PickupPage';
 import LearnPage from './pages/LearnPage';
 import BusinessPage from './pages/BusinessPage';
+import ProfilePage from './pages/ProfilePage';
 
 /**
  * Swachha Parisara — Phase 0 PWA
@@ -13,10 +14,11 @@ import BusinessPage from './pages/BusinessPage';
  *
  * Routes:
  *   /          → Map (default, public)
- *   /report    → Report (anonymous)
- *   /pickup    → Home Pickup (login required)
+ *   /report    → Report (anonymous, launched via "+ Report" button on Map)
+ *   /pickup    → Home Pickup (rewards & collection)
  *   /learn     → Learn & Segregate (public)
- *   /business  → Business Collaboration (via link)
+ *   /profile   → Profile & Account (new 4th tab)
+ *   /business  → Business Collaboration (reachable from Learn & Profile)
  */
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
           <Route path="/report" element={<ReportPage />} />
           <Route path="/pickup" element={<PickupPage />} />
           <Route path="/learn" element={<LearnPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/business" element={<BusinessPage />} />
         </Routes>
       </AppShell>

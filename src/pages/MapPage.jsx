@@ -379,21 +379,33 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Severity / Density Legend */}
-        <div className="pointer-events-auto bg-white/95 glass px-2.5 py-2 md:px-3.5 md:py-2.5 rounded-2xl shadow-elevated border border-border shrink-0">
-          <p className="text-[9px] font-bold text-muted uppercase tracking-wider mb-1">{t('density')}</p>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-severity-low ring-2 ring-severity-low/30" />
-              <span className="text-[10px] font-semibold text-black">{t('low')}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-severity-mid ring-2 ring-severity-mid/30" />
-              <span className="text-[10px] font-semibold text-black">{t('mid')}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-3.5 h-3.5 rounded-full bg-severity-high ring-2 ring-severity-high/30" />
-              <span className="text-[10px] font-semibold text-black">{t('high')}</span>
+        {/* Right stack: Floating "+ Report" button + Severity / Density Legend */}
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => navigate('/report')}
+            aria-label={t('map_report_plastic_waste')}
+            className="pointer-events-auto touch-target h-11 px-4 rounded-full bg-primary hover:bg-primary-dark text-white text-caption font-bold shadow-fab inline-flex items-center justify-center gap-1.5 press-scale transition-all cursor-pointer"
+          >
+            <span>{t('map_fab_report')}</span>
+          </button>
+
+          {/* Severity / Density Legend */}
+          <div className="pointer-events-auto bg-white/95 glass px-2.5 py-2 md:px-3.5 md:py-2.5 rounded-2xl shadow-elevated border border-border shrink-0">
+            <p className="text-[9px] font-bold text-muted uppercase tracking-wider mb-1">{t('density')}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-severity-low ring-2 ring-severity-low/30" />
+                <span className="text-[10px] font-semibold text-black">{t('low')}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-severity-mid ring-2 ring-severity-mid/30" />
+                <span className="text-[10px] font-semibold text-black">{t('mid')}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-3.5 h-3.5 rounded-full bg-severity-high ring-2 ring-severity-high/30" />
+                <span className="text-[10px] font-semibold text-black">{t('high')}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { usePickups } from '../hooks/usePickups';
 import { useToast } from '../components/ui/Toast';
 import LoginFlow from '../components/auth/LoginFlow';
-import StatusBadge from '../components/ui/StatusBadge';
 import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import SuccessState from '../components/ui/SuccessState';
@@ -11,22 +11,30 @@ import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
 import ErrorState from '../components/ui/ErrorState';
 import { QUANTITY_TIERS, TIME_WINDOWS, DK_LOCALITIES, BADGES } from '../data/mockPickups';
 
-import { MapPinIcon, CheckCircleIcon, CalendarIcon, ClockIcon, XIcon } from '../components/ui/Icons';
+import {
+  MapPinIcon,
+  CheckCircleIcon,
+  CalendarIcon,
+  ClockIcon,
+  LockIcon,
+  XIcon,
+  BadgeMedal,
+} from '../components/ui/Icons';
 import { getBagDetails } from '../utils/pickupUtils';
 
-
 /**
- * PickupPage — Home plastic pickup request + points dashboard.
- * Shows login flow if not authenticated, then the pickup dashboard.
+ * PickupPage — Home plastic pickup request + rewards & collection dashboard.
  */
 export default function PickupPage() {
+  const { t } = useTranslation();
   const authHook = useAuth();
-  const { isLoggedIn, user, logout } = authHook;
+  const { isLoggedIn, user } = authHook;
   const { pickups, loading, points, badge, totalKgDiverted, requestPickup } = usePickups();
   const { showToast } = useToast();
 
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState('all'); // 'all' | 'completed' | 'pending'
   const [quantity, setQuantity] = useState('');
   const [locality, setLocality] = useState(() => user?.locality || '');
   const [timeWindow, setTimeWindow] = useState('');
@@ -43,11 +51,39 @@ export default function PickupPage() {
     }
   }, [user?.locality]);
 
-  // Not logged in — show auth flow
+  // Logged-out state: "Log in to earn points" screen listing 3 benefits + existing phone login flow
   if (!isLoggedIn) {
+    const benefits = [
+      t('pickup_benefit_1'),
+      t('pickup_benefit_2'),
+      t('pickup_benefit_3'),
+    ];
+
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <LoginFlow authHook={authHook} />
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-6 md:py-10 space-y-6">
+        <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+          <div>
+            <h2 className="text-lg font-bold text-black tracking-tight">
+              {t('pickup_login_title')}
+            </h2>
+            <p className="text-xs text-muted mt-1">
+              {t('pickup_login_subtitle')}
+            </p>
+          </div>
+
+          <ul className="space-y-2.5 pt-1">
+            {benefits.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2.5 text-xs text-black">
+                <CheckCircleIcon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="border border-border rounded-[8px] bg-white">
+          <LoginFlow authHook={authHook} />
+        </section>
       </div>
     );
   }
@@ -55,9 +91,8 @@ export default function PickupPage() {
   // Loading state (initial load only)
   if (loading && pickups.length === 0) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
-        <Skeleton width="200px" height="28px" rounded="lg" />
-        <SkeletonCard />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-4">
+        <Skeleton width="200px" height="24px" rounded="sm" />
         <SkeletonCard />
         <SkeletonCard />
       </div>
@@ -95,156 +130,184 @@ export default function PickupPage() {
     }, 700);
   };
 
-  // Compute next badge tier for desktop visual polish
+  // Compute next badge tier progress
   const currentBadgeIndex = BADGES.findIndex(b => b.label === badge?.label);
   const nextBadge = currentBadgeIndex !== -1 && currentBadgeIndex < BADGES.length - 1
     ? BADGES[currentBadgeIndex + 1]
     : null;
   const currentMin = badge?.minPoints || 0;
-  const targetPoints = nextBadge ? nextBadge.minPoints : (badge?.maxPoints || 1);
+  const targetPoints = nextBadge ? nextBadge.minPoints : (badge?.maxPoints || 5000);
   const progressPercent = nextBadge
     ? Math.min(100, Math.max(0, Math.round(((points - currentMin) / (targetPoints - currentMin)) * 100)))
     : 100;
 
-  // Compute summary stats for desktop history header
+  // Compute summary stats and filtered list for history section
   const completedCount = pickups.filter(p => p.status === 'Completed').length;
   const pendingCount = pickups.filter(p => p.status === 'Scheduled' || p.status === 'Requested').length;
 
+  // Active requests (Scheduled or Requested) shown above history
+  const activeRequest = pickups.find(p => p.status === 'Scheduled' || p.status === 'Requested');
+
+  const filteredPickups = pickups.filter(p => {
+    if (historyFilter === 'completed') return p.status === 'Completed';
+    if (historyFilter === 'pending') return p.status === 'Scheduled' || p.status === 'Requested';
+    return true;
+  });
+
+  // Mock milestone badges (unlocked vs locked with unlock condition)
+  const milestoneBadges = [
+    {
+      id: 'starter',
+      title: t('pickup_badge_first_pickup'),
+      description: t('pickup_badge_first_pickup_desc'),
+      unlocked: completedCount >= 1,
+    },
+    {
+      id: 'bronze',
+      title: t('pickup_badge_50kg'),
+      description: t('pickup_badge_50kg_desc'),
+      unlocked: totalKgDiverted >= 50,
+    },
+    {
+      id: 'silver',
+      title: t('pickup_badge_silver'),
+      description: t('pickup_badge_silver_desc'),
+      unlocked: points >= 1000,
+    },
+    {
+      id: 'gold',
+      title: t('pickup_badge_gold'),
+      description: t('pickup_badge_gold_desc'),
+      unlocked: points >= 2500,
+    },
+    {
+      id: 'champion',
+      title: t('pickup_badge_champion'),
+      description: t('pickup_badge_champion_desc'),
+      unlocked: points >= 5000,
+    },
+  ];
+
   return (
-    <div className="max-w-lg md:max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 animate-fade-in-up">
-      {/* 2-Column Responsive Grid on Wide Screens */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-8 items-start">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      {/* Main 2-Column Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         {/* ====================================================
-            LEFT / SIDEBAR COLUMN (33-35% width on desktop)
-            Persistent status panel: Greeting, Points Card, Request Form
+            LEFT COLUMN: Points Overview, Request Form & Badges
             ==================================================== */}
-        <div className="md:col-span-5 lg:col-span-4 md:sticky md:top-24 md:bg-white md:p-6 md:rounded-2xl md:border md:border-border md:shadow-card space-y-5">
-          {/* User greeting + logout */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-black">
-                Hi, {user?.name?.split(' ')[0] || 'there'}
-              </h2>
-              <p className="text-xs text-muted">{user?.locality || 'Dakshina Kannada'}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="text-xs text-muted hover:text-orange-red transition-colors font-medium cursor-pointer"
-            >
-              Sign out
-            </button>
-          </div>
-
-          {/* === POINTS CARD === */}
-          <div className="bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-5 text-white shadow-fab relative overflow-hidden">
-            {/* Decorative circles */}
-            <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5" />
-            <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-white/5" />
-
-            <div className="relative">
-              <p className="text-xs font-medium text-white/70 uppercase tracking-wide mb-1">Your Points</p>
-              <p className="text-4xl font-extrabold tracking-tight mb-3">
-                {points.toLocaleString()}
-              </p>
-
-              <div className="flex items-center gap-3">
-                <span className="bg-white/15 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
+        <div className="md:col-span-5 lg:col-span-4 md:sticky md:top-24 space-y-6">
+          {/* === POINTS & PROGRESS SECTION === */}
+          <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+            <div className="flex items-baseline justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">
+                  {t('yourPoints')}
+                </p>
+                <p className="text-3xl font-bold text-black tracking-tight tabular mt-1">
+                  {points.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-semibold text-black">
                   <span>{badge?.icon}</span> {badge?.label}
-                </span>
-                <span className="text-xs text-white/70 font-medium">
-                  {totalKgDiverted}kg diverted
-                </span>
-              </div>
-
-              {/* Supporting visual & next-tier progress */}
-              <div className="block mt-4 pt-3.5 border-t border-white/15 space-y-2">
-                <div className="flex items-center justify-between text-xs font-medium text-white/90">
-                  <span className="flex items-center gap-1">
-                    <span>Next Tier:</span>
-                    <span className="font-semibold text-white">
-                      {nextBadge ? `${nextBadge.icon} ${nextBadge.label}` : 'Top Tier Reached! 🏆'}
-                    </span>
-                  </span>
-                  <span className="text-white/70">
-                    {nextBadge ? `${(nextBadge.minPoints - points).toLocaleString()} pts to go` : 'MAX'}
-                  </span>
-                </div>
-
-                {/* Progress bar */}
-                <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-yellow rounded-full transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-white/70">
-                  <span>{badge?.icon} {badge?.label}</span>
-                  <span>{nextBadge ? `${progressPercent}%` : '100%'}</span>
-                </div>
+                </p>
+                <p className="text-xs text-muted mt-0.5">
+                  {totalKgDiverted}{t('kgDiverted')}
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* === REQUEST PICKUP BUTTON/FORM === */}
+            {/* Next-tier linear progress */}
+            <div className="pt-4 border-t border-border-light space-y-2">
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="font-medium text-black">
+                  {nextBadge
+                    ? t('pickup_points_to_next_tier', {
+                        current: points.toLocaleString(),
+                        target: targetPoints.toLocaleString(),
+                        tier: nextBadge.label,
+                      })
+                    : t('pickup_top_tier_reached', { current: points.toLocaleString() })}
+                </span>
+                <span className="text-muted tabular shrink-0">
+                  {nextBadge ? `${progressPercent}%` : '100%'}
+                </span>
+              </div>
+
+              <div className="w-full h-1.5 bg-sunken rounded-[4px] overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* === REQUEST PICKUP ACTION / FORM === */}
           {!showRequestForm ? (
             <button
+              type="button"
               onClick={() => setShowRequestForm(true)}
-              className="w-full py-3.5 bg-surface border-2 border-primary text-primary font-semibold rounded-xl text-sm
-                hover:bg-primary-lighter active:scale-[0.98] transition-all duration-150
-                flex items-center justify-center gap-2 shadow-card cursor-pointer"
+              className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-[6px] text-sm
+                hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Request Home Pickup</span>
+              <span>{t('requestHomePickup')}</span>
             </button>
           ) : (
-            <div className="bg-surface rounded-2xl border border-border p-4 shadow-card animate-fade-in-up space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-black">Request Pickup</h3>
+            <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border-light">
+                <h3 className="text-sm font-bold text-black">{t('requestPickup')}</h3>
                 <button
+                  type="button"
                   onClick={() => setShowRequestForm(false)}
-                  className="text-muted hover:text-black cursor-pointer p-1 rounded-lg hover:bg-border-light"
+                  className="text-muted hover:text-black cursor-pointer p-1 rounded-[4px]"
                   title="Close"
+                  aria-label="Close"
                 >
-                  <XIcon className="w-5 h-5" />
+                  <XIcon className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Quantity tier */}
               <div>
-                <label className="block text-[10px] font-semibold text-muted mb-1.5 uppercase tracking-wide">
-                  Quantity
+                <label className="block text-[11px] font-semibold text-muted mb-2 uppercase tracking-wider">
+                  {t('quantity')}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {QUANTITY_TIERS.map(tier => (
-                    <button
-                      key={tier.id}
-                      onClick={() => { setQuantity(tier.id); setErrors(prev => ({ ...prev, quantity: null })); }}
-                      className={`py-3 rounded-xl border text-center transition-all press-scale cursor-pointer
-                        ${quantity === tier.id
-                          ? 'border-primary bg-primary-light'
-                          : 'border-border bg-surface hover:border-primary/30'
-                        }`}
-                    >
-                      <p className={`text-xs font-semibold ${quantity === tier.id ? 'text-primary' : 'text-black'}`}>
-                        {tier.label}
-                      </p>
-                      <p className="text-[10px] text-muted">{tier.description}</p>
-                    </button>
-                  ))}
+                  {QUANTITY_TIERS.map(tier => {
+                    const selected = quantity === tier.id;
+                    return (
+                      <button
+                        key={tier.id}
+                        type="button"
+                        onClick={() => { setQuantity(tier.id); setErrors(prev => ({ ...prev, quantity: null })); }}
+                        className={`py-2.5 px-2 rounded-[6px] border text-center transition-colors cursor-pointer
+                          ${selected
+                            ? 'border-primary text-primary bg-white ring-1 ring-primary'
+                            : 'border-border bg-white text-black hover:border-black/30'
+                          }`}
+                      >
+                        <p className={`text-xs font-semibold ${selected ? 'text-primary' : 'text-black'}`}>
+                          {tier.label}
+                        </p>
+                        <p className="text-[10px] text-muted mt-0.5">{tier.description}</p>
+                      </button>
+                    );
+                  })}
                 </div>
-                {errors.quantity && <p className="text-xs text-orange-red mt-1 font-medium">{errors.quantity}</p>}
+                {errors.quantity && <p className="text-xs text-orange-red mt-1.5 font-medium">{errors.quantity}</p>}
               </div>
 
               {/* Locality */}
               <div>
-                <label className="block text-[10px] font-semibold text-muted mb-1.5 uppercase tracking-wide">
-                  Pickup Address
+                <label className="block text-[11px] font-semibold text-muted mb-2 uppercase tracking-wider">
+                  {t('pickupAddress')}
                 </label>
                 <select
                   value={locality}
                   onChange={e => setLocality(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-surface text-black
-                    focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 appearance-none cursor-pointer"
+                  className="w-full px-3 py-2.5 border border-border rounded-[6px] text-sm bg-white text-black
+                    focus:outline-none focus:border-primary cursor-pointer"
                 >
                   {DK_LOCALITIES.map(loc => (
                     <option key={loc} value={loc}>{loc}</option>
@@ -254,25 +317,29 @@ export default function PickupPage() {
 
               {/* Time window */}
               <div>
-                <label className="block text-[10px] font-semibold text-muted mb-1.5 uppercase tracking-wide">
-                  Preferred Time
+                <label className="block text-[11px] font-semibold text-muted mb-2 uppercase tracking-wider">
+                  {t('preferredTime')}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {TIME_WINDOWS.map(tw => (
-                    <button
-                      key={tw.id}
-                      onClick={() => { setTimeWindow(tw.id); setErrors(prev => ({ ...prev, timeWindow: null })); }}
-                      className={`py-2.5 rounded-xl border text-xs font-semibold transition-all press-scale cursor-pointer
-                        ${timeWindow === tw.id
-                          ? 'border-primary bg-primary-light text-primary'
-                          : 'border-border text-muted hover:border-primary/30'
-                        }`}
-                    >
-                      {tw.label}
-                    </button>
-                  ))}
+                  {TIME_WINDOWS.map(tw => {
+                    const selected = timeWindow === tw.id;
+                    return (
+                      <button
+                        key={tw.id}
+                        type="button"
+                        onClick={() => { setTimeWindow(tw.id); setErrors(prev => ({ ...prev, timeWindow: null })); }}
+                        className={`py-2.5 px-3 rounded-[6px] border text-xs font-semibold transition-colors cursor-pointer
+                          ${selected
+                            ? 'border-primary text-primary bg-white ring-1 ring-primary'
+                            : 'border-border bg-white text-black hover:border-black/30'
+                          }`}
+                      >
+                        {tw.label}
+                      </button>
+                    );
+                  })}
                 </div>
-                {errors.timeWindow && <p className="text-xs text-orange-red mt-1 font-medium">{errors.timeWindow}</p>}
+                {errors.timeWindow && <p className="text-xs text-orange-red mt-1.5 font-medium">{errors.timeWindow}</p>}
               </div>
 
               {/* Slow Network Alert */}
@@ -293,10 +360,11 @@ export default function PickupPage() {
               )}
 
               <button
+                type="button"
                 onClick={handleRequestPickup}
                 disabled={submitting}
-                className="w-full py-3 bg-primary text-white font-semibold rounded-xl text-sm
-                  hover:bg-primary-dark active:scale-[0.98] transition-all shadow-fab cursor-pointer
+                className="w-full py-2.5 bg-primary text-white font-semibold rounded-[6px] text-sm
+                  hover:bg-primary-dark transition-colors cursor-pointer
                   disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {submitting ? (
@@ -305,146 +373,196 @@ export default function PickupPage() {
                     Scheduling…
                   </>
                 ) : (
-                  'Confirm Pickup'
+                  t('confirmPickup')
                 )}
               </button>
-            </div>
+            </section>
           )}
+
+          {/* === BADGES SECTION === */}
+          <section className="border border-border rounded-[8px] bg-white p-5 space-y-3.5">
+            <h3 className="text-sm font-bold text-black">{t('pickup_badges_title')}</h3>
+            <div className="divide-y divide-border-light">
+              {milestoneBadges.map(item => (
+                <div
+                  key={item.id}
+                  className={`py-2.5 first:pt-0 last:pb-0 flex items-center gap-3 ${
+                    item.unlocked ? '' : 'opacity-50 grayscale'
+                  }`}
+                >
+                  <BadgeMedal id={item.id} locked={!item.unlocked} className="w-7 h-7 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-black truncate">{item.title}</p>
+                    <p className="text-[11px] text-muted truncate">{item.description}</p>
+                  </div>
+                  {item.unlocked ? (
+                    <CheckCircleIcon className="w-4 h-4 text-primary shrink-0" />
+                  ) : (
+                    <LockIcon className="w-3.5 h-3.5 text-muted shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
 
         {/* ====================================================
-            RIGHT / MAIN COLUMN (65-67% width on desktop)
-            Pickup History: 2-column card grid on wide screens
+            RIGHT COLUMN: Active Request + Pickup History & Status
             ==================================================== */}
-        <div className="md:col-span-7 lg:col-span-8">
-          {/* Responsive Header & Summary Stats */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-border">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-black">Pickup History & Status</h3>
-              <p className="text-xs text-muted mt-0.5">
-                Track your scheduled collections and diverted plastic waste
-              </p>
+        <section className="md:col-span-7 lg:col-span-8 space-y-6">
+          {/* === ACTIVE REQUEST STATUS CARD (above history when Requested or Scheduled) === */}
+          {activeRequest && (
+            <div className="border border-border rounded-[8px] bg-white p-4 flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-[6px] border border-border bg-sunken flex items-center justify-center text-primary shrink-0 mt-0.5">
+                  {activeRequest.status === 'Scheduled' ? (
+                    <CalendarIcon className="w-4 h-4" />
+                  ) : (
+                    <ClockIcon className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="min-w-0 space-y-1">
+                  <p className="text-[11px] font-semibold text-primary uppercase tracking-wider">
+                    {t('pickup_active_request_title')}
+                  </p>
+                  <p className="text-sm font-bold text-black">
+                    {activeRequest.status === 'Scheduled'
+                      ? t('pickup_active_scheduled_window')
+                      : t('pickup_active_requested_window', {
+                          window: activeRequest.timeWindow || 'This Week',
+                        })}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {activeRequest.quantity} · {activeRequest.locality || user?.locality || 'Kadri'}
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold text-primary shrink-0">
+                {activeRequest.status}
+              </span>
             </div>
-            <div className="grid grid-cols-3 sm:flex items-center gap-2">
-              <div className="bg-white px-3 py-1.5 rounded-xl border border-border shadow-xs text-center">
-                <p className="text-[10px] font-semibold text-muted uppercase tracking-wider">Total</p>
-                <p className="text-sm font-bold text-black">{pickups.length}</p>
-              </div>
-              <div className="bg-primary-light px-3 py-1.5 rounded-xl border border-primary/20 shadow-xs text-center">
-                <p className="text-[10px] font-semibold text-primary uppercase tracking-wider">Completed</p>
-                <p className="text-sm font-bold text-primary">{completedCount}</p>
-              </div>
-              {pendingCount > 0 && (
-                <div className="bg-yellow-light px-3 py-1.5 rounded-xl border border-yellow/30 shadow-xs text-center">
-                  <p className="text-[10px] font-semibold text-black uppercase tracking-wider">Pending</p>
-                  <p className="text-sm font-bold text-black">{pendingCount}</p>
+          )}
+
+          <div>
+            {/* Section Title */}
+            <h3 className="text-base font-bold text-black mb-4">Pickup History & Status</h3>
+
+            {/* Centered Filter Tabs (Total / Completed / Pending) */}
+            <div className="flex items-center justify-center gap-8 sm:gap-12 border-b border-border">
+              {[
+                { id: 'all', label: 'Total', count: pickups.length },
+                { id: 'completed', label: 'Completed', count: completedCount },
+                { id: 'pending', label: 'Pending', count: pendingCount },
+              ].map(tab => {
+                const active = historyFilter === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setHistoryFilter(tab.id)}
+                    className={`pb-3 text-sm transition-colors cursor-pointer border-b-2 -mb-px flex items-center gap-1.5
+                      ${active
+                        ? 'border-primary text-black font-bold'
+                        : 'border-transparent text-muted hover:text-black font-medium'
+                      }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className={`tabular ${active ? 'text-primary font-bold' : 'text-muted'}`}>
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Flat, Divided Activity List */}
+            <div>
+              {loading ? (
+                <div className="space-y-3 pt-4">
+                  <SkeletonCard />
+                  <SkeletonCard />
+                </div>
+              ) : filteredPickups.length === 0 ? (
+                <div className="pt-6">
+                  <EmptyState
+                    title="No pickups yet"
+                    description="Request a doorstep pickup for your dry recyclable plastic waste."
+                    actionLabel="Request Home Pickup"
+                    onAction={() => setShowRequestForm(true)}
+                  />
+                </div>
+              ) : (
+                <div className="divide-y divide-border border-b border-border">
+                  {filteredPickups.map(pickup => {
+                    const bag = getBagDetails(pickup.quantity);
+                    const formattedDate = new Date(pickup.date).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    });
+
+                    return (
+                      <div
+                        key={pickup.id}
+                        className="py-4 flex items-start justify-between gap-4"
+                      >
+                        {/* Left: Icon + Bag Info + Metadata */}
+                        <div className="flex items-start gap-3.5 min-w-0">
+                          <div
+                            className="w-9 h-9 rounded-[6px] border border-border bg-sunken flex items-center justify-center text-muted shrink-0 mt-0.5"
+                            title={bag.label}
+                          >
+                            {bag.icon}
+                          </div>
+
+                          <div className="min-w-0 space-y-1">
+                            <div className="flex items-baseline gap-2 flex-wrap">
+                              <p className="text-sm font-semibold text-black leading-snug">
+                                {pickup.quantity}
+                              </p>
+                              <span className="text-xs text-muted">{bag.weight}</span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted">
+                              <span className="inline-flex items-center gap-1 text-black/80">
+                                <MapPinIcon className="w-3.5 h-3.5 text-muted shrink-0" />
+                                <span>{pickup.locality || user?.locality || 'Dakshina Kannada'}</span>
+                              </span>
+                              <span aria-hidden="true">·</span>
+                              <span>{formattedDate}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: Points + Plain Status */}
+                        <div className="text-right shrink-0 space-y-1">
+                          {pickup.pointsEarned ? (
+                            <p className="text-sm font-bold text-primary tabular">
+                              +{pickup.pointsEarned} pts
+                            </p>
+                          ) : (
+                            <p className="text-xs font-medium text-muted">
+                              Pending pts
+                            </p>
+                          )}
+                          <p className="text-[11px] font-medium text-muted">
+                            {pickup.status}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
           </div>
-
-          {/* History list container */}
-          <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-            {loading ? (
-              <>
-                <SkeletonCard />
-                <SkeletonCard />
-                <SkeletonCard />
-                <SkeletonCard />
-              </>
-            ) : pickups.length === 0 ? (
-              <div className="md:col-span-full">
-                <EmptyState
-                  title="No pickups yet"
-                  description="Request a doorstep pickup for your dry recyclable plastic waste."
-                  actionLabel="Request Home Pickup"
-                  onAction={() => setShowRequestForm(true)}
-                />
-              </div>
-            ) : (
-              pickups.map(pickup => {
-                const bag = getBagDetails(pickup.quantity);
-                return (
-                  <div
-                    key={pickup.id}
-                    className="bg-surface rounded-xl md:rounded-2xl border border-border p-3.5 md:p-4 shadow-xs md:shadow-card md:hover:shadow-elevated md:hover:border-primary/30 transition-all press-scale flex flex-col justify-between gap-3 md:gap-3.5"
-                  >
-                    {/* Top row: Bag size & icon + Status Badge */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl flex-shrink-0
-                            ${pickup.status === 'Completed' ? 'bg-primary-light text-primary' : 'bg-yellow-light text-black'}`}
-                          title={bag.label}
-                        >
-                          {bag.icon}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-bold text-black leading-tight truncate">{pickup.quantity}</p>
-                          <p className="text-[11px] text-muted font-medium mt-0.5">{bag.weight}</p>
-                        </div>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <StatusBadge status={pickup.status} />
-                      </div>
-                    </div>
-
-                    {/* Middle box: Locality & Date surfaced prominently */}
-                    <div className="bg-border-light/60 rounded-xl px-3 py-2.5 flex items-center justify-between text-xs gap-2">
-                      <div className="flex items-center gap-1.5 text-black font-medium truncate mr-2">
-                        <MapPinIcon className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="truncate">{pickup.locality || user?.locality || 'Dakshina Kannada'}</span>
-                      </div>
-                      <div className="text-muted font-medium flex-shrink-0">
-                        {new Date(pickup.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </div>
-                    </div>
-
-                    {/* Bottom footer: Verification text & prominent points badge */}
-                    <div className="flex items-center justify-between pt-1 border-t border-border-light/80">
-                      <div className="flex items-center gap-1 text-[11px]">
-                        {pickup.status === 'Completed' ? (
-                          <span className="text-primary font-semibold flex items-center gap-1.5">
-                            <CheckCircleIcon className="w-3.5 h-3.5" />
-                            <span>Verified Collection</span>
-                          </span>
-                        ) : pickup.status === 'Scheduled' ? (
-                          <span className="text-muted font-medium flex items-center gap-1.5">
-                            <CalendarIcon className="w-3.5 h-3.5" />
-                            <span>Scheduled Pickup</span>
-                          </span>
-                        ) : (
-                          <span className="text-muted font-medium flex items-center gap-1.5">
-                            <ClockIcon className="w-3.5 h-3.5" />
-                            <span>Awaiting Schedule</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex-shrink-0">
-                        {pickup.pointsEarned ? (
-                          <span className="text-xs font-bold text-primary bg-primary-light px-2.5 py-1 rounded-full border border-primary/20">
-                            +{pickup.pointsEarned} pts
-                          </span>
-                        ) : (
-                          <span className="text-xs font-semibold text-muted bg-border-light px-2.5 py-1 rounded-full">
-                            Pending pts
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
+        </section>
       </div>
 
       {/* Success Confirmation Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-[2000] bg-black/60 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-elevated border border-border">
+        <div className="fixed inset-0 z-[2000] bg-black/50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-[8px] max-w-sm w-full p-6 border border-border">
             <SuccessState
               title="Pickup Scheduled!"
               description="Our collection vehicle will visit your locality during the selected window. We'll send an SMS when the driver is nearby."

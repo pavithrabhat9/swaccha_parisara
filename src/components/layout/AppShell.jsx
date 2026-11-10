@@ -1,25 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import TopBar from './TopBar';
 import OfflineBanner from '../ui/OfflineBanner';
+import AskChatSheet from '../chat/AskChatSheet';
 
 /**
  * App shell layout wrapper.
- * Handles: OfflineBanner + TopBar (mobile) + scrollable content area + BottomNav.
+ * Handles: OfflineBanner + shared TopBar + scrollable content area + BottomNav + AskChatSheet.
  * Uses min-w-0 and max-w-full so horizontal carousels inside pages never expand the viewport width.
  */
 export default function AppShell({ children }) {
   const location = useLocation();
   const isMapPage = location.pathname === '/';
+  const [askOpen, setAskOpen] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen min-h-dvh w-full max-w-full overflow-x-hidden bg-cream text-ink">
       {/* Persistent Offline Banner */}
       <OfflineBanner />
 
-      {/* Mobile brand header */}
-      <TopBar />
+      {/* Shared header across all screens (mobile + desktop) */}
+      <TopBar onOpenAsk={() => setAskOpen(true)} />
 
       {/* Main content area */}
       <main
@@ -36,8 +38,11 @@ export default function AppShell({ children }) {
         </div>
       </main>
 
-      {/* Responsive navigation (floating bottom bar on mobile, top bar on desktop) */}
+      {/* Responsive 4-tab navigation (Map, Pickup, Learn, Profile) */}
       <BottomNav />
+
+      {/* Ask Chatbot Sheet / Side Panel */}
+      <AskChatSheet open={askOpen} onClose={() => setAskOpen(false)} />
     </div>
   );
 }

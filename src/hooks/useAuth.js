@@ -76,6 +76,33 @@ export function useAuth() {
     return { success: true };
   }, [user]);
 
+  // Update existing profile (from Profile page)
+  const updateProfile = useCallback(async (updates) => {
+    const trimmedName = updates?.name?.trim();
+    const cleanedPhone = String(updates?.phone || user?.phone || '').replace(/\D/g, '').slice(0, 10);
+    const nextLocality = updates?.locality || user?.locality;
+
+    if (!trimmedName) {
+      return { success: false, error: 'Please enter your name' };
+    }
+    if (cleanedPhone.length < 10) {
+      return { success: false, error: 'Please enter a valid 10-digit phone number' };
+    }
+    if (!nextLocality) {
+      return { success: false, error: 'Please select your locality' };
+    }
+
+    const updatedUser = {
+      ...user,
+      name: trimmedName,
+      phone: cleanedPhone,
+      locality: nextLocality,
+    };
+    setUser(updatedUser);
+    await authApi.saveUser(updatedUser);
+    return { success: true, user: updatedUser };
+  }, [user]);
+
   const logout = useCallback(() => {
     setUser(null);
     setIsLoggedIn(false);
@@ -91,6 +118,7 @@ export function useAuth() {
     sendOtp,
     verifyOtp,
     completeSetup,
+    updateProfile,
     logout,
   };
 }
