@@ -42,7 +42,7 @@ export default function TopBar({ onOpenAsk }) {
         <button
           type="button"
           onClick={onOpenAsk}
-          aria-label="Ask"
+          aria-label={t('ask')}
           className="touch-target h-11 px-2.5 md:px-3.5 rounded-lg text-white font-semibold hover:bg-white/15 inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
         >
           <ChatBubbleIcon className="w-4 h-4 text-white shrink-0" />

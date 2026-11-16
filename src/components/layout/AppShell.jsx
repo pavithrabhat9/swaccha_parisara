@@ -12,7 +12,8 @@ import AskChatSheet from '../chat/AskChatSheet';
  */
 export default function AppShell({ children }) {
   const location = useLocation();
-  const isMapPage = location.pathname === '/';
+  const isMapPage = location.pathname === '/map';
+  const isAuthPage = location.pathname === '/auth';
   const [askOpen, setAskOpen] = useState(false);
 
   return (
@@ -29,7 +30,9 @@ export default function AppShell({ children }) {
           flex-1 relative w-full min-w-0 max-w-full
           ${isMapPage
             ? 'md:pt-16'
-            : 'pt-[52px] pb-20 md:pb-10 md:pt-16'
+            : isAuthPage
+              ? 'pt-[52px] pb-10 md:pt-16'
+              : 'pt-[52px] pb-20 md:pb-10 md:pt-16'
           }
         `}
       >
@@ -38,7 +41,7 @@ export default function AppShell({ children }) {
         </div>
       </main>
 
-      {/* Responsive 4-tab navigation (Map, Pickup, Learn, Profile) */}
+      {/* Responsive 5-tab navigation (Home, Map, Pickup, Rewards, Profile) */}
       <BottomNav />
 
       {/* Ask Chatbot Sheet / Side Panel */}

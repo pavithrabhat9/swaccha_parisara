@@ -3,34 +3,55 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useReports } from '../hooks/useReports';
-import { useBusinessSubscription } from '../hooks/useBusinessSubscription';
+import { usePickups } from '../hooks/usePickups';
+import { useAddresses } from '../hooks/useAddresses';
 import { useProfilePreferences } from '../hooks/useProfilePreferences';
 import { useToast } from '../components/ui/Toast';
-import LoginFlow from '../components/auth/LoginFlow';
 import StatusBadge from '../components/ui/StatusBadge';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
 import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
 import { DK_LOCALITIES } from '../data/mockPickups';
-import { EditIcon, MapPinIcon, CalendarIcon, UserIcon } from '../components/ui/Icons';
+import { formatShortDate } from '../utils/dateUtils';
+import {
+  EditIcon,
+  MapPinIcon,
+  UserIcon,
+  TrashIcon,
+  ChevronRightIcon,
+} from '../components/ui/Icons';
 
-// Default device-submitted report IDs from mock data (so all 3 statuses are represented alongside new RP-* reports)
+// Seeded device report IDs so all 3 statuses (Reported, Being Reviewed, Cleared) are visible alongside new RP-* reports
 const SEEDED_DEVICE_REPORT_IDS = new Set(['RPT-0002', 'RPT-0005', 'RPT-0006']);
 
 /**
- * ProfilePage — Account management, My Reports, Business link/status,
- * Notification Preferences, About the NGO, and Privacy/Version info.
+ * ProfilePage — Stage 6:
+ * 1. Account card: name, phone, locality, edit (mock)
+ * 2. My activity: timeline of reports and pickups
+ * 3. My reports: list with photo thumbnail, waste type, date and status chip (Reported, Being Reviewed, Cleared)
+ * 4. Addresses: list, add, edit, delete, set default (locality dropdown)
+ * 5. Notification toggles (pickup updates, report status, NGO news), saved through a service
+ * 6. Privacy Policy & Terms of Service pages + About the NGO (placeholder contacts), app version, Sign out
+ * (No Payment section and no Security section.)
  */
 export default function ProfilePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const authHook = useAuth();
-  const { isLoggedIn, user, updateProfile, logout } = authHook;
-
+  const { user, updateProfile, logout } = useAuth();
   const { reports, loading: reportsLoading } = useReports();
-  const { business, loading: businessLoading } = useBusinessSubscription();
+  const { pickups, loading: pickupsLoading } = usePickups();
+  const {
+    addresses,
+    loading: addressesLoading,
+    error: addressesError,
+    reloadAddresses,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress,
+  } = useAddresses();
   const {
     preferences,
     loading: prefsLoading,
@@ -46,7 +67,13 @@ export default function ProfilePage() {
   const [editLocality, setEditLocality] = useState('');
   const [editError, setEditError] = useState('');
 
-  const startEditing = () => {
+  // Address form state (add / edit)
+  const [addressFormMode, setAddressFormMode] = useState(null); // null | 'add' | addressId
+  const [addrLabel, setAddrLabel] = useState('');
+  const [addrLine, setAddrLine] = useState('');
+  const [addrLocality, setAddrLocality] = useState(DK_LOCALITIES[0]);
+
+  const startEditingAccount = () => {
     setEditName(user?.name || '');
     setEditPhone(user?.phone || '');
     setEditLocality(user?.locality || DK_LOCALITIES[0]);
@@ -63,34 +90,97 @@ export default function ProfilePage() {
       locality: editLocality,
     });
     if (!result.success) {
-      setEditError(result.error);
+      setEditError(t(result.error));
       return;
     }
     setIsEditing(false);
     showToast(t('profile_updated_toast'), 'success', 2500);
   };
 
-  // Reports submitted from this device (new RP-* reports + 3 seeded device reports)
+  const openAddAddress = () => {
+    setAddrLabel('');
+    setAddrLine('');
+    setAddrLocality(user?.locality || DK_LOCALITIES[0]);
+    setAddressFormMode('add');
+  };
+
+  const openEditAddress = (addr) => {
+    setAddrLabel(addr.label);
+    setAddrLine(addr.line);
+    setAddrLocality(addr.locality || DK_LOCALITIES[0]);
+    setAddressFormMode(addr.id);
+  };
+
+  const handleSaveAddress = async (e) => {
+    e.preventDefault();
+    if (!addrLine.trim()) return;
+    if (addressFormMode === 'add') {
+      await addAddress({ label: addrLabel || 'Address', line: addrLine, locality: addrLocality });
+    } else if (addressFormMode) {
+      await updateAddress(addressFormMode, {
+        label: addrLabel || 'Address',
+        line: addrLine,
+        locality: addrLocality,
+      });
+    }
+    setAddressFormMode(null);
+    showToast(t('profile_address_saved_toast'), 'success', 2500);
+  };
+
+  const handleDeleteAddress = async (id) => {
+    await deleteAddress(id);
+    showToast(t('profile_address_deleted_toast'), 'success', 2500);
+  };
+
+  const handleSetDefaultAddress = async (id) => {
+    await setDefaultAddress(id);
+    showToast(t('profile_address_default_toast'), 'success', 2500);
+  };
+
+  // Device-submitted reports
   const myReports = useMemo(() => {
     return (reports || []).filter(
       r => String(r.id).startsWith('RP-') || SEEDED_DEVICE_REPORT_IDS.has(r.id)
     );
   }, [reports]);
 
+  // Unified chronological activity timeline (reports + pickups)
+  const activityItems = useMemo(() => {
+    const reportEvents = myReports.map(r => ({
+      id: `act-rep-${r.id}`,
+      kind: 'report',
+      date: r.createdAt ? r.createdAt.split('T')[0] : '2026-07-01',
+      title: t('profile_activity_report_label', { type: r.wasteType }),
+      subtitle: r.placeName,
+      status: r.status,
+    }));
+
+    const pickupEvents = (pickups || []).slice(0, 5).map(p => ({
+      id: `act-pu-${p.id}`,
+      kind: 'pickup',
+      date: p.date,
+      title: t('profile_activity_pickup_label', { bag: p.quantity }),
+      subtitle: p.locality || 'Kadri',
+      status: p.status,
+    }));
+
+    return [...pickupEvents, ...reportEvents].sort((a, b) =>
+      String(b.date).localeCompare(String(a.date))
+    );
+  }, [myReports, pickups, t]);
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 md:py-8 space-y-6">
-      {/* Page Title + Sign Out button */}
+      {/* Page Title + Sign Out */}
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-bold text-black tracking-tight">{t('profile_title')}</h1>
-        {isLoggedIn && (
-          <button
-            type="button"
-            onClick={logout}
-            className="touch-target px-3 py-1.5 text-xs font-semibold text-orange-red hover:text-orange-red-dark transition-colors cursor-pointer"
-          >
-            {t('signOut')}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={logout}
+          className="touch-target px-3 py-1.5 text-xs font-semibold text-orange-red hover:text-orange-red-dark transition-colors cursor-pointer"
+        >
+          {t('signOut')}
+        </button>
       </div>
 
       {/* ====================================================
@@ -101,10 +191,10 @@ export default function ProfilePage() {
           <h2 className="text-sm font-bold text-black uppercase tracking-wider">
             {t('profile_account_title')}
           </h2>
-          {isLoggedIn && !isEditing && (
+          {!isEditing && (
             <button
               type="button"
-              onClick={startEditing}
+              onClick={startEditingAccount}
               className="touch-target px-3 py-1.5 rounded-[6px] border border-border text-xs font-semibold text-black hover:border-black/30 inline-flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <EditIcon className="w-3.5 h-3.5" />
@@ -113,15 +203,14 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {!isLoggedIn ? (
-          <LoginFlow authHook={authHook} />
-        ) : isEditing ? (
+        {isEditing ? (
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div>
-              <label className="block text-[11px] font-semibold text-muted mb-1.5 uppercase tracking-wider">
+              <label htmlFor="profile-name" className="block text-[11px] font-semibold text-muted mb-1.5 uppercase tracking-wider">
                 {t('yourName')}
               </label>
               <input
+                id="profile-name"
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
@@ -130,10 +219,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-muted mb-1.5 uppercase tracking-wider">
+              <label htmlFor="profile-phone" className="block text-[11px] font-semibold text-muted mb-1.5 uppercase tracking-wider">
                 {t('phoneNumber')}
               </label>
               <input
+                id="profile-phone"
                 type="tel"
                 maxLength={10}
                 value={editPhone}
@@ -143,10 +233,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-muted mb-1.5 uppercase tracking-wider">
+              <label htmlFor="profile-locality" className="block text-[11px] font-semibold text-muted mb-1.5 uppercase tracking-wider">
                 {t('locality')}
               </label>
               <select
+                id="profile-locality"
                 value={editLocality}
                 onChange={(e) => setEditLocality(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-border rounded-[6px] text-sm bg-white text-black focus:outline-none focus:border-primary cursor-pointer"
@@ -187,7 +278,7 @@ export default function ProfilePage() {
                 {user?.name || 'Resident'}
               </p>
               <p className="text-xs text-muted tabular">
-                +91 {user?.phone || '9876543210'}
+                {user?.phone ? `+91 ${user.phone}` : 'Google Account (Sample)'}
               </p>
               <p className="text-xs text-muted inline-flex items-center gap-1">
                 <MapPinIcon className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -199,7 +290,45 @@ export default function ProfilePage() {
       </section>
 
       {/* ====================================================
-          2. MY REPORTS (submitted from this device)
+          2. MY ACTIVITY (Timeline of reports and pickups)
+          ==================================================== */}
+      <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+        <div>
+          <h2 className="text-sm font-bold text-black uppercase tracking-wider">
+            {t('profile_activity_title')}
+          </h2>
+          <p className="text-xs text-muted mt-0.5">{t('profile_activity_subtitle')}</p>
+        </div>
+
+        {reportsLoading || pickupsLoading ? (
+          <SkeletonCard />
+        ) : activityItems.length === 0 ? (
+          <EmptyState title={t('profile_activity_empty')} />
+        ) : (
+          <ol className="relative border-l-2 border-border ml-2.5 space-y-4">
+            {activityItems.slice(0, 6).map(item => (
+              <li key={item.id} className="pl-4 relative flex items-start justify-between gap-3">
+                <span
+                  aria-hidden="true"
+                  className={`absolute -left-[7px] top-1.5 w-3 h-3 rounded-full border-2 border-white ${
+                    item.kind === 'pickup' ? 'bg-primary' : 'bg-yellow'
+                  }`}
+                />
+                <div className="min-w-0 space-y-0.5">
+                  <p className="text-xs font-bold text-black truncate">{item.title}</p>
+                  <p className="text-[11px] text-muted">
+                    {item.subtitle} · {formatShortDate(item.date)}
+                  </p>
+                </div>
+                <StatusBadge status={item.status} />
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      {/* ====================================================
+          3. MY REPORTS (with photo thumbnail, waste type, date & status chip)
           ==================================================== */}
       <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
         <div>
@@ -214,109 +343,204 @@ export default function ProfilePage() {
         {reportsLoading ? (
           <div className="space-y-3">
             <SkeletonCard />
-            <SkeletonCard />
           </div>
         ) : myReports.length === 0 ? (
           <EmptyState
             title={t('profile_no_reports_title')}
             description={t('profile_no_reports_desc')}
             actionLabel={t('profile_report_plastic')}
-            onAction={() => navigate('/')}
+            onAction={() => navigate('/map')}
           />
         ) : (
           <div className="divide-y divide-border">
-            {myReports.map(report => {
-              const formattedDate = report.createdAt
-                ? new Date(report.createdAt).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })
-                : `${report.daysSinceFirst || 0} ${t('daysAgo')}`;
-
-              return (
-                <div
-                  key={report.id}
-                  className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3.5"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={report.photoUrl}
-                      alt={report.wasteType}
-                      className="w-12 h-12 rounded-[6px] object-cover bg-sunken border border-border shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-black truncate">
-                        {report.wasteType}
-                      </p>
-                      <p className="text-xs text-muted truncate mt-0.5">
-                        {report.placeName} · {formattedDate}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0">
-                    <StatusBadge status={report.status} />
+            {myReports.map(report => (
+              <div
+                key={report.id}
+                className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3.5"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <img
+                    src={report.photoUrl}
+                    alt={report.wasteType}
+                    className="w-12 h-12 rounded-[6px] object-cover bg-sunken border border-border shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-black truncate">
+                      {report.wasteType}
+                    </p>
+                    <p className="text-xs text-muted truncate mt-0.5">
+                      {report.placeName} · {formatShortDate(report.createdAt)}
+                    </p>
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="shrink-0">
+                  <StatusBadge status={report.status} />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>
 
       {/* ====================================================
-          3. FOR BUSINESSES (status card if subscribed, otherwise link)
+          4. ADDRESSES (list, add, edit, delete, set default with locality dropdown)
           ==================================================== */}
-      <section className="border border-border rounded-[8px] bg-white p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
+      <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <div>
             <h2 className="text-sm font-bold text-black uppercase tracking-wider">
-              {t('profile_business_title')}
+              {t('profile_addresses_title')}
             </h2>
-
-            {businessLoading ? (
-              <Skeleton width="220px" height="18px" rounded="sm" />
-            ) : business ? (
-              <div className="space-y-1 pt-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-black">{business.name}</p>
-                  <span
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-[4px] border ${
-                      business.isPaused
-                        ? 'bg-yellow-light text-yellow-dark border-yellow/30'
-                        : 'bg-primary-light text-primary-dark border-primary/20'
-                    }`}
-                  >
-                    {business.isPaused ? t('profile_business_paused') : t('profile_business_active')}
-                  </span>
-                </div>
-                <p className="text-xs text-muted inline-flex items-center gap-1.5">
-                  <CalendarIcon className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span>
-                    {t('profile_business_next_pickup', { date: business.nextPickup })}
-                  </span>
-                </p>
-              </div>
-            ) : (
-              <p className="text-xs text-muted leading-relaxed">
-                {t('profile_business_desc')}
-              </p>
-            )}
+            <p className="text-xs text-muted mt-0.5">{t('profile_addresses_subtitle')}</p>
           </div>
-
-          <button
-            type="button"
-            onClick={() => navigate('/business')}
-            className="touch-target px-4 py-2.5 rounded-[6px] bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors shrink-0 cursor-pointer"
-          >
-            {business ? t('profile_business_manage') : t('profile_business_cta')}
-          </button>
+          {!addressFormMode && (
+            <button
+              type="button"
+              onClick={openAddAddress}
+              className="touch-target px-3 py-1.5 rounded-[6px] bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer shrink-0"
+            >
+              {t('profile_address_add')}
+            </button>
+          )}
         </div>
+
+        {addressesLoading ? (
+          <Skeleton width="100%" height="72px" rounded="sm" />
+        ) : addressesError ? (
+          <ErrorState
+            title={t('ui_error_default_title')}
+            description={addressesError}
+            onRetry={reloadAddresses}
+          />
+        ) : (
+          <>
+            {addressFormMode && (
+              <form
+                onSubmit={handleSaveAddress}
+                className="p-4 rounded-[6px] border border-border bg-sunken space-y-3"
+              >
+                <div>
+                  <label htmlFor="addr-label" className="block text-[11px] font-semibold text-muted mb-1 uppercase tracking-wider">
+                    {t('profile_address_label_field')}
+                  </label>
+                  <input
+                    id="addr-label"
+                    type="text"
+                    value={addrLabel}
+                    onChange={e => setAddrLabel(e.target.value)}
+                    placeholder="Home"
+                    className="w-full px-3 py-2 border border-border rounded-[6px] text-xs bg-white text-black focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="addr-line" className="block text-[11px] font-semibold text-muted mb-1 uppercase tracking-wider">
+                    {t('profile_address_line_field')}
+                  </label>
+                  <input
+                    id="addr-line"
+                    type="text"
+                    required
+                    value={addrLine}
+                    onChange={e => setAddrLine(e.target.value)}
+                    placeholder="Flat / Street / Landmark"
+                    className="w-full px-3 py-2 border border-border rounded-[6px] text-xs bg-white text-black focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="addr-locality" className="block text-[11px] font-semibold text-muted mb-1 uppercase tracking-wider">
+                    {t('locality')}
+                  </label>
+                  <select
+                    id="addr-locality"
+                    value={addrLocality}
+                    onChange={e => setAddrLocality(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-[6px] text-xs bg-white text-black focus:outline-none focus:border-primary cursor-pointer"
+                  >
+                    {DK_LOCALITIES.map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="submit"
+                    className="min-h-[40px] px-4 py-2 rounded-[6px] bg-primary text-white text-xs font-semibold hover:bg-primary-dark cursor-pointer"
+                  >
+                    {t('profile_save')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddressFormMode(null)}
+                    className="min-h-[40px] px-4 py-2 rounded-[6px] border border-border bg-white text-xs font-semibold text-muted hover:text-black cursor-pointer"
+                  >
+                    {t('profile_cancel')}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="divide-y divide-border">
+              {addresses.map(addr => (
+                <div
+                  key={addr.id}
+                  className="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div className="min-w-0 space-y-0.5">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold text-black">{addr.label}</p>
+                      {addr.isDefault && (
+                        <span className="px-2 py-0.5 rounded-[4px] bg-primary-light text-primary-dark text-[10px] font-bold">
+                          {t('profile_address_default_badge')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted">
+                      {addr.line} · <span className="font-medium text-black">{addr.locality}</span>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {!addr.isDefault && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetDefaultAddress(addr.id)}
+                        className="min-h-[36px] px-2.5 py-1 rounded-[6px] border border-border text-[11px] font-semibold text-primary hover:border-primary cursor-pointer"
+                      >
+                        {t('profile_address_set_default')}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => openEditAddress(addr)}
+                      aria-label={`${t('profile_address_edit')} ${addr.label}`}
+                      className="min-h-[36px] px-2.5 py-1 rounded-[6px] border border-border text-[11px] font-semibold text-black hover:border-black/30 inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <EditIcon className="w-3.5 h-3.5" />
+                      <span>{t('profile_address_edit')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteAddress(addr.id)}
+                      aria-label={`${t('profile_address_delete')} ${addr.label}`}
+                      className="min-h-[36px] px-2.5 py-1 rounded-[6px] border border-border text-[11px] font-semibold text-orange-red hover:border-orange-red/40 inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <TrashIcon className="w-3.5 h-3.5" />
+                      <span>{t('profile_address_delete')}</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {/* ====================================================
-          4. NOTIFICATION PREFERENCES (3 mock toggles saved in localStorage via service)
+          5. NOTIFICATION PREFERENCES (3 mock toggles saved via service)
           ==================================================== */}
       <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
         <h2 className="text-sm font-bold text-black uppercase tracking-wider">
@@ -384,9 +608,9 @@ export default function ProfilePage() {
       </section>
 
       {/* ====================================================
-          5. ABOUT THE NGO (mission + clearly marked placeholder contact details)
+          6. PRIVACY POLICY, TERMS OF SERVICE & ABOUT THE NGO
           ==================================================== */}
-      <section className="border border-border rounded-[8px] bg-white p-5 space-y-3">
+      <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
         <h2 className="text-sm font-bold text-black uppercase tracking-wider">
           {t('profile_about_title')}
         </h2>
@@ -394,6 +618,7 @@ export default function ProfilePage() {
           {t('profile_about_mission')}
         </p>
 
+        {/* Placeholder Contact Details (clearly marked) */}
         <div className="pt-3 border-t border-border-light space-y-1">
           <p className="text-[11px] font-semibold text-black uppercase tracking-wider">
             {t('profile_contact_label')}
@@ -402,23 +627,41 @@ export default function ProfilePage() {
           <p className="text-xs text-muted">{t('profile_contact_phone')}</p>
           <p className="text-xs text-muted">{t('profile_contact_office')}</p>
         </div>
-      </section>
 
-      {/* ====================================================
-          6. PRIVACY AND APP VERSION
-          ==================================================== */}
-      <section className="border border-border rounded-[8px] bg-white p-5 space-y-2">
-        <h2 className="text-sm font-bold text-black uppercase tracking-wider">
-          {t('profile_privacy_title')}
-        </h2>
-        <p className="text-xs text-muted leading-relaxed">
-          {t('profile_privacy_text')}
-        </p>
-        <p className="text-[11px] font-semibold text-muted pt-1">
-          {t('profile_version_label')}
-        </p>
+        {/* Legal page links (Privacy Policy & Terms of Service) */}
+        <div className="pt-3 border-t border-border-light divide-y divide-border-light">
+          <button
+            type="button"
+            onClick={() => navigate('/privacy')}
+            className="w-full min-h-[44px] py-2 flex items-center justify-between text-xs font-semibold text-black hover:text-primary cursor-pointer"
+          >
+            <span>{t('profile_legal_privacy_link')}</span>
+            <ChevronRightIcon className="w-4 h-4 text-muted" />
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/terms')}
+            className="w-full min-h-[44px] py-2 flex items-center justify-between text-xs font-semibold text-black hover:text-primary cursor-pointer"
+          >
+            <span>{t('profile_legal_terms_link')}</span>
+            <ChevronRightIcon className="w-4 h-4 text-muted" />
+          </button>
+        </div>
+
+        {/* App version + Sign out */}
+        <div className="pt-3 border-t border-border-light flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold text-muted">
+            {t('profile_version_label')}
+          </p>
+          <button
+            type="button"
+            onClick={logout}
+            className="touch-target px-3 py-1.5 text-xs font-semibold text-orange-red hover:text-orange-red-dark transition-colors cursor-pointer"
+          >
+            {t('signOut')}
+          </button>
+        </div>
       </section>
     </div>
   );
 }
-
