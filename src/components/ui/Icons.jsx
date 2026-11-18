@@ -252,6 +252,17 @@ export const QrIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
+export const ScanFrameIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} viewBox="0 0 24 24" {...stroke}>
+    <path d="M3 8V6a3 3 0 0 1 3-3h2" />
+    <path d="M16 3h2a3 3 0 0 1 3 3v2" />
+    <path d="M21 16v2a3 3 0 0 1-3 3h-2" />
+    <path d="M8 21H6a3 3 0 0 1-3-3v-2" />
+    <rect x="7" y="7" width="10" height="10" rx="2" />
+    <line x1="6" y1="12" x2="18" y2="12" />
+  </svg>
+);
+
 export const ChevronRightIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} viewBox="0 0 24 24" {...stroke}>
     <polyline points="9 18 15 12 9 6" />
@@ -281,5 +292,27 @@ export const LeafIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" {...stroke}>
     <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" />
     <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+  </svg>
+);
+
+export const BellIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} viewBox="0 0 24 24" {...stroke}>
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
+export const TruckIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} viewBox="0 0 24 24" {...stroke}>
+    <rect x="1" y="3" width="15" height="13" rx="1.5" />
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+    <circle cx="5.5" cy="18.5" r="2.5" />
+    <circle cx="18.5" cy="18.5" r="2.5" />
+  </svg>
+);
+
+export const PlayIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5.5v13a1 1 0 0 0 1.52.85l10.4-6.5a1 1 0 0 0 0-1.7L9.52 4.65A1 1 0 0 0 8 5.5z" />
   </svg>
 );

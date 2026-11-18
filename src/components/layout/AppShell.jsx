@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
-import TopBar from './TopBar';
 import OfflineBanner from '../ui/OfflineBanner';
 import AskChatSheet from '../chat/AskChatSheet';
 
 /**
  * App shell layout wrapper.
- * Handles: OfflineBanner + shared TopBar + scrollable content area + BottomNav + AskChatSheet.
+ * Handles: OfflineBanner + scrollable content area + BottomNav + AskChatSheet.
  * Uses min-w-0 and max-w-full so horizontal carousels inside pages never expand the viewport width.
  */
 export default function AppShell({ children }) {
@@ -21,9 +20,6 @@ export default function AppShell({ children }) {
       {/* Persistent Offline Banner */}
       <OfflineBanner />
 
-      {/* Shared header across all screens (mobile + desktop) */}
-      <TopBar onOpenAsk={() => setAskOpen(true)} />
-
       {/* Main content area */}
       <main
         className={`
@@ -31,8 +27,8 @@ export default function AppShell({ children }) {
           ${isMapPage
             ? 'md:pt-16'
             : isAuthPage
-              ? 'pt-[52px] pb-10 md:pt-16'
-              : 'pt-[52px] pb-20 md:pb-10 md:pt-16'
+              ? 'pb-10 md:pt-16'
+              : 'pb-28 md:pb-10 md:pt-16'
           }
         `}
       >

@@ -27,8 +27,9 @@ const STATUS_DOTS = {
 /**
  * Color-coded status pill badge.
  * Used for report statuses, pickup statuses, business schedule statuses.
+ * `status` picks the colors; optional `label` overrides the displayed text (e.g. a translated label).
  */
-export default function StatusBadge({ status, size = 'sm', className = '' }) {
+export default function StatusBadge({ status, label, size = 'sm', className = '' }) {
   const styles = STATUS_STYLES[status] || 'bg-sunken text-muted border-border';
   const dotColor = STATUS_DOTS[status] || 'bg-muted';
 
@@ -44,7 +45,7 @@ export default function StatusBadge({ status, size = 'sm', className = '' }) {
       `}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} aria-hidden="true" />
-      {status}
+      {label || status}
     </span>
   );
 }

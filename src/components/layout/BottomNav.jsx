@@ -1,13 +1,13 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { HomeIcon, GiftIcon, UserIcon } from '../ui/Icons';
+import { HomeIcon, GiftIcon, UserIcon, ScanFrameIcon } from '../ui/Icons';
 
 const NAV_ITEMS = [
   {
     path: '/home',
     labelKey: 'home',
-    icon: () => <HomeIcon className="w-[21px] h-[21px]" />,
+    icon: () => <HomeIcon className="w-[22px] h-[22px]" />,
   },
   {
     path: '/map',
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
     // The Report flow is launched from the Map, so Map stays highlighted while reporting
     alsoActiveOn: ['/report'],
     icon: () => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
         <circle cx="12" cy="10" r="3" />
       </svg>
@@ -24,24 +24,18 @@ const NAV_ITEMS = [
   {
     path: '/pickup',
     labelKey: 'pickup',
-    primary: true, // center tab, raised on mobile as the primary action
-    icon: () => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-        <line x1="12" y1="22.08" x2="12" y2="12" />
-      </svg>
-    ),
+    primary: true, // center raised button on mobile
+    icon: () => <ScanFrameIcon className="w-[26px] h-[26px]" />,
   },
   {
     path: '/rewards',
     labelKey: 'rewards',
-    icon: () => <GiftIcon className="w-[21px] h-[21px]" />,
+    icon: () => <GiftIcon className="w-[22px] h-[22px]" />,
   },
   {
     path: '/profile',
     labelKey: 'profile',
-    icon: () => <UserIcon className="w-[21px] h-[21px]" />,
+    icon: () => <UserIcon className="w-[22px] h-[22px]" />,
   },
 ];
 
@@ -50,9 +44,9 @@ const isItemActive = (item, pathname) =>
 
 /**
  * Single responsive navigation component (5 destinations: Home, Map, Pickup, Rewards, Profile):
- * - Mobile (<768px): fixed full-width white bottom bar, icon + tab name, Pickup raised in the center.
- * - Desktop (≥768px): centered pill dock in the top header (icons only below 1280px so it never
- *   collides with the logo, icon + label from 1280px).
+ * - Mobile (<768px): full-width primary green (#38761d) bar with a constant-geometry curved center notch
+ *   and a raised white circular Pickup button (scan-frame icon). Icons only, white with active dot.
+ * - Desktop (≥768px): centered pill dock in the top header (unchanged).
  * Hidden on the Auth screen.
  */
 export default function BottomNav() {
@@ -62,9 +56,45 @@ export default function BottomNav() {
 
   if (location.pathname === '/auth') return null;
 
+  const leftItems = NAV_ITEMS.slice(0, 2);
+  const centerItem = NAV_ITEMS[2];
+  const rightItems = NAV_ITEMS.slice(3, 5);
+  const centerActive = isItemActive(centerItem, location.pathname);
+  const centerLabel = t(centerItem.labelKey);
+
+  const renderSideTab = (item) => {
+    const isActive = isItemActive(item, location.pathname);
+    const label = t(item.labelKey);
+
+    return (
+      <button
+        key={item.path}
+        type="button"
+        onClick={() => navigate(item.path)}
+        aria-label={label}
+        aria-current={isActive ? 'page' : undefined}
+        className="flex-1 h-full min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-1 text-white cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow rounded-lg"
+      >
+        <span
+          className={`transition-all duration-200 motion-reduce:transition-none motion-reduce:transform-none ${
+            isActive ? 'opacity-100 scale-105' : 'opacity-70 hover:opacity-95 scale-100'
+          }`}
+        >
+          {item.icon()}
+        </span>
+        <span
+          aria-hidden="true"
+          className={`w-1.5 h-1.5 rounded-full bg-white transition-all duration-200 motion-reduce:transition-none ${
+            isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+          }`}
+        />
+      </button>
+    );
+  };
+
   return (
     <>
-      {/* === DESKTOP NAV DOCK (≥768px) — centered inside the top header === */}
+      {/* === DESKTOP NAV DOCK (≥768px) — centered inside the top header (unchanged) === */}
       <nav
         aria-label="Primary"
         className="hidden md:flex fixed top-2.5 left-1/2 -translate-x-1/2 z-[1210] items-center gap-1 bg-white p-1.5 rounded-full shadow-xs"
@@ -97,58 +127,74 @@ export default function BottomNav() {
         })}
       </nav>
 
-      {/* === MOBILE NAV (<768px) — fixed edge-to-edge white bottom bar === */}
+      {/* === MOBILE NAV (<768px) — green curved-notch bar with raised center Pickup button === */}
       <nav
         aria-label="Primary"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] bg-white border-t border-black/8 shadow-[0_-2px_10px_rgba(0,0,0,0.04)]"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] pointer-events-none select-none"
       >
-        <div className="flex items-center justify-around h-16 px-1 bg-white">
-          {NAV_ITEMS.map(item => {
-            const isActive = isItemActive(item, location.pathname);
-            const label = t(item.labelKey);
+        <div className="relative w-full pointer-events-auto">
+          {/* Raised circular center Pickup button — sits in the curved notch */}
+          <button
+            type="button"
+            onClick={() => navigate(centerItem.path)}
+            aria-label={centerLabel}
+            aria-current={centerActive ? 'page' : undefined}
+            className={`
+              absolute left-1/2 -translate-x-1/2 -top-[28px] z-20
+              w-[62px] h-[62px] rounded-full bg-white text-primary
+              flex items-center justify-center cursor-pointer
+              transition-all duration-200 active:scale-95
+              motion-reduce:transition-none motion-reduce:transform-none
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow
+              ${centerActive
+                ? 'border-[3px] border-primary shadow-[0_8px_22px_rgba(56,118,29,0.42)] scale-[1.03]'
+                : 'border-2 border-primary shadow-[0_6px_18px_rgba(16,24,12,0.18)]'
+              }
+            `}
+          >
+            {centerItem.icon()}
+          </button>
 
-            const labelClass = `text-[11px] leading-none tracking-tight ${
-              isActive ? 'font-bold text-primary' : 'font-medium text-muted-light'
-            }`;
+          {/* Bar background: stretching left/right green wings + fixed-width SVG notch in the center */}
+          <div
+            aria-hidden="true"
+            className="flex items-stretch w-full h-16 drop-shadow-[0_-4px_14px_rgba(16,24,12,0.12)]"
+          >
+            <div className="flex-1 bg-primary rounded-tl-[18px]" />
+            <svg
+              className="w-[136px] h-16 shrink-0 -mx-px block"
+              viewBox="0 0 136 64"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M0 0C22 0 28 38 68 38C108 38 114 0 136 0V64H0V0Z"
+                fill="#38761d"
+              />
+            </svg>
+            <div className="flex-1 bg-primary rounded-tr-[18px]" />
+          </div>
 
-            // Center Pickup tab: slightly raised round button (primary action)
-            if (item.primary) {
-              return (
-                <button
-                  key={item.path}
-                  type="button"
-                  onClick={() => navigate(item.path)}
-                  aria-label={label}
-                  aria-current={isActive ? 'page' : undefined}
-                  className="flex-1 h-full flex flex-col items-center justify-end gap-[3px] pb-1.5 touch-target press-scale cursor-pointer"
-                >
-                  <span className="w-[52px] h-[52px] rounded-full bg-primary text-white shadow-fab ring-4 ring-white flex items-center justify-center">
-                    {item.icon()}
-                  </span>
-                  <span className={labelClass}>{label}</span>
-                </button>
-              );
-            }
+          {/* Interactive icon row overlaid on the 64px bar */}
+          <div className="absolute inset-x-0 top-0 h-16 z-10 flex items-center">
+            <div className="flex-1 h-full flex items-center justify-around pl-2 pr-1">
+              {leftItems.map(renderSideTab)}
+            </div>
 
-            return (
-              <button
-                key={item.path}
-                type="button"
-                onClick={() => navigate(item.path)}
-                aria-label={label}
-                aria-current={isActive ? 'page' : undefined}
-                className={`
-                  flex-1 flex flex-col items-center justify-center gap-1 py-1.5 px-1
-                  touch-target transition-colors duration-200 press-scale cursor-pointer
-                  ${isActive ? 'text-primary' : 'text-muted-light hover:text-primary'}
-                `}
-              >
-                {item.icon()}
-                <span className={labelClass}>{label}</span>
-              </button>
-            );
-          })}
+            {/* Center notch spacer (matches the 136px notch width) */}
+            <div className="w-[112px] shrink-0 pointer-events-none" aria-hidden="true" />
+
+            <div className="flex-1 h-full flex items-center justify-around pl-1 pr-2">
+              {rightItems.map(renderSideTab)}
+            </div>
+          </div>
+
+          {/* Solid green safe-area fill under the gesture bar */}
+          <div
+            aria-hidden="true"
+            className="w-full bg-primary"
+            style={{ height: 'env(safe-area-inset-bottom, 0px)' }}
+          />
         </div>
       </nav>
     </>
