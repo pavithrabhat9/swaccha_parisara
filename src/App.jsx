@@ -14,6 +14,7 @@ import ReportPage from './pages/ReportPage';
 import PickupPage from './pages/PickupPage';
 import RewardsPage from './pages/RewardsPage';
 import LearnPage from './pages/LearnPage';
+import PlasticTypesPage from './pages/PlasticTypesPage';
 import BusinessPage from './pages/BusinessPage';
 import ProfilePage from './pages/ProfilePage';
 import AuthPage from './pages/AuthPage';
@@ -82,6 +83,7 @@ function AppRoutes() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/learn" element={<LearnPage />} />
+        <Route path="/learn/plastic-types" element={<PlasticTypesPage />} />
         <Route path="/business" element={<BusinessPage />} />
         <Route path="/privacy" element={<LegalPage docType="privacy" />} />
         <Route path="/terms" element={<LegalPage docType="terms" />} />

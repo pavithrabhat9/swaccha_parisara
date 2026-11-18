@@ -50,19 +50,61 @@ const confused = (id) => commonlyConfused.find(c => c.id === id);
 const coastal = (id) => localCoastalContent.find(c => c.id === id);
 
 /**
- * Learn highlights for the Home carousel.
- * Articles reuse the existing Learn content and images; the videos are sample entries.
- * `videoUrl` is optional: without it the player shows a "Video coming soon" state.
+ * Quick guides for the Home Learn section (6 cards: 4 guides + 2 short videos).
+ * Reuses existing Learn content & images.
  * Category ids: plastic | segregation | local.
  */
 export const LEARN_HIGHLIGHTS = [
-  { id: 'a-pet', kind: 'article', category: 'plastic', title: 'PET bottles: rinse, crush, recycle', imageUrl: byCode(1).imageUrl, minutes: 2 },
-  { id: 'v-sort', kind: 'video', category: 'plastic', title: 'How to sort PP and HDPE at home', imageUrl: byCode(5).imageUrl, minutes: 3, duration: '2:40', videoUrl: null },
-  { id: 'a-chips', kind: 'article', category: 'segregation', title: 'Why chip packets are not recyclable', imageUrl: confused('chip-packets').imageUrl, minutes: 2 },
-  { id: 'v-black', kind: 'video', category: 'segregation', title: 'Black plastic trays: where do they go?', imageUrl: confused('black-plastic').imageUrl, minutes: 3, duration: '3:15', videoUrl: null },
-  { id: 'a-beach', kind: 'article', category: 'local', title: 'Beach tourism and the PET bottle problem', imageUrl: coastal('beach-tourism').imageUrl, minutes: 3 },
-  { id: 'v-nets', kind: 'video', category: 'local', title: 'Ghost nets: cleanup with local fishers', imageUrl: coastal('fishing-plastic').imageUrl, minutes: 4, duration: '4:05', videoUrl: null },
-  { id: 'a-hdpe', kind: 'article', category: 'plastic', title: 'HDPE: one of the safest plastics to recycle', imageUrl: byCode(2).imageUrl, minutes: 2 },
-  { id: 'a-tetra', kind: 'article', category: 'segregation', title: 'Juice cartons: recyclable, but not locally', imageUrl: confused('tetra-pak').imageUrl, minutes: 3 },
+  {
+    id: 'g-prepare',
+    kind: 'article',
+    category: 'segregation',
+    title: 'How to prepare plastic for pickup (rinse, remove caps and labels, dry, keep separate)',
+    imageUrl: byCode(1).imageUrl,
+    minutes: 2,
+  },
+  {
+    id: 'g-confused',
+    kind: 'article',
+    category: 'segregation',
+    title: 'Commonly confused plastics (chip packets, black plastic, "biodegradable" labels)',
+    imageUrl: confused('chip-packets').imageUrl,
+    minutes: 3,
+  },
+  {
+    id: 'g-points',
+    kind: 'article',
+    category: 'plastic',
+    title: 'How points work',
+    imageUrl: byCode(2).imageUrl,
+    minutes: 2,
+  },
+  {
+    id: 'g-coast',
+    kind: 'article',
+    category: 'local',
+    title: 'Plastic on our coast (beach bottles, temple packaging, fishing nets)',
+    imageUrl: coastal('beach-tourism').imageUrl,
+    minutes: 3,
+  },
+  {
+    id: 'v-sort',
+    kind: 'video',
+    category: 'plastic',
+    title: 'How to sort PP and HDPE at home',
+    imageUrl: byCode(5).imageUrl,
+    minutes: 3,
+    duration: '2:40',
+    videoUrl: null,
+  },
+  {
+    id: 'v-nets',
+    kind: 'video',
+    category: 'local',
+    title: 'Ghost nets: cleanup with local fishers',
+    imageUrl: coastal('fishing-plastic').imageUrl,
+    minutes: 4,
+    duration: '4:05',
+    videoUrl: null,
+  },
 ];
-

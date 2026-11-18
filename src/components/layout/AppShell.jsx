@@ -27,21 +27,22 @@ export default function AppShell({ children }) {
           ${isMapPage
             ? 'md:pt-16'
             : isAuthPage
-              ? 'pb-10 md:pt-16'
-              : 'pb-28 md:pb-10 md:pt-16'
+                ? 'pb-10 md:pt-16'
+                : 'pb-28 md:pb-10 md:pt-16'
           }
         `}
       >
-        <div key={location.pathname} className="page-enter w-full min-w-0 max-w-full">
-          {children}
-        </div>
-      </main>
+      <div key={location.pathname} className="page-enter w-full min-w-0 max-w-full">
+        {children}
+      </div>
+    </main>
 
-      {/* Responsive 5-tab navigation (Home, Map, Pickup, Rewards, Profile) */}
-      <BottomNav />
+  {/* Responsive 5-tab navigation (Home, Map, Pickup, Rewards, Profile) */ }
+  <BottomNav />
 
-      {/* Ask Chatbot Sheet / Side Panel */}
-      <AskChatSheet open={askOpen} onClose={() => setAskOpen(false)} />
-    </div>
+    {/* Ask Chatbot Sheet / Side Panel */ }
+    < AskChatSheet open = { askOpen } onClose = {() => setAskOpen(false)
+} />
+    </div >
   );
 }
