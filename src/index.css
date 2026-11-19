@@ -437,20 +437,26 @@ body {
 }
 
 /* =============================================
-   BOTTOM MIST - soft blurred fade above the mobile bottom bar (see components/layout/BottomMist)
+   BOTTOM MIST - soft blurred fade above & behind the curved mobile bottom bar
    ============================================= */
 .bottom-mist {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(var(--height-bottomnav, 64px) + env(safe-area-inset-bottom, 0px));
-  height: 100px;
-  z-index: 1150; /* above page content, below the bottom bar (1200) */
+  bottom: 0;
+  height: calc(104px + var(--height-bottomnav, 64px) + env(safe-area-inset-bottom, 0px));
+  z-index: 1150; /* above page content, below the bottom bar (1200) so it fills the center notch gap */
   pointer-events: none; /* never blocks taps */
-  background: linear-gradient(to bottom, transparent 0%, var(--color-cream, #ffffff) 100%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.72) 42%,
+    var(--color-cream, #ffffff) 62%,
+    var(--color-cream, #ffffff) 100%
+  );
 }
 
-/* Blur layer: strongest at the bottom, masked to fade in smoothly. Skipped when unsupported. */
+/* Blur layer: fades in smoothly above the bar and stays full-strength inside the center notch gap */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .bottom-mist::before {
     content: '';
@@ -458,7 +464,7 @@ body {
     inset: 0;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 90%);
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 90%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 55%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 55%, #000 100%);
   }
 }

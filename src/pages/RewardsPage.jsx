@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useRewards } from '../hooks/useRewards';
 import { useToast } from '../components/ui/Toast';
 import PointsSummaryCard from '../components/rewards/PointsSummaryCard';
+import BottomMist from '../components/layout/BottomMist';
 import { BADGE_CATEGORIES, DONATION_AMOUNTS } from '../data/mockRewards';
 import { formatShortDate } from '../utils/dateUtils';
 import EmptyState from '../components/ui/EmptyState';
@@ -101,7 +102,7 @@ export default function RewardsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 md:py-8 space-y-6">
       <div>
         <h1 className="text-xl font-bold text-black tracking-tight">{t('rewards')}</h1>
       </div>
@@ -433,6 +434,8 @@ export default function RewardsPage() {
           </section>
         </div>
       </div>
+
+      <BottomMist />
     </div>
   );
 }
