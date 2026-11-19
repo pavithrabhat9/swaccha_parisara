@@ -2,7 +2,11 @@ import { useState, useCallback, useEffect } from 'react';
 import { authApi } from '../services/authApi';
 
 // STUB: simulated Google account. No real Google sign-in or token exchange happens anywhere.
-const GOOGLE_STUB_USER = { name: 'Google User (sample)', provider: 'google' };
+const GOOGLE_STUB_USER = {
+  name: 'Google User (sample)',
+  email: 'citizen.sample@example.com',
+  provider: 'google',
+};
 const GOOGLE_STUB_KEY = 'google:mock';
 
 /**
@@ -115,6 +119,7 @@ export function useAuthState() {
       name: trimmedName,
       phone: cleanedPhone,
       locality: nextLocality,
+      ...(updates?.avatarUrl !== undefined ? { avatarUrl: updates.avatarUrl } : {}),
     };
     setUser(updatedUser);
     await authApi.saveUser(updatedUser);
