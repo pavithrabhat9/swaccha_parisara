@@ -21,6 +21,7 @@ import {
   SignOutConfirmDialog,
 } from '../components/profile/ProfileSubPages';
 import { getInitials, getMyReports } from '../utils/homeUtils';
+import { cn } from '../utils/cn';
 import {
   EditIcon,
   ChevronRightIcon,
@@ -36,45 +37,40 @@ import {
 } from '../components/ui/Icons';
 
 /**
- * Reusable row inside a grouped Profile settings card:
- * Round light-green tinted icon, bold title (or orange-red for destructive), grey one-line subtitle, and chevron.
+ * Reusable row inside a grouped Profile settings card.
  */
 function ProfileRow({ Icon, title, subtitle, onClick, destructive = false }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full min-h-[64px] px-4 py-3 flex items-center justify-between gap-3.5 text-left hover:bg-sunken/70 transition-colors cursor-pointer first:rounded-t-[20px] last:rounded-b-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+      className="w-full min-h-16 px-4 py-3 flex items-center justify-between gap-3.5 text-left hover:bg-sunken/70 transition-colors duration-150 cursor-pointer first:rounded-t-2xl last:rounded-b-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
     >
       <div className="flex items-center gap-3.5 min-w-0">
         <span
           aria-hidden="true"
-          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-            destructive ? 'bg-orange-red-light text-orange-red' : 'bg-primary-light text-primary'
-          }`}
+          className={cn(
+            'size-10 rounded-full flex items-center justify-center shrink-0',
+            destructive ? 'bg-orange-red-light text-orange-red-dark' : 'bg-primary-light text-primary'
+          )}
         >
-          <Icon className="w-5 h-5" />
+          <Icon className="size-5" />
         </span>
         <div className="min-w-0 leading-snug">
-          <p className={`text-sm font-bold truncate ${destructive ? 'text-orange-red' : 'text-black'}`}>
+          <p className={cn('text-sm font-bold truncate', destructive ? 'text-orange-red-dark' : 'text-ink')}>
             {title}
           </p>
           <p className="text-xs text-muted truncate mt-0.5">{subtitle}</p>
         </div>
       </div>
 
-      <ChevronRightIcon className="w-4 h-4 text-muted shrink-0" />
+      <ChevronRightIcon className="size-4 text-muted shrink-0" />
     </button>
   );
 }
 
 /**
- * ProfilePage — Settings-style Profile screen + sub-pages:
- * 1. PageTopBar (back arrow + centered title)
- * 2. Profile Card (round avatar with yellow badge, bold name, phone, Google email if applicable, pencil edit button)
- * 3. Grouped Sections: Account, General, Preference
- * 4. Full-width outlined Sign out button (with confirm dialog) + app version line + BottomMist
- * 5. Desktop (≥1024px): 2 columns (left sticky profile card + Sign out, right 3 grouped sections)
+ * ProfilePage — Settings-style Profile screen + sub-pages.
  */
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -107,7 +103,7 @@ export default function ProfilePage() {
   const [langSheetOpen, setLangSheetOpen] = useState(false);
   const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
 
-  const activeSection = searchParams.get('section'); // null | 'edit' | 'activity' | 'addresses' | 'notifications' | 'delete' | 'about'
+  const activeSection = searchParams.get('section');
   const openSection = (sec) => setSearchParams(sec ? { section: sec } : {});
 
   const myReports = useMemo(() => getMyReports(reports), [reports]);
@@ -131,10 +127,10 @@ export default function ProfilePage() {
     about: t('profile_row_about_title'),
   };
 
-  // === SUB-PAGES (rendered under the same PageTopBar with back arrow returning to Profile hub) ===
+  // === SUB-PAGES ===
   if (activeSection && sectionTitles[activeSection]) {
     return (
-      <div className="min-h-screen pb-16">
+      <div className="min-h-dvh pb-16">
         <PageTopBar
           title={sectionTitles[activeSection]}
           onBack={() => openSection(null)}
@@ -221,7 +217,7 @@ export default function ProfilePage() {
 
   // === MAIN PROFILE HUB ===
   const profileCardElement = (
-    <section className="rounded-[20px] bg-white shadow-card border border-border/60 p-5 flex items-center justify-between gap-3.5">
+    <section className="rounded-2xl bg-white border border-border p-5 flex items-center justify-between gap-3.5">
       <div className="flex items-center gap-3.5 min-w-0">
         {/* Round avatar with small yellow badge at bottom-right */}
         <div className="relative shrink-0">
@@ -229,27 +225,27 @@ export default function ProfilePage() {
             <img
               src={user.avatarUrl}
               alt={user?.name || 'User'}
-              className="w-14 h-14 rounded-full object-cover border border-primary/20"
+              className="size-14 rounded-full object-cover border border-primary/20"
             />
           ) : (
             <span
               aria-hidden="true"
-              className="w-14 h-14 rounded-full bg-primary text-white text-base font-extrabold flex items-center justify-center shadow-pill"
+              className="size-14 rounded-full bg-primary text-white text-base font-extrabold flex items-center justify-center"
             >
               {getInitials(user?.name)}
             </span>
           )}
           <span
             aria-hidden="true"
-            className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-yellow border-2 border-white flex items-center justify-center"
+            className="absolute -bottom-0.5 -right-0.5 size-5 rounded-full bg-yellow border-2 border-white flex items-center justify-center"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-ink" />
+            <span className="size-1.5 rounded-full bg-ink" />
           </span>
         </div>
 
-        {/* Name, phone, and email (email shown only if signed in with Google) */}
+        {/* Name, phone, and email */}
         <div className="min-w-0 leading-snug">
-          <h2 className="text-base font-extrabold text-black truncate">
+          <h2 className="text-base font-extrabold text-ink text-balance truncate">
             {user?.name || 'Resident'}
           </h2>
           {user?.phone && (
@@ -270,9 +266,9 @@ export default function ProfilePage() {
         type="button"
         onClick={() => openSection('edit')}
         aria-label={t('profile_edit_aria')}
-        className="w-11 h-11 rounded-full bg-primary-light text-primary hover:bg-primary/20 flex items-center justify-center shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="size-11 rounded-full bg-primary-light text-primary hover:bg-primary/20 flex items-center justify-center shrink-0 transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
-        <EditIcon className="w-4 h-4" />
+        <EditIcon className="size-4" />
       </button>
     </section>
   );
@@ -282,19 +278,18 @@ export default function ProfilePage() {
       <button
         type="button"
         onClick={() => setSignOutConfirmOpen(true)}
-        className="w-full min-h-[48px] py-3 px-5 rounded-[20px] border border-orange-red/40 bg-white hover:bg-orange-red-light/50 text-sm font-bold text-orange-red transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-red"
+        className="w-full min-h-12 py-3 px-5 rounded-2xl border border-orange-red/40 bg-white hover:bg-orange-red-light/50 text-sm font-bold text-orange-red-dark transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-red"
       >
         {t('signOut')}
       </button>
-      <p className="text-center text-xs text-muted">
+      <p className="text-center text-xs text-muted tabular">
         {t('profile_version_label')}
       </p>
     </div>
   );
 
   return (
-    <div className="min-h-screen pb-16">
-      {/* 1. Shared PageTopBar */}
+    <div className="min-h-dvh pb-16">
       <PageTopBar title={t('profile_title')} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -311,11 +306,11 @@ export default function ProfilePage() {
             <section aria-labelledby="profile-group-account" className="space-y-2">
               <h2
                 id="profile-group-account"
-                className="px-1 text-xs font-bold text-muted uppercase tracking-wider"
+                className="px-1 text-xs font-bold text-ink text-balance"
               >
                 {t('profile_group_account')}
               </h2>
-              <div className="rounded-[20px] bg-white shadow-card border border-border/60 divide-y divide-border-light/70">
+              <div className="rounded-2xl bg-white border border-border divide-y divide-border-light">
                 <ProfileRow
                   Icon={ClockIcon}
                   title={t('profile_row_activity_title')}
@@ -341,11 +336,11 @@ export default function ProfilePage() {
             <section aria-labelledby="profile-group-general" className="space-y-2">
               <h2
                 id="profile-group-general"
-                className="px-1 text-xs font-bold text-muted uppercase tracking-wider"
+                className="px-1 text-xs font-bold text-ink text-balance"
               >
                 {t('profile_group_general')}
               </h2>
-              <div className="rounded-[20px] bg-white shadow-card border border-border/60 divide-y divide-border-light/70">
+              <div className="rounded-2xl bg-white border border-border divide-y divide-border-light">
                 <ProfileRow
                   Icon={BellIcon}
                   title={t('profile_row_notifications_title')}
@@ -372,11 +367,11 @@ export default function ProfilePage() {
             <section aria-labelledby="profile-group-preference" className="space-y-2">
               <h2
                 id="profile-group-preference"
-                className="px-1 text-xs font-bold text-muted uppercase tracking-wider"
+                className="px-1 text-xs font-bold text-ink text-balance"
               >
                 {t('profile_group_preference')}
               </h2>
-              <div className="rounded-[20px] bg-white shadow-card border border-border/60 divide-y divide-border-light/70">
+              <div className="rounded-2xl bg-white border border-border divide-y divide-border-light">
                 <ProfileRow
                   Icon={GlobeIcon}
                   title={t('profile_row_language_title')}

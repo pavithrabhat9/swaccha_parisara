@@ -25,7 +25,6 @@ export default function HomeGreetingRow({
   const [anchor, setAnchor] = useState(null);
 
   const openInbox = () => {
-    // Remember where the bell is so the desktop popover can sit right under it
     const rect = bellRef.current?.getBoundingClientRect();
     if (rect) {
       setAnchor({
@@ -43,13 +42,13 @@ export default function HomeGreetingRow({
       <div className="flex items-center gap-3 min-w-0">
         <span
           aria-hidden="true"
-          className="w-11 h-11 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center shrink-0 shadow-pill"
+          className="size-11 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center shrink-0"
         >
           {initials}
         </span>
         <div className="min-w-0 leading-tight">
           <p className="text-xs text-muted">{t(greetingKey)}</p>
-          <p className="text-base font-extrabold text-black truncate">{firstName}</p>
+          <p className="text-base font-extrabold text-ink truncate">{firstName}</p>
         </div>
       </div>
 
@@ -59,10 +58,10 @@ export default function HomeGreetingRow({
           type="button"
           onClick={() => navigate('/rewards')}
           aria-label={t('home_rewards_pill_aria', { points: formattedPoints })}
-          className="min-h-[44px] pl-2.5 pr-3 rounded-full bg-white border border-border shadow-xs inline-flex items-center gap-1.5 cursor-pointer press-scale hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="min-h-11 pl-3 pr-3.5 rounded-full bg-white border border-border inline-flex items-center gap-1.5 cursor-pointer press-scale hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <LeafIcon className="w-4 h-4 text-primary" />
-          <span className="text-sm font-bold text-black tabular">{formattedPoints}</span>
+          <LeafIcon className="size-4 text-primary" />
+          <span className="text-sm font-bold text-ink tabular">{formattedPoints}</span>
           <span className="hidden min-[380px]:inline text-xs font-medium text-muted">{t('rewards')}</span>
         </button>
 
@@ -78,13 +77,13 @@ export default function HomeGreetingRow({
               ? t('home_notifications_aria_unread', { count: unreadCount })
               : t('home_notifications_aria')
           }
-          className="relative w-11 h-11 rounded-full bg-white border border-border shadow-xs flex items-center justify-center text-ink cursor-pointer press-scale hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="relative size-11 rounded-full bg-white border border-border flex items-center justify-center text-ink cursor-pointer press-scale hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <BellIcon className="w-5 h-5" />
+          <BellIcon className="size-5" />
           {unreadCount > 0 && (
             <span
               aria-hidden="true"
-              className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-orange-red ring-2 ring-white"
+              className="absolute top-2.5 right-2.5 size-2.5 rounded-full bg-orange-red ring-2 ring-white"
             />
           )}
         </button>
@@ -101,4 +100,3 @@ export default function HomeGreetingRow({
     </div>
   );
 }
-

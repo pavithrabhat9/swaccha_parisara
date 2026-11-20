@@ -39,7 +39,7 @@ function KnowYourPlasticIllustration() {
         fill="#ffffff"
         fontSize="10"
         fontWeight="800"
-        fontFamily="Inter, sans-serif"
+        fontFamily="DM Sans, sans-serif"
       >
         1
       </text>
@@ -59,7 +59,7 @@ function QuickGuideCard({ item, onOpen }) {
       aria-label={isVideo ? t('home_video_play_aria', { title: item.title }) : undefined}
       className="
         snap-start shrink-0 w-[236px] text-left flex flex-col overflow-hidden
-        rounded-[24px] bg-white border border-border/60 shadow-card cursor-pointer press-scale
+        rounded-2xl bg-white border border-border cursor-pointer press-scale
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
       "
     >
@@ -72,18 +72,18 @@ function QuickGuideCard({ item, onOpen }) {
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
 
-        <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-white/92 text-[11px] font-semibold text-primary-dark">
+        <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-white/95 text-[11px] font-semibold text-primary-dark">
           {t(CATEGORY_KEYS[item.category])}
         </span>
 
         {isVideo && (
           <>
             <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-              <span className="w-11 h-11 rounded-full bg-white/92 text-primary shadow-card flex items-center justify-center pl-0.5">
-                <PlayIcon className="w-5 h-5" />
+              <span className="size-11 rounded-full bg-white/95 text-primary flex items-center justify-center pl-0.5">
+                <PlayIcon className="size-5" />
               </span>
             </span>
-            <span className="absolute bottom-2.5 right-2.5 px-1.5 py-0.5 rounded-md bg-black/70 text-white text-[11px] font-semibold tabular">
+            <span className="absolute bottom-2.5 right-2.5 px-1.5 py-0.5 rounded-md bg-ink/80 text-white text-[11px] font-semibold tabular">
               {item.duration}
             </span>
           </>
@@ -91,8 +91,8 @@ function QuickGuideCard({ item, onOpen }) {
       </span>
 
       <span className="block p-3.5 space-y-1.5 flex-1">
-        <span className="block text-sm font-bold text-black leading-snug line-clamp-2">{item.title}</span>
-        <span className="block text-xs text-muted">
+        <span className="block text-sm font-bold text-ink leading-snug line-clamp-2 text-balance">{item.title}</span>
+        <span className="block text-xs text-muted tabular">
           {isVideo
             ? t('home_learn_watch_time', { minutes: item.minutes })
             : t('home_learn_read_time', { minutes: item.minutes })}
@@ -105,7 +105,7 @@ function QuickGuideCard({ item, onOpen }) {
 /**
  * Home Learn section:
  * 1. Featured banner "Know your plastic" (light green card, short text, original SVG, 1–7 circles, "Explore" button -> /learn/plastic-types)
- * 2. Horizontal snap-scrolling row "Quick guides" (5 to 7 cards)
+ * 2. Horizontal snap-scrolling row "Quick guides"
  */
 export default function LearnCarousel({ items, onOpenItem }) {
   const { t } = useTranslation();
@@ -120,14 +120,14 @@ export default function LearnCarousel({ items, onOpenItem }) {
       {/* 1. Featured banner: "Know your plastic" */}
       <div
         onClick={openPlasticTypes}
-        className="rounded-[24px] bg-primary-light p-5 shadow-card cursor-pointer hover:bg-primary-light/90 transition-colors space-y-4"
+        className="rounded-2xl bg-primary-light border border-primary/15 p-5 cursor-pointer hover:bg-primary-light/90 transition-colors duration-150 space-y-4"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-1.5">
-            <h3 className="text-base font-extrabold text-black tracking-tight">
+            <h3 className="text-base font-extrabold text-ink text-balance">
               {t('home_kyp_title')}
             </h3>
-            <p className="text-xs text-muted leading-relaxed">
+            <p className="text-xs text-muted text-pretty leading-relaxed">
               {t('home_kyp_subtitle')}
             </p>
           </div>
@@ -142,7 +142,7 @@ export default function LearnCarousel({ items, onOpenItem }) {
             {RESIN_NUMBERS.map(num => (
               <span
                 key={num}
-                className="w-7 h-7 rounded-full bg-white text-primary-dark border border-primary/20 text-xs font-extrabold tabular flex items-center justify-center"
+                className="size-7 rounded-full bg-white text-primary-dark border border-primary/20 text-xs font-extrabold tabular flex items-center justify-center"
               >
                 {num}
               </span>
@@ -155,17 +155,17 @@ export default function LearnCarousel({ items, onOpenItem }) {
               e.stopPropagation();
               openPlasticTypes();
             }}
-            className="min-h-[44px] px-4 py-2 rounded-full bg-primary hover:bg-primary-dark text-white text-xs font-semibold inline-flex items-center gap-1 shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="min-h-11 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-semibold inline-flex items-center gap-1 shrink-0 transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <span>{t('home_kyp_explore')}</span>
-            <ChevronRightIcon className="w-3.5 h-3.5" />
+            <ChevronRightIcon className="size-3.5" />
           </button>
         </div>
       </div>
 
       {/* 2. Horizontal snap-scrolling row: "Quick guides" */}
       <div className="space-y-2.5">
-        <h3 className="text-sm font-bold text-black tracking-tight">
+        <h3 className="text-sm font-bold text-ink text-balance">
           {t('home_quick_guides_title')}
         </h3>
 
@@ -176,8 +176,8 @@ export default function LearnCarousel({ items, onOpenItem }) {
           className="
             flex gap-3 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-4 px-4 pb-3
             sm:-mx-6 sm:px-6 md:mx-0 md:px-0
-            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[24px]
+            hide-scrollbar
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl
           "
         >
           {items.map(item => (

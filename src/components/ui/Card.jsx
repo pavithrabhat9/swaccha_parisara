@@ -1,17 +1,17 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
 
 /**
- * Card — base surface.
- * tone: default (white) | sunken (soft inset) | tint (green wash) | primary (brand hero)
+ * Card — base surface (16px radius, single elevation declaration: border or fill).
+ * tone: default (white + border) | sunken (soft inset) | tint (green wash) | primary (solid brand hero)
  * padding: none | sm | md | lg
  * interactive: adds hover lift + press feedback (use for tappable cards)
  */
 const TONES = {
-  default: 'bg-white border border-border/80 shadow-card',
+  default: 'bg-white border border-border',
   sunken: 'bg-sunken border border-border-light',
-  tint: 'bg-primary-lighter border border-primary/10',
-  primary:
-    'bg-gradient-to-br from-primary via-primary-dark to-primary-deep text-white shadow-fab',
+  tint: 'bg-primary-lighter border border-primary/15',
+  primary: 'bg-primary text-white',
   outline: 'bg-white border border-border',
 };
 
@@ -33,17 +33,16 @@ export default function Card({
 }) {
   return (
     <Tag
-      className={`
-        relative rounded-3xl overflow-hidden
-        ${TONES[tone] || TONES.default}
-        ${PADDING[padding] ?? PADDING.md}
-        ${interactive ? 'hover-lift press-scale cursor-pointer' : ''}
-        ${className}
-      `}
+      className={cn(
+        'relative rounded-2xl overflow-hidden',
+        TONES[tone] || TONES.default,
+        PADDING[padding] ?? PADDING.md,
+        interactive && 'hover-lift press-scale cursor-pointer',
+        className
+      )}
       {...rest}
     >
       {children}
     </Tag>
   );
 }
-

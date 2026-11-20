@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import EmptyState from '../ui/EmptyState';
 import { TruckIcon, GiftIcon, MapPinIcon, XIcon } from '../ui/Icons';
 import { formatTimeAgo } from '../../utils/homeUtils';
+import { cn } from '../../utils/cn';
 
 const TYPE_ICONS = { pickup: TruckIcon, points: GiftIcon, report: MapPinIcon };
 
@@ -38,7 +39,7 @@ export default function NotificationInbox({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[2000] flex items-end md:block bg-black/40 md:bg-transparent animate-fade-in"
+      className="fixed inset-0 z-50 flex items-end md:block bg-black/40 md:bg-transparent animate-fade-in"
       onClick={onClose}
     >
       <div
@@ -55,17 +56,17 @@ export default function NotificationInbox({
         }
         className="
           w-full max-h-[78dvh] flex flex-col overflow-hidden outline-none
-          bg-white rounded-t-[24px] shadow-modal animate-slide-up
-          md:fixed md:w-[380px] md:max-h-[70vh] md:rounded-[24px] md:shadow-elevated md:border md:border-border
+          bg-white rounded-t-2xl shadow-modal animate-slide-up
+          md:fixed md:w-[380px] md:max-h-[70dvh] md:rounded-2xl md:shadow-elevated md:border md:border-border
           md:animate-slide-down md:top-[var(--pop-top,72px)] md:right-[var(--pop-right,24px)]
         "
       >
         {/* Header */}
         <div className="flex items-center justify-between gap-2 px-5 pt-4 pb-3 border-b border-border-light shrink-0">
           <div className="min-w-0">
-            <h2 className="text-base font-bold text-black">{t('home_inbox_title')}</h2>
+            <h2 className="text-base font-bold text-ink text-balance">{t('home_inbox_title')}</h2>
             {unreadCount > 0 && (
-              <p className="text-[11px] font-semibold text-primary">
+              <p className="text-[11px] font-semibold text-primary tabular">
                 {unreadCount} {t('home_inbox_unread')}
               </p>
             )}
@@ -75,7 +76,7 @@ export default function NotificationInbox({
               type="button"
               onClick={onMarkAllRead}
               disabled={unreadCount === 0}
-              className="min-h-[44px] px-2.5 text-xs font-semibold text-primary hover:text-primary-dark disabled:text-muted-light disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
+              className="min-h-11 px-2.5 text-xs font-semibold text-primary hover:text-primary-dark disabled:text-muted-light disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
             >
               {t('home_inbox_mark_all')}
             </button>
@@ -83,9 +84,9 @@ export default function NotificationInbox({
               type="button"
               onClick={onClose}
               aria-label={t('home_inbox_close')}
-              className="touch-target w-11 h-11 rounded-full text-muted hover:text-black hover:bg-sunken flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="touch-target size-11 rounded-full text-muted hover:text-ink hover:bg-sunken flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <XIcon className="w-5 h-5" />
+              <XIcon className="size-5" />
             </button>
           </div>
         </div>
@@ -108,30 +109,31 @@ export default function NotificationInbox({
                     <button
                       type="button"
                       onClick={() => onMarkRead(n.id)}
-                      className={`w-full min-h-[44px] px-5 py-3.5 flex items-start gap-3 text-left cursor-pointer transition-colors focus-visible:outline-none focus-visible:bg-primary-lighter ${
+                      className={cn(
+                        'w-full min-h-11 px-5 py-3.5 flex items-start gap-3 text-left cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:bg-primary-lighter',
                         n.unread ? 'bg-primary-lighter' : 'bg-white hover:bg-sunken'
-                      }`}
+                      )}
                     >
                       <span
-                        className="w-9 h-9 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"
+                        className="size-9 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"
                         aria-hidden="true"
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="size-4" />
                       </span>
                       <span className="min-w-0 flex-1 space-y-0.5">
                         <span className="flex items-center gap-2">
-                          <span className={`text-sm text-black truncate ${n.unread ? 'font-bold' : 'font-semibold'}`}>
+                          <span className={cn('text-sm text-ink truncate', n.unread ? 'font-bold' : 'font-semibold')}>
                             {n.title}
                           </span>
                           {n.unread && (
                             <>
-                              <span aria-hidden="true" className="w-2 h-2 rounded-full bg-orange-red shrink-0" />
+                              <span aria-hidden="true" className="size-2 rounded-full bg-orange-red shrink-0" />
                               <span className="sr-only">{t('home_inbox_unread')}</span>
                             </>
                           )}
                         </span>
-                        <span className="block text-xs text-muted leading-snug">{n.body}</span>
-                        <span className="block text-[11px] text-muted-light">
+                        <span className="block text-xs text-muted text-pretty leading-snug">{n.body}</span>
+                        <span className="block text-[11px] text-muted-light tabular">
                           {formatTimeAgo(n.createdAt, i18n.language)}
                         </span>
                       </span>
@@ -154,4 +156,3 @@ export default function NotificationInbox({
     document.body
   );
 }
-

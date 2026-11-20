@@ -21,13 +21,13 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto px-4 py-4 md:py-8">
+    <div className="w-full max-w-sm mx-auto px-4 py-6 md:py-10 space-y-3">
       <LoginFlow authHook={authHook} />
       <div className="text-center">
         <button
           type="button"
           onClick={() => navigate('/map')}
-          className="min-h-[44px] px-3 text-sm font-semibold text-primary hover:text-primary-dark hover:underline underline-offset-2 cursor-pointer"
+          className="min-h-11 px-4 text-sm font-semibold text-primary hover:text-primary-dark hover:underline underline-offset-4 cursor-pointer"
         >
           {t('auth_explore_map')}
         </button>
@@ -35,4 +35,3 @@ export default function AuthPage() {
     </div>
   );
 }
-

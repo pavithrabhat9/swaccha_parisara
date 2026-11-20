@@ -5,6 +5,7 @@ import { getBagDetails } from '../../utils/pickupUtils';
 import { PICKUP_STATUS_STEPS, STATUS_LABEL_KEYS, getStatusStepIndex } from '../../utils/pickupStatusUtils';
 import { formatShortDate } from '../../utils/dateUtils';
 import { TIME_WINDOWS } from '../../data/mockPickups';
+import { cn } from '../../utils/cn';
 
 /**
  * An in-progress pickup with a 4-step status line: Requested, Scheduled, On the way, Completed.
@@ -17,16 +18,16 @@ export default function ActivePickupCard({ pickup, title, actionLabel, onAction 
   const windowLabel = TIME_WINDOWS.find(w => w.id === pickup.timeWindow)?.label;
 
   return (
-    <section className="border border-border rounded-[8px] bg-white p-5 space-y-5">
+    <section className="border border-border rounded-2xl bg-white p-5 space-y-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold text-primary uppercase tracking-wider">{title}</p>
-          <p className="text-sm font-bold text-black mt-1">
+          <h2 className="text-sm font-bold text-ink text-balance">{title}</h2>
+          <p className="text-sm font-semibold text-primary-dark mt-1 tabular">
             {pickup.quantity} · {bag.weight}
           </p>
-          <p className="text-xs text-muted mt-1 inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="text-xs text-muted mt-1 inline-flex flex-wrap items-center gap-x-2 gap-y-1 tabular">
             <span className="inline-flex items-center gap-1">
-              <MapPinIcon className="w-3.5 h-3.5 text-muted shrink-0" />
+              <MapPinIcon className="size-3.5 text-primary shrink-0" />
               {pickup.locality}
             </span>
             <span aria-hidden="true">·</span>
@@ -43,7 +44,7 @@ export default function ActivePickupCard({ pickup, title, actionLabel, onAction 
           <button
             type="button"
             onClick={onAction}
-            className="min-h-[44px] px-3 text-xs font-semibold text-primary hover:text-primary-dark cursor-pointer shrink-0"
+            className="min-h-11 px-3 text-xs font-semibold text-primary hover:text-primary-dark cursor-pointer shrink-0"
           >
             {actionLabel}
           </button>
@@ -64,18 +65,21 @@ export default function ActivePickupCard({ pickup, title, actionLabel, onAction 
               {i > 0 && (
                 <span
                   aria-hidden="true"
-                  className={`absolute top-[7px] right-1/2 w-full h-0.5 ${reached ? 'bg-primary' : 'bg-border'}`}
+                  className={cn('absolute top-[7px] right-1/2 w-full h-0.5', reached ? 'bg-primary' : 'bg-border')}
                 />
               )}
               <span
-                className={`relative z-10 w-4 h-4 rounded-full border-2 ${
-                  reached ? 'bg-primary border-primary' : 'bg-white border-border'
-                }`}
+                className={cn(
+                  'relative z-10 size-4 rounded-full border-2',
+                  reached ? 'bg-primary border-primary' : 'bg-white border-border',
+                  current && 'ring-4 ring-primary/20'
+                )}
               />
               <span
-                className={`text-[11px] leading-tight text-center ${
-                  current ? 'font-bold text-black' : 'text-muted'
-                }`}
+                className={cn(
+                  'text-[11px] leading-tight text-center',
+                  current ? 'font-bold text-ink' : 'text-muted'
+                )}
               >
                 {t(STATUS_LABEL_KEYS[status])}
               </span>
@@ -86,4 +90,3 @@ export default function ActivePickupCard({ pickup, title, actionLabel, onAction 
     </section>
   );
 }
-

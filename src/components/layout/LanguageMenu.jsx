@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GlobeIcon } from '../ui/Icons';
+import { cn } from '../../utils/cn';
 
 const LANGUAGES = [
   { code: 'en', short: 'EN', name: 'English', disabled: false },
@@ -40,13 +41,13 @@ export default function LanguageMenu({ compact = false }) {
         aria-label="Change language"
         aria-expanded={open}
         aria-haspopup="listbox"
-        className={`
-          touch-target inline-flex items-center justify-center gap-1.5 rounded-lg
-          text-white font-semibold hover:bg-white/15 transition-colors cursor-pointer
-          ${compact ? 'h-9 px-2.5 text-caption' : 'h-10 px-3 text-caption'}
-        `}
+        className={cn(
+          'touch-target inline-flex items-center justify-center gap-1.5 rounded-xl',
+          'text-white font-semibold hover:bg-white/15 transition-colors duration-150 cursor-pointer',
+          compact ? 'min-h-11 px-2.5 text-caption' : 'min-h-11 px-3 text-caption'
+        )}
       >
-        <GlobeIcon className="w-4 h-4 text-white" />
+        <GlobeIcon className="size-4 text-white" />
         <span className="text-white">{current.code === 'kn' ? 'ಕನ್ನಡ' : 'EN'}</span>
       </button>
 
@@ -55,7 +56,7 @@ export default function LanguageMenu({ compact = false }) {
           role="listbox"
           aria-label="Select language"
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-full mt-2 bg-white border border-border rounded-[8px] shadow-elevated py-1.5 min-w-[168px] z-50 animate-slide-down"
+          className="absolute right-0 top-full mt-2 bg-white border border-border rounded-2xl shadow-elevated py-1.5 min-w-[176px] z-50 animate-slide-down"
         >
           {LANGUAGES.map(lang => {
             const active = i18n.language === lang.code;
@@ -67,23 +68,21 @@ export default function LanguageMenu({ compact = false }) {
                 aria-selected={active}
                 disabled={lang.disabled}
                 onClick={() => handleSelect(lang)}
-                className={`
-                  w-full px-3.5 py-2 text-left text-caption font-semibold flex items-center justify-between
-                  transition-colors
-                  ${lang.disabled
+                className={cn(
+                  'w-full min-h-11 px-3.5 py-2 text-left text-caption font-semibold flex items-center justify-between transition-colors duration-150',
+                  lang.disabled
                     ? 'text-muted-light/60 cursor-not-allowed'
                     : active
-                        ? 'text-primary cursor-pointer'
-                        : 'text-ink hover:bg-sunken cursor-pointer'
-                  }
-                `}
+                      ? 'text-primary cursor-pointer'
+                      : 'text-ink hover:bg-sunken cursor-pointer'
+                )}
               >
                 <span>{lang.name}</span>
-                  { active && !lang.disabled ? (
-                    <svg className="w-3.5 h-3.5 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  ) : null}
+                {active && !lang.disabled ? (
+                  <svg className="size-3.5 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : null}
               </button>
             );
           })}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrandMark } from '../ui/Icons';
 import { ReportIllustration, PickupIllustration, RewardsIllustration } from './OnboardingIllustrations';
+import { cn } from '../../utils/cn';
 
 const STEPS = [
   { id: 'report', Illustration: ReportIllustration, titleKey: 'onboarding_1_title', textKey: 'onboarding_1_text' },
@@ -11,8 +12,6 @@ const STEPS = [
 
 /**
  * First-launch onboarding: 3 animated steps with dots, Next and Skip.
- * Entrance animations come from shared CSS classes, which the global
- * prefers-reduced-motion rule neutralises.
  */
 export default function OnboardingScreen({ onFinish }) {
   const { t } = useTranslation();
@@ -35,21 +34,21 @@ export default function OnboardingScreen({ onFinish }) {
       role="dialog"
       aria-modal="true"
       aria-label={t('appTitle')}
-      className="fixed inset-0 z-[3000] bg-white flex flex-col"
+      className="fixed inset-0 z-50 bg-white flex flex-col"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {/* Top row: brand + Skip */}
       <div className="flex items-center justify-between px-4 sm:px-6 h-14 shrink-0">
         <div className="flex items-center gap-2">
-          <BrandMark className="w-8 h-8 rounded-xl" />
-          <span className="font-brand text-[18px] font-extrabold tracking-[-0.03em] text-primary whitespace-nowrap">
+          <BrandMark className="size-8 rounded-xl" />
+          <span className="font-brand text-lg font-extrabold text-primary whitespace-nowrap">
             {t('appTitle')}
           </span>
         </div>
         <button
           type="button"
           onClick={onFinish}
-          className="touch-target px-3 text-sm font-semibold text-muted hover:text-black transition-colors cursor-pointer"
+          className="touch-target px-3 text-sm font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
         >
           {t('onboarding_skip')}
         </button>
@@ -61,24 +60,25 @@ export default function OnboardingScreen({ onFinish }) {
           <div className="w-full max-w-[280px] aspect-[6/5] animate-scale-in">
             <Illustration />
           </div>
-          <h1 className="mt-6 text-title font-extrabold text-black tracking-tight animate-fade-in-up">
+          <h1 className="mt-6 text-title font-extrabold text-ink text-balance animate-fade-in-up">
             {t(step.titleKey)}
           </h1>
-          <p className="mt-2 text-body text-muted max-w-[280px] animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+          <p className="mt-2 text-body text-muted text-pretty max-w-[280px] animate-fade-in-up">
             {t(step.textKey)}
           </p>
         </div>
       </div>
 
-      {/* Bottom: dots + Next */}
+      {/* Bottom: dots + Next (uses compositor transform instead of width animation) */}
       <div className="shrink-0 px-6 pb-6 pt-2 w-full max-w-sm mx-auto space-y-5">
         <div className="flex items-center justify-center gap-2" aria-hidden="true">
           {STEPS.map((s, i) => (
             <span
               key={s.id}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === index ? 'w-6 bg-primary' : 'w-2 bg-border'
-              }`}
+              className={cn(
+                'h-2 w-6 rounded-full origin-center transition-[transform,opacity] duration-150 ease-out',
+                i === index ? 'scale-x-100 bg-primary opacity-100' : 'scale-x-35 bg-border opacity-80'
+              )}
             />
           ))}
         </div>
@@ -89,7 +89,7 @@ export default function OnboardingScreen({ onFinish }) {
         <button
           type="button"
           onClick={handleNext}
-          className="w-full min-h-[48px] py-3 bg-primary text-white font-semibold rounded-[6px] text-sm hover:bg-primary-dark transition-colors cursor-pointer"
+          className="w-full min-h-12 py-3 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-dark transition-colors duration-150 cursor-pointer"
         >
           {isLast ? t('onboarding_get_started') : t('onboarding_next')}
         </button>
@@ -97,4 +97,3 @@ export default function OnboardingScreen({ onFinish }) {
     </div>
   );
 }
-

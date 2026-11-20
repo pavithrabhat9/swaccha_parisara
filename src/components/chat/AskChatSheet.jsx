@@ -5,6 +5,7 @@ import { useNetworkStatus } from '../ui/OfflineBanner';
 import ErrorState from '../ui/ErrorState';
 import Skeleton from '../ui/Skeleton';
 import { ChatBubbleIcon, SendIcon, TrashIcon, XIcon } from '../ui/Icons';
+import { cn } from '../../utils/cn';
 
 /**
  * AskChatSheet — Mock Q&A assistant panel.
@@ -56,7 +57,7 @@ export default function AskChatSheet({ open, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-[2000] bg-black/50 flex items-end md:items-stretch md:justify-end animate-fade-in"
+      className="fixed inset-0 z-50 bg-black/50 flex items-end md:items-stretch md:justify-end animate-fade-in"
       onClick={onClose}
     >
       <aside
@@ -69,11 +70,11 @@ export default function AskChatSheet({ open, onClose }) {
         {/* Header */}
         <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-2 bg-white shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-9 h-9 rounded-[8px] bg-primary-light text-primary flex items-center justify-center shrink-0">
-              <ChatBubbleIcon className="w-4 h-4" />
+            <span className="size-9 rounded-xl bg-primary-light text-primary flex items-center justify-center shrink-0">
+              <ChatBubbleIcon className="size-4" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-sm font-bold text-black truncate">{t('ask_title')}</h2>
+              <h2 className="text-sm font-bold text-ink text-balance truncate">{t('ask_title')}</h2>
               <p className="text-[11px] text-muted truncate">{t('ask_subtitle')}</p>
             </div>
           </div>
@@ -85,35 +86,34 @@ export default function AskChatSheet({ open, onClose }) {
               disabled={messages.length === 0 && !streamingMessage && !error}
               aria-label={t('ask_clear')}
               title={t('ask_clear')}
-              className="touch-target w-11 h-11 rounded-[6px] text-muted hover:text-black hover:bg-sunken disabled:opacity-35 disabled:cursor-not-allowed flex items-center justify-center transition-colors cursor-pointer"
+              className="touch-target size-11 rounded-xl text-muted hover:text-ink hover:bg-sunken disabled:opacity-35 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 cursor-pointer"
             >
-              <TrashIcon className="w-4 h-4" />
+              <TrashIcon className="size-4" />
             </button>
             <button
               type="button"
               onClick={onClose}
               aria-label={t('ask_close')}
               title={t('ask_close')}
-              className="touch-target w-11 h-11 rounded-[6px] text-muted hover:text-black hover:bg-sunken flex items-center justify-center transition-colors cursor-pointer"
+              className="touch-target size-11 rounded-xl text-muted hover:text-ink hover:bg-sunken flex items-center justify-center transition-colors duration-150 cursor-pointer"
             >
-              <XIcon className="w-5 h-5" />
+              <XIcon className="size-5" />
             </button>
           </div>
         </div>
 
         {/* Offline alert strip inside chat if offline */}
         {!isOnline && (
-          <div className="px-4 py-2 bg-yellow-light border-b border-yellow/30 text-xs font-medium text-black">
+          <div className="px-4 py-2 bg-yellow-light border-b border-yellow/30 text-xs font-medium text-ink">
             {t('report_offline_saved_title')} — {t('ask_error_desc')}
           </div>
         )}
 
         {/* Messages & Suggested Questions */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {/* Suggested questions shown on first open / when chat is empty */}
           {messages.length === 0 && !isTyping && !streamingMessage && (
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-muted uppercase tracking-wider">
+              <p className="text-xs font-semibold text-muted">
                 {t('ask_suggested_label')}
               </p>
               {loadingSuggestions ? (
@@ -129,7 +129,7 @@ export default function AskChatSheet({ open, onClose }) {
                       key={item.id}
                       type="button"
                       onClick={() => ask(item.query)}
-                      className="text-left px-3 py-2 rounded-[8px] border border-border bg-sunken hover:border-primary hover:text-primary text-xs font-medium text-black transition-colors cursor-pointer"
+                      className="min-h-11 text-left px-3.5 py-2 rounded-xl border border-border bg-sunken hover:border-primary hover:text-primary text-xs font-medium text-ink transition-colors duration-150 cursor-pointer"
                     >
                       {t(item.labelKey)}
                     </button>
@@ -145,14 +145,15 @@ export default function AskChatSheet({ open, onClose }) {
             return (
               <div
                 key={msg.id}
-                className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+                className={cn('flex', isUser ? 'justify-end' : 'justify-start')}
               >
                 <div
-                  className={`max-w-[85%] px-3.5 py-2.5 rounded-[8px] text-xs leading-relaxed whitespace-pre-line ${
+                  className={cn(
+                    'max-w-[85%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-line text-pretty',
                     isUser
                       ? 'bg-primary text-white font-medium'
-                      : 'bg-sunken text-black border border-border'
-                  }`}
+                      : 'bg-sunken text-ink border border-border'
+                  )}
                 >
                   {msg.text}
                 </div>
@@ -163,10 +164,10 @@ export default function AskChatSheet({ open, onClose }) {
           {/* Typing indicator */}
           {isTyping && (
             <div className="flex justify-start" aria-live="polite">
-              <div className="px-3.5 py-2.5 rounded-[8px] bg-sunken border border-border inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-muted animate-pulse" />
-                <span className="w-1.5 h-1.5 rounded-full bg-muted animate-pulse [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-muted animate-pulse [animation-delay:300ms]" />
+              <div className="px-3.5 py-2.5 rounded-2xl bg-sunken border border-border inline-flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-muted animate-pulse" />
+                <span className="size-1.5 rounded-full bg-muted animate-pulse [animation-delay:150ms]" />
+                <span className="size-1.5 rounded-full bg-muted animate-pulse [animation-delay:300ms]" />
                 <span className="sr-only">{t('ask_typing')}</span>
               </div>
             </div>
@@ -175,7 +176,7 @@ export default function AskChatSheet({ open, onClose }) {
           {/* Progressive streaming reply */}
           {streamingMessage && (
             <div className="flex justify-start">
-              <div className="max-w-[85%] px-3.5 py-2.5 rounded-[8px] bg-sunken text-black border border-border text-xs leading-relaxed whitespace-pre-line">
+              <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl bg-sunken text-ink border border-border text-xs leading-relaxed whitespace-pre-line text-pretty">
                 {streamingMessage.text}
               </div>
             </div>
@@ -208,15 +209,15 @@ export default function AskChatSheet({ open, onClose }) {
             onChange={(e) => setInput(e.target.value)}
             placeholder={t('ask_placeholder')}
             aria-label={t('ask_placeholder')}
-            className="flex-1 h-11 px-3.5 rounded-[6px] border border-border bg-white text-sm text-black placeholder:text-muted-light focus:outline-none focus:border-primary"
+            className="flex-1 h-11 px-3.5 rounded-xl border border-border bg-sunken focus:bg-white text-sm text-ink placeholder:text-muted-light focus:outline-none focus:border-primary"
           />
           <button
             type="submit"
             disabled={!canSend}
             aria-label={t('ask_send')}
-            className="touch-target h-11 px-4 rounded-[6px] bg-primary text-white text-xs font-semibold hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0"
+            className="touch-target h-11 px-4 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center gap-1.5 transition-colors duration-150 cursor-pointer shrink-0"
           >
-            <SendIcon className="w-4 h-4" />
+            <SendIcon className="size-4" />
             <span className="hidden sm:inline">{t('ask_send')}</span>
           </button>
         </form>
@@ -224,4 +225,3 @@ export default function AskChatSheet({ open, onClose }) {
     </div>
   );
 }
-

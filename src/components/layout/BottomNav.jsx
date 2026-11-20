@@ -2,17 +2,17 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HomeIcon, GiftIcon, UserIcon, ScanFrameIcon } from '../ui/Icons';
+import { cn } from '../../utils/cn';
 
 const NAV_ITEMS = [
   {
     path: '/home',
     labelKey: 'home',
-    icon: () => <HomeIcon className="w-[22px] h-[22px]" />,
+    icon: () => <HomeIcon className="size-[22px]" />,
   },
   {
     path: '/map',
     labelKey: 'map',
-    // The Report flow is launched from the Map, so Map stays highlighted while reporting
     alsoActiveOn: ['/report'],
     icon: () => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -24,18 +24,18 @@ const NAV_ITEMS = [
   {
     path: '/pickup',
     labelKey: 'pickup',
-    primary: true, // center raised button on mobile
-    icon: () => <ScanFrameIcon className="w-[26px] h-[26px]" />,
+    primary: true,
+    icon: () => <ScanFrameIcon className="size-[26px]" />,
   },
   {
     path: '/rewards',
     labelKey: 'rewards',
-    icon: () => <GiftIcon className="w-[22px] h-[22px]" />,
+    icon: () => <GiftIcon className="size-[22px]" />,
   },
   {
     path: '/profile',
     labelKey: 'profile',
-    icon: () => <UserIcon className="w-[22px] h-[22px]" />,
+    icon: () => <UserIcon className="size-[22px]" />,
   },
 ];
 
@@ -45,8 +45,8 @@ const isItemActive = (item, pathname) =>
 /**
  * Single responsive navigation component (5 destinations: Home, Map, Pickup, Rewards, Profile):
  * - Mobile (<768px): full-width primary green (#38761d) bar with a constant-geometry curved center notch
- *   and a raised white circular Pickup button (scan-frame icon). Icons only, white with active dot.
- * - Desktop (≥768px): centered pill dock in the top header (unchanged).
+ *   and a raised white circular Pickup button (scan-frame icon).
+ * - Desktop (≥768px): centered pill dock in the top header.
  * Hidden on the Auth screen.
  */
 export default function BottomNav() {
@@ -76,17 +76,19 @@ export default function BottomNav() {
         className="flex-1 h-full min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-1 text-white cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow rounded-lg"
       >
         <span
-          className={`transition-all duration-200 motion-reduce:transition-none motion-reduce:transform-none ${
-            isActive ? 'opacity-100 scale-105' : 'opacity-70 hover:opacity-95 scale-100'
-          }`}
+          className={cn(
+            'transition-[transform,opacity] duration-150 ease-out',
+            isActive ? 'opacity-100 scale-105' : 'opacity-75 hover:opacity-95 scale-100'
+          )}
         >
           {item.icon()}
         </span>
         <span
           aria-hidden="true"
-          className={`w-1.5 h-1.5 rounded-full bg-white transition-all duration-200 motion-reduce:transition-none ${
+          className={cn(
+            'size-1.5 rounded-full bg-white transition-[transform,opacity] duration-150 ease-out',
             isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-          }`}
+          )}
         />
       </button>
     );
@@ -94,10 +96,10 @@ export default function BottomNav() {
 
   return (
     <>
-      {/* === DESKTOP NAV DOCK (≥768px) — centered inside the top header (unchanged) === */}
+      {/* === DESKTOP NAV DOCK (≥768px) — centered inside the top header === */}
       <nav
         aria-label="Primary"
-        className="hidden md:flex fixed top-2.5 left-1/2 -translate-x-1/2 z-[1210] items-center gap-1 bg-white p-1.5 rounded-full shadow-xs"
+        className="hidden md:flex fixed top-2.5 left-1/2 -translate-x-1/2 z-40 items-center gap-1 bg-white p-1.5 rounded-full border border-border"
       >
         {NAV_ITEMS.map(item => {
           const isActive = isItemActive(item, location.pathname);
@@ -111,14 +113,13 @@ export default function BottomNav() {
               aria-label={label}
               title={label}
               aria-current={isActive ? 'page' : undefined}
-              className={`
-                touch-target h-10 px-4 rounded-full flex items-center justify-center gap-2
-                text-caption font-semibold transition-all duration-200 press-scale cursor-pointer
-                ${isActive
-                  ? 'bg-primary text-white shadow-pill'
+              className={cn(
+                'touch-target h-10 px-4 rounded-full flex items-center justify-center gap-2',
+                'text-caption font-semibold transition-colors duration-150 press-scale cursor-pointer',
+                isActive
+                  ? 'bg-primary text-white'
                   : 'text-muted hover:text-primary hover:bg-primary-lighter'
-                }
-              `}
+              )}
             >
               {item.icon()}
               <span className="hidden xl:inline">{label}</span>
@@ -130,7 +131,7 @@ export default function BottomNav() {
       {/* === MOBILE NAV (<768px) — green curved-notch bar with raised center Pickup button === */}
       <nav
         aria-label="Primary"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] pointer-events-none select-none"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 pointer-events-none select-none"
       >
         <div className="relative w-full pointer-events-auto">
           {/* Raised circular center Pickup button — sits in the curved notch */}
@@ -139,18 +140,16 @@ export default function BottomNav() {
             onClick={() => navigate(centerItem.path)}
             aria-label={centerLabel}
             aria-current={centerActive ? 'page' : undefined}
-            className={`
-              absolute left-1/2 -translate-x-1/2 -top-[28px] z-20
-              w-[62px] h-[62px] rounded-full bg-white text-primary
-              flex items-center justify-center cursor-pointer
-              transition-all duration-200 active:scale-95
-              motion-reduce:transition-none motion-reduce:transform-none
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow
-              ${centerActive
-                ? 'border-[3px] border-primary shadow-[0_8px_22px_rgba(56,118,29,0.42)] scale-[1.03]'
-                : 'border-2 border-primary shadow-[0_6px_18px_rgba(16,24,12,0.18)]'
-              }
-            `}
+            className={cn(
+              'absolute left-1/2 -translate-x-1/2 -top-[28px] z-20',
+              'size-[62px] rounded-full bg-white text-primary',
+              'flex items-center justify-center cursor-pointer',
+              'transition-transform duration-150 ease-out active:scale-95',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow',
+              centerActive
+                ? 'border-[3px] border-primary shadow-fab scale-[1.03]'
+                : 'border-2 border-primary shadow-card'
+            )}
           >
             {centerItem.icon()}
           </button>

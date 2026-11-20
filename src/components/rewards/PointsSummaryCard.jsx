@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import CountUp from '../ui/CountUp';
 import { BadgeMedal } from '../ui/Icons';
+import { cn } from '../../utils/cn';
 
 /**
  * Points balance, current tier and progress to the next tier.
@@ -12,18 +13,18 @@ export default function PointsSummaryCard({ points, tierProgress, className = ''
   const { tier, nextTier, progressPercent, pointsToNext } = tierProgress;
 
   return (
-    <section className={`border border-border rounded-[8px] bg-white p-5 space-y-4 ${className}`}>
+    <section className={cn('border border-border rounded-2xl bg-white p-5 space-y-4', className)}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">{t('yourPoints')}</p>
-          <p className="text-3xl font-bold text-black tracking-tight mt-1">
+          <p className="text-xs font-semibold text-muted">{t('yourPoints')}</p>
+          <p className="text-3xl font-bold text-ink tabular mt-1">
             <CountUp value={points} />
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">{t('tier_label')}</p>
-          <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-black">
-            <BadgeMedal id={tier.id} className="w-5 h-5" />
+          <p className="text-xs font-semibold text-muted">{t('tier_label')}</p>
+          <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
+            <BadgeMedal id={tier.id} className="size-5" />
             {tier.label}
           </p>
         </div>
@@ -31,7 +32,7 @@ export default function PointsSummaryCard({ points, tierProgress, className = ''
 
       <div className="pt-4 border-t border-border-light space-y-2">
         <div className="flex items-center justify-between gap-2 text-xs">
-          <span className="font-medium text-black">
+          <span className="font-medium text-ink tabular">
             {nextTier
               ? t('tier_points_to_next', {
                   points: pointsToNext.toLocaleString('en-IN'),
@@ -47,15 +48,14 @@ export default function PointsSummaryCard({ points, tierProgress, className = ''
           aria-valuemax={100}
           aria-valuenow={progressPercent}
           aria-label={t('tier_label')}
-          className="w-full h-1.5 bg-sunken rounded-[4px] overflow-hidden"
+          className="w-full h-2 bg-sunken rounded-full overflow-hidden"
         >
           <div
-            className="h-full bg-primary transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
+            className="h-full w-full bg-primary origin-left transition-transform duration-200 ease-out"
+            style={{ transform: `scaleX(${Math.max(0, Math.min(100, progressPercent)) / 100})` }}
           />
         </div>
       </div>
     </section>
   );
 }
-

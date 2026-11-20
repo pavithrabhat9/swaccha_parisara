@@ -102,24 +102,24 @@ export default function TrashBankTab({ initialCenterId = null }) {
     <div className="space-y-6">
       {/* === CENTER DETAIL VIEW === */}
       {selectedCenter ? (
-        <section className="border border-border rounded-[8px] bg-white p-5 space-y-5">
+        <section className="border border-border rounded-2xl bg-white p-5 space-y-5">
           <button
             type="button"
             onClick={() => {
               setSelectedCenterId(null);
               setShowQr(false);
             }}
-            className="touch-target -ml-2 px-2 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 cursor-pointer"
+            className="touch-target -ml-2 px-2 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 cursor-pointer rounded-lg"
           >
-            <ArrowLeftIcon className="w-4 h-4" />
+            <ArrowLeftIcon className="size-4" />
             <span>{t('trash_bank_back_to_list')}</span>
           </button>
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div className="space-y-1">
-              <h2 className="text-lg font-bold text-black">{selectedCenter.name}</h2>
-              <p className="text-xs text-muted inline-flex items-center gap-1.5">
-                <MapPinIcon className="w-3.5 h-3.5 text-primary shrink-0" />
+              <h2 className="text-lg font-bold text-ink text-balance">{selectedCenter.name}</h2>
+              <p className="text-xs text-muted inline-flex items-center gap-1.5 tabular">
+                <MapPinIcon className="size-3.5 text-primary shrink-0" />
                 <span>{selectedCenter.address}</span>
                 <span aria-hidden="true">·</span>
                 <span>{t('distance_km', { km: selectedCenter.distanceKm })}</span>
@@ -128,10 +128,10 @@ export default function TrashBankTab({ initialCenterId = null }) {
             <OpenStatusBadge point={selectedCenter} />
           </div>
 
-          <div className="p-3.5 rounded-[6px] bg-sunken border border-border flex items-center gap-2.5 text-xs">
-            <ClockIcon className="w-4 h-4 text-primary shrink-0" />
+          <div className="p-3.5 rounded-xl bg-sunken border border-border flex items-center gap-2.5 text-xs tabular">
+            <ClockIcon className="size-4 text-primary shrink-0" />
             <div>
-              <span className="font-semibold text-black">{t('trash_bank_hours_label')}: </span>
+              <span className="font-semibold text-ink">{t('trash_bank_hours_label')}: </span>
               <span className="text-muted">{formatHoursSummary(selectedCenter)}</span>
             </div>
           </div>
@@ -142,42 +142,38 @@ export default function TrashBankTab({ initialCenterId = null }) {
               href={getDirectionsUrl(selectedCenter)}
               target="_blank"
               rel="noopener noreferrer"
-              className="touch-target px-4 py-2.5 rounded-[6px] border border-border bg-white hover:border-primary text-xs font-semibold text-black inline-flex items-center gap-2 transition-colors"
+              className="touch-target px-4 py-2.5 rounded-xl border border-border bg-white hover:border-primary/40 hover:bg-primary-lighter text-xs font-semibold text-ink inline-flex items-center gap-2 transition-colors duration-150"
             >
-              <DirectionsIcon className="w-4 h-4 text-primary" />
+              <DirectionsIcon className="size-4 text-primary" />
               <span>{t('trash_bank_directions')}</span>
             </a>
 
             <button
               type="button"
               onClick={() => setShowQr(prev => !prev)}
-              className="touch-target px-4 py-2.5 rounded-[6px] bg-primary hover:bg-primary-dark text-white text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer"
+              className="touch-target px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-semibold inline-flex items-center gap-2 transition-colors duration-150 cursor-pointer"
             >
-              <QrIcon className="w-4 h-4" />
+              <QrIcon className="size-4" />
               <span>{showQr ? t('trash_bank_hide_qr') : t('trash_bank_show_qr')}</span>
             </button>
           </div>
 
           {/* STUB: Mock QR code for staff to scan at the drop-off center */}
           {showQr && (
-            <div className="p-5 rounded-[8px] border border-border bg-sunken flex flex-col items-center text-center space-y-3 animate-fade-in">
-              <p className="text-xs font-bold text-black uppercase tracking-wider">
+            <div className="p-5 rounded-2xl border border-border bg-sunken flex flex-col items-center text-center space-y-3 animate-fade-in">
+              <p className="text-xs font-bold text-ink">
                 {t('trash_bank_qr_title')}
               </p>
               {/* Inline SVG mock QR pattern in palette colors */}
-              <div className="p-3 bg-white rounded-[8px] border border-border">
+              <div className="p-3 bg-white rounded-xl border border-border">
                 <svg width="136" height="136" viewBox="0 0 136 136" fill="none" role="img" aria-label={t('trash_bank_qr_title')}>
                   <rect width="136" height="136" fill="#ffffff" />
-                  {/* Top-left finder */}
                   <rect x="10" y="10" width="36" height="36" stroke="#10180c" strokeWidth="6" />
                   <rect x="20" y="20" width="16" height="16" fill="#38761d" />
-                  {/* Top-right finder */}
                   <rect x="90" y="10" width="36" height="36" stroke="#10180c" strokeWidth="6" />
                   <rect x="100" y="20" width="16" height="16" fill="#38761d" />
-                  {/* Bottom-left finder */}
                   <rect x="10" y="90" width="36" height="36" stroke="#10180c" strokeWidth="6" />
                   <rect x="20" y="100" width="16" height="16" fill="#38761d" />
-                  {/* Sample data modules */}
                   <rect x="56" y="14" width="8" height="8" fill="#10180c" />
                   <rect x="70" y="14" width="8" height="16" fill="#10180c" />
                   <rect x="56" y="30" width="16" height="8" fill="#38761d" />
@@ -194,23 +190,23 @@ export default function TrashBankTab({ initialCenterId = null }) {
                   <rect x="96" y="112" width="26" height="12" fill="#10180c" />
                 </svg>
               </div>
-              <p className="text-xs font-bold text-black tabular">
+              <p className="text-xs font-bold text-ink tabular">
                 {t('trash_bank_qr_code_label', { id: memberCode })}
               </p>
             </div>
           )}
 
           {/* Mandatory weigh-in note */}
-          <p className="text-xs text-muted border-t border-border-light pt-3">
+          <p className="text-xs text-muted text-pretty border-t border-border-light pt-3">
             {t('trash_bank_weigh_note')}
           </p>
         </section>
       ) : (
         /* === DROP-OFF CENTERS LIST === */
-        <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+        <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
           <div>
-            <h2 className="text-base font-bold text-black">{t('trash_bank_title')}</h2>
-            <p className="text-xs text-muted mt-0.5">{t('trash_bank_subtitle')}</p>
+            <h2 className="text-base font-bold text-ink text-balance">{t('trash_bank_title')}</h2>
+            <p className="text-xs text-muted text-pretty mt-0.5">{t('trash_bank_subtitle')}</p>
           </div>
 
           <div className="divide-y divide-border">
@@ -219,22 +215,22 @@ export default function TrashBankTab({ initialCenterId = null }) {
                 key={center.id}
                 type="button"
                 onClick={() => setSelectedCenterId(center.id)}
-                className="w-full py-4 first:pt-1 last:pb-1 flex items-center justify-between gap-4 text-left hover:bg-sunken/60 px-2 -mx-2 rounded-[6px] transition-colors cursor-pointer"
+                className="w-full py-4 first:pt-1 last:pb-1 flex items-center justify-between gap-4 text-left hover:bg-sunken/70 px-2.5 -mx-2.5 rounded-xl transition-colors duration-150 cursor-pointer"
               >
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-bold text-black">{center.name}</p>
-                    <span className="text-xs text-muted">
+                    <p className="text-sm font-bold text-ink">{center.name}</p>
+                    <span className="text-xs text-muted tabular">
                       · {t('distance_km', { km: center.distanceKm })}
                     </span>
                   </div>
                   <p className="text-xs text-muted">{center.area}</p>
-                  <p className="text-[11px] text-muted">{formatHoursSummary(center)}</p>
+                  <p className="text-[11px] text-muted tabular">{formatHoursSummary(center)}</p>
                   <div className="pt-0.5">
                     <OpenStatusBadge point={center} />
                   </div>
                 </div>
-                <ChevronRightIcon className="w-4 h-4 text-muted shrink-0" />
+                <ChevronRightIcon className="size-4 text-muted shrink-0" />
               </button>
             ))}
           </div>
@@ -242,9 +238,9 @@ export default function TrashBankTab({ initialCenterId = null }) {
       )}
 
       {/* === DROP-OFF HISTORY === */}
-      <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+      <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-bold text-black">{t('trash_bank_history_title')}</h3>
+          <h3 className="text-sm font-bold text-ink text-balance">{t('trash_bank_history_title')}</h3>
           <span className="text-[11px] text-muted-light">{t('sample_data_note')}</span>
         </div>
 
@@ -263,10 +259,10 @@ export default function TrashBankTab({ initialCenterId = null }) {
                   className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
                 >
                   <div className="min-w-0 space-y-0.5">
-                    <p className="text-sm font-semibold text-black truncate">
+                    <p className="text-sm font-semibold text-ink truncate">
                       {center?.name || 'Trash Bank Center'}
                     </p>
-                    <p className="text-xs text-muted">
+                    <p className="text-xs text-muted tabular">
                       {formatShortDate(item.date)}
                       {item.kg ? ` · ${item.kg} ${t('home_kg')}` : ''}
                     </p>

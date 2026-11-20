@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { businessApi } from '../services/businessApi';
 import { getNextPickupDate } from '../utils/dateUtils';
-import { CADENCE_OPTIONS } from '../data/mockBusinesses';
 
 export function useBusinessSubscription() {
   const [business, setBusiness] = useState(null);
@@ -80,7 +79,7 @@ export function useBusinessSubscription() {
       setStep('dashboard');
       setShowSuccessModal(true);
       return { success: true, cadenceId: form.cadence };
-    } catch (err) {
+    } catch {
       clearTimeout(slowTimer);
       setShowSlowNetwork(false);
       setSubmitting(false);

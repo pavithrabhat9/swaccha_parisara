@@ -9,6 +9,7 @@ import { formatShortDate } from '../utils/dateUtils';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
 import { SkeletonCard, SkeletonHero } from '../components/ui/Skeleton';
+import { cn } from '../utils/cn';
 import {
   BadgeMedal,
   CheckCircleIcon,
@@ -43,9 +44,9 @@ export default function RewardsPage() {
     donatePoints,
   } = useRewards();
 
-  const [historyFilter, setHistoryFilter] = useState('all'); // 'all' | 'earned' | 'pending' | 'donated'
+  const [historyFilter, setHistoryFilter] = useState('all');
   const [badgeCategory, setBadgeCategory] = useState('Pickup');
-  const [rankTab, setRankTab] = useState('area'); // 'area' | 'plastic'
+  const [rankTab, setRankTab] = useState('area');
   const [selectedCauseId, setSelectedCauseId] = useState('cause-beach-cleanup');
   const [donationAmount, setDonationAmount] = useState(DONATION_AMOUNTS[0]);
   const [confirmingDonation, setConfirmingDonation] = useState(false);
@@ -104,7 +105,7 @@ export default function RewardsPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 md:py-8 space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-black tracking-tight">{t('rewards')}</h1>
+        <h1 className="text-xl font-bold text-ink text-balance">{t('rewards')}</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
@@ -114,24 +115,25 @@ export default function RewardsPage() {
           <PointsSummaryCard points={points} tierProgress={tierProgress} />
 
           {/* 3. Badges by category: Pickup, Report, Streak, Plastic type */}
-          <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
-            <h2 className="text-sm font-bold text-black">{t('rewards_badges_title')}</h2>
+            <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
+              <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_badges_title')}</h2>
 
-            <div className="flex flex-wrap gap-1.5" role="tablist" aria-label={t('rewards_badges_title')}>
-              {BADGE_CATEGORIES.map(cat => {
-                const active = badgeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setBadgeCategory(cat.id)}
-                    className={`min-h-[36px] px-3 py-1.5 rounded-[6px] text-xs font-semibold border transition-colors cursor-pointer ${
-                      active
-                        ? 'bg-primary text-white border-primary'
-                        : 'bg-sunken text-black border-border hover:border-primary/40'
-                    }`}
+              <div className="flex flex-wrap gap-1.5" role="tablist" aria-label={t('rewards_badges_title')}>
+                {BADGE_CATEGORIES.map(cat => {
+                  const active = badgeCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setBadgeCategory(cat.id)}
+                    className={cn(
+                        'min-h-10 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors duration-150 cursor-pointer',
+                        active
+                          ? 'bg-primary text-white border-primary'
+                        : 'bg-sunken text-ink border-border hover:border-primary/40'
+                    )}
                   >
                     {t(cat.labelKey)}
                   </button>
@@ -142,20 +144,21 @@ export default function RewardsPage() {
             <div className="divide-y divide-border-light">
               {filteredBadges.map((item, idx) => (
                 <div
-                  key={`${item.category}-${idx}`}
-                  className={`py-3 first:pt-1 last:pb-0 flex items-center gap-3 ${
-                    item.unlocked ? '' : 'opacity-55 grayscale'
-                  }`}
+                  key={`${ item.category } -${ idx } `}
+                  className={cn(
+                    'py-3 first:pt-1 last:pb-0 flex items-center gap-3',
+                    !item.unlocked && 'opacity-60 grayscale'
+                  )}
                 >
-                  <BadgeMedal id={item.id} locked={!item.unlocked} className="w-8 h-8 shrink-0" />
+                  <BadgeMedal id={item.id} locked={!item.unlocked} className="size-8 shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-black truncate">{t(item.titleKey)}</p>
-                    <p className="text-[11px] text-muted leading-snug mt-0.5">{t(item.descKey)}</p>
+                    <p className="text-xs font-bold text-ink truncate">{t(item.titleKey)}</p>
+                    <p className="text-[11px] text-muted text-pretty leading-snug mt-0.5">{t(item.descKey)}</p>
                   </div>
                   {item.unlocked ? (
-                    <CheckCircleIcon className="w-4 h-4 text-primary shrink-0" />
+                    <CheckCircleIcon className="size-4 text-primary shrink-0" />
                   ) : (
-                    <LockIcon className="w-3.5 h-3.5 text-muted shrink-0" />
+                    <LockIcon className="size-3.5 text-muted shrink-0" />
                   )}
                 </div>
               ))}
@@ -163,34 +166,37 @@ export default function RewardsPage() {
           </section>
 
           {/* 5. Donate Points to NGO Causes */}
-          <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+          <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
             <div className="flex items-start gap-2.5">
-              <span className="w-8 h-8 rounded-[6px] bg-primary-light text-primary flex items-center justify-center shrink-0">
-                <HeartIcon className="w-4 h-4" />
+              <span className="size-8 rounded-xl bg-primary-light text-primary flex items-center justify-center shrink-0">
+                <HeartIcon className="size-4" />
               </span>
               <div>
-                <h2 className="text-sm font-bold text-black">{t('rewards_donate_title')}</h2>
-                <p className="text-xs text-muted mt-0.5">{t('rewards_donate_subtitle')}</p>
+                <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_donate_title')}</h2>
+                <p className="text-xs text-muted text-pretty mt-0.5">{t('rewards_donate_subtitle')}</p>
               </div>
             </div>
 
             {/* Cause selector */}
-            <div className="space-y-2">
+            <div className="space-y-2" role="radiogroup" aria-label={t('rewards_donate_title')}>
               {causes.map(cause => {
                 const selected = selectedCause?.id === cause.id;
                 return (
                   <button
                     key={cause.id}
                     type="button"
+                    role="radio"
+                    aria-checked={selected}
                     onClick={() => setSelectedCauseId(cause.id)}
-                    className={`w-full p-3 rounded-[6px] border text-left transition-colors cursor-pointer ${
+                    className={cn(
+                      'w-full p-3.5 rounded-xl border text-left transition-colors duration-150 cursor-pointer',
                       selected
-                        ? 'border-primary bg-primary-lighter/60 ring-1 ring-primary'
-                        : 'border-border bg-white hover:border-black/30'
-                    }`}
+                        ? 'border-primary bg-primary-lighter'
+                        : 'border-border bg-white hover:border-primary/40'
+                    )}
                   >
-                    <p className="text-xs font-bold text-black">{t(cause.titleKey)}</p>
-                    <p className="text-[11px] text-muted mt-0.5">{t(cause.descKey)}</p>
+                    <p className="text-xs font-bold text-ink">{t(cause.titleKey)}</p>
+                    <p className="text-[11px] text-muted text-pretty mt-0.5">{t(cause.descKey)}</p>
                   </button>
                 );
               })}
@@ -198,22 +204,25 @@ export default function RewardsPage() {
 
             {/* Amount selector */}
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider mb-2">
+              <p className="text-xs font-semibold text-ink mb-2">
                 {t('rewards_select_amount')}
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t('rewards_select_amount')}>
                 {DONATION_AMOUNTS.map(amt => {
                   const selected = donationAmount === amt;
                   return (
                     <button
                       key={amt}
                       type="button"
+                      role="radio"
+                      aria-checked={selected}
                       onClick={() => setDonationAmount(amt)}
-                      className={`min-h-[40px] py-2 rounded-[6px] border text-xs font-bold tabular transition-colors cursor-pointer ${
+                      className={cn(
+                        'min-h-11 py-2 rounded-xl border text-xs font-bold tabular transition-colors duration-150 cursor-pointer',
                         selected
-                          ? 'border-primary text-primary bg-white ring-1 ring-primary'
-                          : 'border-border text-black bg-white hover:border-black/30'
-                      }`}
+                          ? 'border-primary text-primary-dark bg-primary-lighter'
+                          : 'border-border text-ink bg-white hover:border-primary/40'
+                      )}
                     >
                       {amt} pts
                     </button>
@@ -223,7 +232,7 @@ export default function RewardsPage() {
             </div>
 
             {donateError && (
-              <p className="text-xs font-medium text-orange-red">{donateError}</p>
+              <p role="alert" className="text-xs font-semibold text-orange-red-dark">{donateError}</p>
             )}
 
             {!confirmingDonation ? (
@@ -231,14 +240,21 @@ export default function RewardsPage() {
                 type="button"
                 disabled={points < donationAmount}
                 onClick={() => setConfirmingDonation(true)}
-                className="w-full min-h-[44px] py-2.5 px-4 rounded-[6px] bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-xs font-semibold transition-colors cursor-pointer"
+                className="w-full min-h-11 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-xs font-semibold transition-colors duration-150 cursor-pointer"
               >
                 {t('rewards_donate_cta', { amount: donationAmount })}
               </button>
             ) : (
-              <div className="p-3.5 rounded-[6px] border border-border bg-sunken space-y-3">
-                <p className="text-xs font-bold text-black">{t('rewards_donate_confirm_title')}</p>
-                <p className="text-xs text-muted">
+              <div
+                role="alertdialog"
+                aria-labelledby="donate-confirm-title"
+                aria-describedby="donate-confirm-desc"
+                className="p-4 rounded-xl border border-border bg-sunken space-y-3"
+              >
+                <p id="donate-confirm-title" className="text-xs font-bold text-ink">
+                  {t('rewards_donate_confirm_title')}
+                </p>
+                <p id="donate-confirm-desc" className="text-xs text-muted text-pretty">
                   {t('rewards_donate_confirm_text', {
                     amount: donationAmount,
                     cause: selectedCause ? t(selectedCause.titleKey) : '',
@@ -248,14 +264,14 @@ export default function RewardsPage() {
                   <button
                     type="button"
                     onClick={handleConfirmDonate}
-                    className="flex-1 min-h-[40px] py-2 px-3 rounded-[6px] bg-primary text-white text-xs font-semibold hover:bg-primary-dark cursor-pointer"
+                    className="flex-1 min-h-11 py-2 px-3 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark cursor-pointer"
                   >
                     {t('rewards_donate_confirm_btn')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmingDonation(false)}
-                    className="min-h-[40px] py-2 px-3 rounded-[6px] border border-border bg-white text-xs font-semibold text-muted hover:text-black cursor-pointer"
+                    className="min-h-11 py-2 px-3 rounded-xl border border-border bg-white text-xs font-semibold text-muted hover:text-ink cursor-pointer"
                   >
                     {t('profile_cancel')}
                   </button>
@@ -264,18 +280,18 @@ export default function RewardsPage() {
             )}
           </section>
 
-          {/* 6. Redemption: Coming Soon card only (no cash, no payment) */}
-          <section className="border border-border rounded-[8px] bg-sunken p-5 space-y-2">
+          {/* 6. Redemption: Coming Soon card only */}
+          <section className="border border-border rounded-2xl bg-sunken p-5 space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-bold text-black inline-flex items-center gap-2">
-                <GiftIcon className="w-4 h-4 text-primary" />
+              <h2 className="text-sm font-bold text-ink text-balance inline-flex items-center gap-2">
+                <GiftIcon className="size-4 text-primary" />
                 <span>{t('rewards_redemption_title')}</span>
               </h2>
               <span className="px-2.5 py-0.5 rounded-full bg-white border border-border text-[11px] font-semibold text-muted">
                 {t('rewards_redemption_coming_soon')}
               </span>
             </div>
-            <p className="text-xs text-muted leading-relaxed">
+            <p className="text-xs text-muted text-pretty leading-relaxed">
               {t('rewards_redemption_desc')}
             </p>
           </section>
@@ -283,11 +299,11 @@ export default function RewardsPage() {
 
         {/* RIGHT COLUMN: Ranks (Top 10) + Points History */}
         <div className="md:col-span-7 space-y-6">
-          {/* 4. Ranks: tabs "My area" and "By plastic type", top 10 list (first name + initial only) */}
-          <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
+          {/* 4. Ranks: tabs "My area" and "By plastic type", top 10 list */}
+          <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-sm font-bold text-black">{t('rewards_ranks_title')}</h2>
-              <div className="inline-flex p-1 rounded-[6px] bg-sunken border border-border" role="tablist">
+              <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_ranks_title')}</h2>
+              <div className="inline-flex p-1 rounded-xl bg-sunken border border-border" role="tablist">
                 {[
                   { id: 'area', label: t('rewards_ranks_tab_area') },
                   { id: 'plastic', label: t('rewards_ranks_tab_plastic') },
@@ -300,9 +316,10 @@ export default function RewardsPage() {
                       role="tab"
                       aria-selected={active}
                       onClick={() => setRankTab(tab.id)}
-                      className={`min-h-[34px] px-3 py-1 rounded-[4px] text-xs font-semibold transition-colors cursor-pointer ${
-                        active ? 'bg-primary text-white' : 'text-muted hover:text-black'
-                      }`}
+                      className={cn(
+                        'min-h-10 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer',
+                        active ? 'bg-primary text-white' : 'text-muted hover:text-ink'
+                      )}
                     >
                       {tab.label}
                     </button>
@@ -311,29 +328,32 @@ export default function RewardsPage() {
               </div>
             </div>
 
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border-light">
               {activeRanks.map(row => (
                 <div
                   key={row.rank}
-                  className={`py-2.5 px-2.5 -mx-2.5 rounded-[6px] flex items-center justify-between gap-3 ${
-                    row.isCurrentUser ? 'bg-primary-lighter border border-primary/25' : ''
-                  }`}
+                  className={cn(
+                    'py-2.5 px-2.5 -mx-2.5 rounded-xl flex items-center justify-between gap-3',
+                    row.isCurrentUser && 'bg-primary-lighter border border-primary/25'
+                  )}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span
-                      className={`w-6 h-6 rounded-full text-xs font-bold tabular flex items-center justify-center shrink-0 ${
-                        row.rank <= 3
-                          ? 'bg-yellow-light text-yellow-dark border border-yellow/40'
-                          : 'bg-sunken text-muted'
-                      }`}
+                    className = {
+                      cn(
+                        'size-6 rounded-full text-xs font-bold tabular flex items-center justify-center shrink-0',
+                      row.rank <= 3
+                        ? 'bg-yellow-light text-yellow-dark border border-yellow/40'
+                        : 'bg-sunken text-muted'
+                      )}
                     >
                       {row.rank}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-black truncate">
+                      <p className="text-xs font-bold text-ink truncate">
                         {row.name}{' '}
                         {row.isCurrentUser && (
-                          <span className="ml-1 px-1.5 py-0.5 rounded-[4px] bg-primary text-white text-[10px] font-semibold">
+                          <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary text-white text-[10px] font-semibold">
                             {t('rewards_ranks_you')}
                           </span>
                         )}
@@ -343,7 +363,7 @@ export default function RewardsPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-black tabular shrink-0">
+                  <span className="text-xs font-bold text-ink tabular shrink-0">
                     {row.value.toLocaleString('en-IN')} {row.unit}
                   </span>
                 </div>
@@ -352,10 +372,10 @@ export default function RewardsPage() {
           </section>
 
           {/* 2. Points History: earned, pending ("Awaiting weigh-in"), and donated */}
-          <section className="border border-border rounded-[8px] bg-white p-5 space-y-4">
-            <h2 className="text-sm font-bold text-black">{t('rewards_history_title')}</h2>
+          <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
+            <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_history_title')}</h2>
 
-            <div className="flex items-center gap-6 border-b border-border overflow-x-auto">
+            <div className="flex items-center gap-6 border-b border-border overflow-x-auto hide-scrollbar" role="tablist">
               {[
                 { id: 'all', label: t('rewards_filter_all') },
                 { id: 'earned', label: t('rewards_filter_earned') },
@@ -367,12 +387,15 @@ export default function RewardsPage() {
                   <button
                     key={tab.id}
                     type="button"
+                    role="tab"
+                    aria-selected={active}
                     onClick={() => setHistoryFilter(tab.id)}
-                    className={`pb-2.5 text-xs whitespace-nowrap transition-colors cursor-pointer border-b-2 -mb-px ${
+                    className={cn(
+                      'min-h-11 pb-2.5 text-xs whitespace-nowrap transition-colors duration-150 cursor-pointer border-b-2 -mb-px',
                       active
-                        ? 'border-primary text-black font-bold'
-                        : 'border-transparent text-muted hover:text-black font-medium'
-                    }`}
+                        ? 'border-primary text-ink font-bold'
+                        : 'border-transparent text-muted hover:text-ink font-medium'
+                    )}
                   >
                     {tab.label}
                   </button>
@@ -386,15 +409,15 @@ export default function RewardsPage() {
                 description={t('ui_empty_default_description')}
               />
             ) : (
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-border-light">
                 {filteredHistory.map(entry => (
                   <div
                     key={entry.id}
                     className="py-3.5 first:pt-0 last:pb-0 flex items-start justify-between gap-4"
                   >
                     <div className="min-w-0 space-y-0.5">
-                      <p className="text-sm font-semibold text-black truncate">{entry.title}</p>
-                      <p className="text-xs text-muted">
+                      <p className="text-sm font-semibold text-ink truncate">{entry.title}</p>
+                      <p className="text-xs text-muted tabular">
                         {entry.subtitle} · {formatShortDate(entry.date)}
                       </p>
                     </div>
@@ -418,7 +441,7 @@ export default function RewardsPage() {
                       )}
                       {entry.kind === 'donated' && (
                         <>
-                          <p className="text-sm font-bold text-black tabular">
+                          <p className="text-sm font-bold text-ink tabular">
                             −{entry.points} pts
                           </p>
                           <p className="text-[11px] text-primary font-semibold">

@@ -10,7 +10,9 @@ import Chip from '../components/ui/Chip';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
 import { SkeletonCard } from '../components/ui/Skeleton';
+import BottomMist from '../components/layout/BottomMist';
 import { ArrowLeftIcon } from '../components/ui/Icons';
+import { cn } from '../utils/cn';
 
 const TAG_STYLES = {
   recyclable: {
@@ -36,7 +38,7 @@ const TAG_STYLES = {
 /**
  * PlasticTypesPage (/learn/plastic-types) — "Know your plastic"
  * Filter chips: All, Recyclable, Special handling, Not recyclable.
- * Renders resin codes 1 to 7 from `src/data/learnContent.js` in a 1-col mobile / 2-col desktop grid.
+ * Renders resin codes 1 to 7 in a 1-col mobile / 2-col desktop grid.
  */
 export default function PlasticTypesPage() {
   const { t } = useTranslation();
@@ -44,24 +46,24 @@ export default function PlasticTypesPage() {
   const { items, loading, error, activeFilter, setActiveFilter, retry } = usePlasticTypes();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 md:py-8 space-y-6">
       {/* Header: Back button + Page Title */}
       <div className="space-y-2">
         <button
           type="button"
           onClick={() => navigate(-1)}
           aria-label={t('kyp_back')}
-          className="min-h-[44px] -ml-2 px-2 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
+          className="min-h-11 -ml-2 px-2 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
         >
-          <ArrowLeftIcon className="w-4 h-4" />
+          <ArrowLeftIcon className="size-4" />
           <span>{t('kyp_back')}</span>
         </button>
 
         <div>
-          <h1 className="text-xl font-extrabold text-black tracking-tight">
+          <h1 className="text-xl font-extrabold text-ink text-balance">
             {t('kyp_page_title')}
           </h1>
-          <p className="text-xs text-muted mt-1">{t('kyp_page_subtitle')}</p>
+          <p className="text-xs text-muted text-pretty mt-1">{t('kyp_page_subtitle')}</p>
         </div>
       </div>
 
@@ -113,7 +115,7 @@ export default function PlasticTypesPage() {
             return (
               <article
                 key={plastic.code}
-                className="rounded-[24px] bg-white border border-border/70 shadow-card overflow-hidden flex flex-col"
+                className="rounded-2xl bg-white border border-border overflow-hidden flex flex-col"
               >
                 {/* Top image + resin code number + category tag */}
                 <div className="relative h-40 w-full bg-sunken">
@@ -124,41 +126,44 @@ export default function PlasticTypesPage() {
                     className="w-full h-full object-cover"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                  <div className="absolute inset-0 bg-ink/55" />
 
                   {/* Resin code number badge (1 to 7) */}
-                  <div className="absolute top-3 left-3 w-10 h-10 rounded-full bg-white text-black font-extrabold text-base tabular shadow-xs flex items-center justify-center">
+                  <div className="absolute top-3 left-3 size-10 rounded-full bg-white text-ink font-extrabold text-base tabular flex items-center justify-center">
                     #{plastic.code}
                   </div>
 
-                  {/* Color-coded tag: green = recyclable, yellow = special handling, orange-red = not recyclable */}
+                  {/* Color-coded tag */}
                   <span
-                    className={`absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${tag.className}`}
+                    className={cn(
+                      'absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border',
+                      tag.className
+                    )}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${tag.dotClass}`} aria-hidden="true" />
+                    <span className={cn('size-1.5 rounded-full', tag.dotClass)} aria-hidden="true" />
                     {t(tag.labelKey)}
                   </span>
 
                   {/* Name & full chemical name */}
                   <div className="absolute bottom-3 left-4 right-4">
-                    <h2 className="text-base font-extrabold text-white leading-tight">
+                    <h2 className="text-base font-extrabold text-white text-balance leading-tight">
                       {plastic.name}
                     </h2>
-                    <p className="text-xs text-white/85 truncate">{plastic.fullName}</p>
+                    <p className="text-xs text-white/90 truncate">{plastic.fullName}</p>
                   </div>
                 </div>
 
                 {/* Body: example items + "Can I put this in a pickup?" */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-2">
+                    <p className="text-xs font-bold text-ink mb-2">
                       {t('kyp_examples_label')}
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {plastic.examples.map(ex => (
                         <span
                           key={ex}
-                          className="px-2.5 py-1 rounded-full bg-sunken border border-border text-xs font-medium text-black"
+                          className="px-2.5 py-1 rounded-lg bg-sunken border border-border text-xs font-medium text-ink"
                         >
                           {ex}
                         </span>
@@ -168,13 +173,13 @@ export default function PlasticTypesPage() {
 
                   {/* Short line: "Can I put this in a pickup?" */}
                   <div className="pt-3 border-t border-border-light space-y-1">
-                    <p className="text-xs font-bold text-black">
+                    <p className="text-xs font-bold text-ink">
                       {t('kyp_pickup_question')}
                     </p>
                     <p className="text-xs font-semibold text-primary-dark">
                       {t(tag.answerKey)}
                     </p>
-                    <p className="text-[11px] text-muted leading-relaxed">
+                    <p className="text-[11px] text-muted text-pretty leading-relaxed">
                       {plastic.tip}
                     </p>
                   </div>
@@ -184,7 +189,8 @@ export default function PlasticTypesPage() {
           })}
         </div>
       )}
+
+      <BottomMist />
     </div>
   );
 }
-

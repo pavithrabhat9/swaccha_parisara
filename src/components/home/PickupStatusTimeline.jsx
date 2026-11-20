@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PICKUP_STATUS_STEPS, STATUS_LABEL_KEYS, getStatusStepIndex } from '../../utils/pickupStatusUtils';
+import { cn } from '../../utils/cn';
 
-/** Small 4-step timeline: Requested, Scheduled, On the way, Completed. No live tracking. */
+/** Small 4-step timeline: Requested, Scheduled, On the way, Completed. */
 export default function PickupStatusTimeline({ status }) {
   const { t } = useTranslation();
   const currentIndex = getStatusStepIndex(status);
@@ -21,18 +22,21 @@ export default function PickupStatusTimeline({ status }) {
             {i > 0 && (
               <span
                 aria-hidden="true"
-                className={`absolute top-[7px] right-1/2 w-full h-0.5 ${reached ? 'bg-primary' : 'bg-border'}`}
+                className={cn('absolute top-[7px] right-1/2 w-full h-0.5', reached ? 'bg-primary' : 'bg-border')}
               />
             )}
             <span
-              className={`relative z-10 w-4 h-4 rounded-full border-2 ${
-                reached ? 'bg-primary border-primary' : 'bg-white border-border'
-              } ${current ? 'ring-4 ring-primary/20' : ''}`}
+              className={cn(
+                'relative z-10 size-4 rounded-full border-2',
+                reached ? 'bg-primary border-primary' : 'bg-white border-border',
+                current && 'ring-4 ring-primary/20'
+              )}
             />
             <span
-              className={`text-[11px] leading-tight text-center ${
-                current ? 'font-bold text-black' : 'text-muted'
-              }`}
+              className={cn(
+                'text-[11px] leading-tight text-center',
+                current ? 'font-bold text-ink' : 'text-muted'
+              )}
             >
               {t(STATUS_LABEL_KEYS[step])}
             </span>
@@ -42,4 +46,3 @@ export default function PickupStatusTimeline({ status }) {
     </ol>
   );
 }
-

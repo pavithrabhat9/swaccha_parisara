@@ -1,25 +1,31 @@
 import React from 'react';
 import Button from './Button';
+import { cn } from '../../utils/cn';
 
 /**
  * Reusable EmptyState component with a palette-only inline SVG illustration.
  */
 export default function EmptyState({
   icon,
-  title = "No items yet",
-  description = "There is currently nothing to display here.",
+  title = 'No items yet',
+  description = 'There is currently nothing to display here.',
   actionLabel,
   onAction,
-  className = "",
+  className = '',
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center text-center py-12 px-6 bg-white rounded-3xl border border-border/80 shadow-card ${className}`}>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center text-center py-10 px-6 bg-white rounded-2xl border border-border',
+        className
+      )}
+    >
       {icon ? (
-        <div className="w-16 h-16 rounded-2xl bg-primary-lighter border border-primary/15 flex items-center justify-center text-primary mb-5">
+        <div className="size-14 rounded-2xl bg-primary-lighter border border-primary/15 flex items-center justify-center text-primary mb-4">
           {icon}
         </div>
       ) : (
-        <div className="mb-5 animate-float" aria-hidden="true">
+        <div className="mb-4" aria-hidden="true">
           <svg width="88" height="72" viewBox="0 0 88 72" fill="none">
             <ellipse cx="44" cy="62" rx="30" ry="5" fill="#e3eedd" />
             <rect x="22" y="20" width="44" height="36" rx="10" fill="#f2f7ef" stroke="#38761d" strokeWidth="2" />
@@ -31,11 +37,11 @@ export default function EmptyState({
         </div>
       )}
 
-      <h3 className="text-heading text-ink mb-1.5">
+      <h3 className="text-heading font-bold text-ink text-balance mb-1.5">
         {title}
       </h3>
 
-      <p className="text-body-sm text-muted max-w-xs leading-relaxed mb-6">
+      <p className="text-body-sm text-muted text-pretty max-w-xs leading-relaxed mb-5">
         {description}
       </p>
 
@@ -45,7 +51,7 @@ export default function EmptyState({
           size="md"
           onClick={onAction}
           rightIcon={
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
             </svg>

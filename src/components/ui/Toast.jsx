@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { cn } from '../../utils/cn';
 
 const ToastContext = createContext();
 
@@ -8,7 +9,6 @@ export function useToast() {
 
 /**
  * Global toast notification system.
- * Wrap your app with <ToastProvider> and call showToast() from anywhere.
  */
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -18,8 +18,8 @@ export function ToastProvider({ children }) {
     setToasts(prev => [...prev, { id, message, type, exiting: false }]);
 
     setTimeout(() => {
-      setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
-    }, duration - 300);
+      setToasts(prev => prev.map(t => (t.id === id ? { ...t, exiting: true } : t)));
+    }, duration - 220);
 
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
@@ -27,10 +27,10 @@ export function ToastProvider({ children }) {
   }, []);
 
   const dismissToast = useCallback((id) => {
-    setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
+    setToasts(prev => prev.map(t => (t.id === id ? { ...t, exiting: true } : t)));
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, 300);
+    }, 200);
   }, []);
 
   return (
@@ -38,42 +38,42 @@ export function ToastProvider({ children }) {
       {children}
       <div
         aria-live="polite"
-        className="fixed top-3 left-0 right-0 z-[9999] flex flex-col items-center gap-2 px-4 pointer-events-none"
+        className="fixed top-3 left-0 right-0 z-50 flex flex-col items-center gap-2 px-4 pointer-events-none"
       >
         {toasts.map(toast => (
           <div
             key={toast.id}
             role="status"
             onClick={() => dismissToast(toast.id)}
-            className={`
-              pointer-events-auto cursor-pointer max-w-sm w-full px-4 py-3 rounded-2xl
-              shadow-elevated flex items-center gap-3 text-body-sm font-semibold
-              ${toast.exiting ? 'animate-toast-out' : 'animate-toast-in'}
-              ${toast.type === 'success' ? 'bg-primary text-white' : ''}
-              ${toast.type === 'info' ? 'bg-yellow text-ink' : ''}
-              ${toast.type === 'error' ? 'bg-orange-red text-white' : ''}
-            `}
+            className={cn(
+              'pointer-events-auto cursor-pointer max-w-sm w-full px-4 py-3 rounded-2xl',
+              'shadow-elevated flex items-center gap-3 text-body-sm font-semibold',
+              toast.exiting ? 'animate-toast-out' : 'animate-toast-in',
+              toast.type === 'success' && 'bg-primary text-white',
+              toast.type === 'info' && 'bg-yellow text-ink',
+              toast.type === 'error' && 'bg-orange-red text-white'
+            )}
           >
-            <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0" aria-hidden="true">
+            <span className="size-6 rounded-full bg-white/20 flex items-center justify-center shrink-0" aria-hidden="true">
               {toast.type === 'success' && (
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}
               {toast.type === 'info' && (
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="16" x2="12" y2="12" />
                   <line x1="12" y1="8" x2="12.01" y2="8" />
                 </svg>
               )}
               {toast.type === 'error' && (
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="8" x2="12" y2="12" />
                   <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
               )}
             </span>
-            <span className="flex-1 leading-snug">{toast.message}</span>
+            <span className="flex-1 leading-snug text-pretty">{toast.message}</span>
           </div>
         ))}
       </div>

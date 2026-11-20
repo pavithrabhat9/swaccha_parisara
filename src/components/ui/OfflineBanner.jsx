@@ -13,9 +13,9 @@ export default function OfflineBanner() {
     <div
       role="status"
       aria-live="polite"
-      className="sticky top-0 z-[1100] w-full bg-yellow text-ink px-4 py-2.5 shadow-xs flex items-center justify-center gap-2 text-caption font-semibold animate-fade-in"
+      className="sticky top-0 z-40 w-full bg-yellow text-ink px-4 py-2.5 border-b border-yellow-dark/20 flex items-center justify-center gap-2 text-caption font-semibold animate-fade-in"
     >
-      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <line x1="1" y1="1" x2="23" y2="23" />
         <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
         <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />

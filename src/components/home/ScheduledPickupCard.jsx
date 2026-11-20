@@ -43,11 +43,10 @@ function ArrowRightGlyph() {
 }
 
 /**
- * Compact one-row Scheduled Pickup card (~72px tall):
+ * Compact one-row Scheduled Pickup card:
  * - Left: original inline SVG calendar icon with yellow accent
- * - Middle: status-driven title ("Pickup requested" / "Pickup scheduled" / "Pickup on the way") + date
- * - Right: outlined "Track" button with circled arrow icon
- * Tapping "Track" or the card navigates to the Pickup tab.
+ * - Middle: status-driven title + date
+ * - Right: outlined "Track" button
  */
 export default function ScheduledPickupCard({ item }) {
   const { t } = useTranslation();
@@ -63,25 +62,25 @@ export default function ScheduledPickupCard({ item }) {
   return (
     <div
       onClick={handleTrack}
-      className="min-h-[72px] rounded-[20px] bg-primary-light/65 border border-primary/15 px-4 py-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-primary-light/85 transition-colors"
+      className="min-h-[72px] rounded-2xl bg-primary-light/65 border border-primary/15 px-4 py-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-primary-light/85 transition-colors duration-150"
     >
       {/* Left + Middle: Calendar icon + Title & Date */}
       <div className="flex items-center gap-3 min-w-0">
-        <span className="w-11 h-11 rounded-[14px] bg-white/90 border border-primary/15 flex items-center justify-center shrink-0">
+        <span className="size-11 rounded-xl bg-white/95 border border-primary/15 flex items-center justify-center shrink-0">
           <PickupCalendarGlyph />
         </span>
 
         <div className="min-w-0 leading-snug">
-          <p className="text-sm font-bold text-black truncate">
+          <p className="text-sm font-bold text-ink truncate">
             {t(titleKey)}
           </p>
-          <p className="text-xs text-muted truncate mt-0.5">
+          <p className="text-xs text-muted tabular truncate mt-0.5">
             {formatShortDate(item.date)}
           </p>
         </div>
       </div>
 
-      {/* Right: Outlined "Track" button with tight border around text & icon */}
+      {/* Right: Outlined "Track" button */}
       <button
         type="button"
         onClick={(e) => {
@@ -89,7 +88,7 @@ export default function ScheduledPickupCard({ item }) {
           handleTrack();
         }}
         aria-label={t('home_pickup_track_aria')}
-        className="px-3 py-1.5 rounded-full border border-primary/40 bg-white/80 hover:bg-white text-primary-dark text-xs font-semibold leading-none inline-flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="min-h-9 px-3.5 py-1.5 rounded-full border border-primary/40 bg-white/90 hover:bg-white text-primary-dark text-xs font-semibold leading-none inline-flex items-center gap-1.5 shrink-0 transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         <span>{t('home_pickup_track')}</span>
         <ArrowRightGlyph />

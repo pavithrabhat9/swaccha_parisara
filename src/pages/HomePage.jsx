@@ -15,14 +15,14 @@ import { ChevronRightIcon, TruckIcon } from '../components/ui/Icons';
 function SectionHeader({ id, title, actionLabel, onAction }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <h2 id={id} className="text-base font-extrabold text-black tracking-tight">{title}</h2>
+      <h2 id={id} className="text-base font-extrabold text-ink text-balance">{title}</h2>
       <button
         type="button"
         onClick={onAction}
-        className="min-h-[44px] pl-3 -mr-1 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
+        className="min-h-11 pl-3 -mr-1 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
       >
         {actionLabel}
-        <ChevronRightIcon className="w-3.5 h-3.5" />
+        <ChevronRightIcon className="size-3.5" />
       </button>
     </div>
   );
@@ -51,9 +51,8 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Extra bottom padding so the last card scrolls fully clear of the mist and the bar */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 md:pt-8 pb-14 md:pb-8">
-        <div className="stagger space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-x-8 md:gap-y-6 md:items-start">
+        <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-x-8 md:gap-y-6 md:items-start">
           {/* 1. Greeting row */}
           <div className="md:col-span-12">
             <HomeGreetingRow
@@ -97,7 +96,7 @@ export default function HomePage() {
                 />
 
                 <section aria-labelledby="home-scheduled-title" className="space-y-3">
-                  <h2 id="home-scheduled-title" className="text-base font-extrabold text-black tracking-tight">
+                  <h2 id="home-scheduled-title" className="text-base font-extrabold text-ink text-balance">
                     {t('home_scheduled_title')}
                   </h2>
 
@@ -108,21 +107,21 @@ export default function HomePage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-[24px] bg-white border border-dashed border-border p-6 text-center space-y-3">
+                    <div className="rounded-2xl bg-white border border-dashed border-border p-6 text-center space-y-3">
                       <span
                         aria-hidden="true"
-                        className="mx-auto w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center"
+                        className="mx-auto size-12 rounded-full bg-primary-light text-primary flex items-center justify-center"
                       >
-                        <TruckIcon className="w-6 h-6" />
+                        <TruckIcon className="size-6" />
                       </span>
                       <div>
-                        <p className="text-sm font-bold text-black">{t('home_scheduled_empty_title')}</p>
-                        <p className="text-xs text-muted mt-1">{t('home_scheduled_empty_text')}</p>
+                        <p className="text-sm font-bold text-ink text-balance">{t('home_scheduled_empty_title')}</p>
+                        <p className="text-xs text-muted text-pretty mt-1">{t('home_scheduled_empty_text')}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => navigate('/pickup?tab=home&start=1')}
-                        className="min-h-[44px] px-5 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        className="min-h-11 px-5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       >
                         {t('home_no_pickup_cta')}
                       </button>
@@ -152,7 +151,7 @@ export default function HomePage() {
 
       <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />
 
-      {/* 5. Bottom mist above the bar (Home only for now) */}
+      {/* 5. Bottom mist above the bar */}
       <BottomMist />
     </>
   );
