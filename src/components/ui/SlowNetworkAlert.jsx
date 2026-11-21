@@ -2,10 +2,6 @@ import React from 'react';
 import Button from './Button';
 import { cn } from '../../utils/cn';
 
-/**
- * Reusable alert for slow network conditions (requests taking longer than ~5 seconds).
- * Provides immediate feedback with manual "Try Again" and "Cancel" options.
- */
 export default function SlowNetworkAlert({
   message = 'This is taking longer than usual...',
   onRetry,
@@ -17,19 +13,19 @@ export default function SlowNetworkAlert({
       role="status"
       aria-live="polite"
       className={cn(
-        'p-4 bg-yellow-light border border-yellow/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in',
+        'p-3.5 bg-yellow-light border border-yellow/40 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in',
         className
       )}
     >
-      <div className="flex items-start gap-3">
-        <div className="size-9 rounded-xl bg-yellow/25 flex items-center justify-center text-yellow-dark shrink-0">
-          <svg className="size-4 stroke-current animate-pulse" viewBox="0 0 24 24" fill="none" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <div className="flex items-start gap-2.5">
+        <div className="size-8 rounded-md bg-white border border-yellow/40 flex items-center justify-center text-yellow-dark shrink-0">
+          <svg className="size-4 stroke-current animate-pulse" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
           </svg>
         </div>
         <div>
-          <p className="text-body-sm font-bold text-ink">{message}</p>
+          <p className="text-xs font-bold text-ink">{message}</p>
           <p className="text-caption text-muted text-pretty mt-0.5">Slow mobile data or poor connection detected.</p>
         </div>
       </div>

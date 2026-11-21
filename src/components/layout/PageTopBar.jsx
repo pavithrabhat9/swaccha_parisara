@@ -4,10 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeftIcon } from '../ui/Icons';
 
 /**
- * PageTopBar — Reusable settings-style top bar:
- * - Left: Back arrow button (44px tap target). Goes to `onBack` if provided, otherwise history back or /home.
- * - Center: Page title.
- * - Right: Empty spacer so the title stays optically centered.
+ * PageTopBar — Sub-page contextual breadcrumb/header bar below the global utility header.
  */
 export default function PageTopBar({ title, onBack }) {
   const { t } = useTranslation();
@@ -26,21 +23,21 @@ export default function PageTopBar({ title, onBack }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 h-14 bg-white border-b border-border px-3 sm:px-6 flex items-center justify-between">
-      <button
-        type="button"
-        onClick={handleBack}
-        aria-label={t('profile_back_aria')}
-        className="size-11 rounded-full text-ink hover:bg-sunken flex items-center justify-center transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-      >
-        <ArrowLeftIcon className="size-5" />
-      </button>
+    <div className="bg-white border-b border-border px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto h-12 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleBack}
+          aria-label={t('profile_back_aria')}
+          className="size-9 -ml-1.5 rounded-lg text-ink hover:bg-sunken flex items-center justify-center transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <ArrowLeftIcon className="size-4" />
+        </button>
 
-      <h1 className="text-base font-extrabold text-ink text-balance truncate px-2">
-        {title}
-      </h1>
-
-      <span className="size-11 shrink-0" aria-hidden="true" />
-    </header>
+        <h1 className="text-sm font-bold text-ink text-balance truncate">
+          {title}
+        </h1>
+      </div>
+    </div>
   );
 }

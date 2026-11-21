@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useRewards } from '../hooks/useRewards';
 import { useToast } from '../components/ui/Toast';
 import PointsSummaryCard from '../components/rewards/PointsSummaryCard';
-import BottomMist from '../components/layout/BottomMist';
 import { BADGE_CATEGORIES, DONATION_AMOUNTS } from '../data/mockRewards';
 import { formatShortDate } from '../utils/dateUtils';
 import EmptyState from '../components/ui/EmptyState';
@@ -19,13 +18,7 @@ import {
 } from '../components/ui/Icons';
 
 /**
- * RewardsPage — Stage 5:
- * 1. Balance card with tier progress
- * 2. Points history: earned, pending ("Awaiting weigh-in"), and donated entries
- * 3. Badges: categories Pickup, Report, Streak, Plastic type (unlocked + locked with unlock condition)
- * 4. Ranks: tabs "My area" and "By plastic type", top 10 list (first name + initial only), user's row highlighted
- * 5. Donate points: choose a sample NGO cause, amount selector, confirmation, entry appears in history
- * 6. Redemption: "Coming soon" card only (no cash, no payment)
+ * RewardsPage — Civic Recycling Credits, Verification Seals, District Standings & NGO Donations.
  */
 export default function RewardsPage() {
   const { t } = useTranslation();
@@ -103,36 +96,35 @@ export default function RewardsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 md:py-8 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-ink text-balance">{t('rewards')}</h1>
+        <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">{t('rewards')}</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: Balance Card, Badges, Donate Points, Redemption Coming Soon */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start">
+        {/* LEFT COLUMN */}
         <div className="md:col-span-5 space-y-6">
-          {/* 1. Balance card with tier progress */}
           <PointsSummaryCard points={points} tierProgress={tierProgress} />
 
-          {/* 3. Badges by category: Pickup, Report, Streak, Plastic type */}
-            <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
-              <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_badges_title')}</h2>
+          {/* Badges / Achievements */}
+          <section className="rounded-2xl card-elevated p-5 space-y-4">
+            <h2 className="text-base font-extrabold text-ink tracking-tight text-balance">{t('rewards_badges_title')}</h2>
 
-              <div className="flex flex-wrap gap-1.5" role="tablist" aria-label={t('rewards_badges_title')}>
-                {BADGE_CATEGORIES.map(cat => {
-                  const active = badgeCategory === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setBadgeCategory(cat.id)}
+            <div className="flex flex-wrap gap-1.5" role="tablist" aria-label={t('rewards_badges_title')}>
+              {BADGE_CATEGORIES.map(cat => {
+                const active = badgeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setBadgeCategory(cat.id)}
                     className={cn(
-                        'min-h-10 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors duration-150 cursor-pointer',
-                        active
-                          ? 'bg-primary text-white border-primary'
-                        : 'bg-sunken text-ink border-border hover:border-primary/40'
+                      'min-h-9 px-3.5 py-1 rounded-xl text-xs font-bold transition-colors duration-150 cursor-pointer',
+                      active
+                        ? 'bg-primary text-white shadow-xs'
+                        : 'bg-sunken text-muted hover:text-ink hover:bg-border/60'
                     )}
                   >
                     {t(cat.labelKey)}
@@ -144,7 +136,7 @@ export default function RewardsPage() {
             <div className="divide-y divide-border-light">
               {filteredBadges.map((item, idx) => (
                 <div
-                  key={`${ item.category } -${ idx } `}
+                  key={`${item.category}-${idx}`}
                   className={cn(
                     'py-3 first:pt-1 last:pb-0 flex items-center gap-3',
                     !item.unlocked && 'opacity-60 grayscale'
@@ -165,20 +157,19 @@ export default function RewardsPage() {
             </div>
           </section>
 
-          {/* 5. Donate Points to NGO Causes */}
-          <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
-            <div className="flex items-start gap-2.5">
-              <span className="size-8 rounded-xl bg-primary-light text-primary flex items-center justify-center shrink-0">
-                <HeartIcon className="size-4" />
+          {/* Donate Points to NGO Causes */}
+          <section className="rounded-2xl card-elevated p-5 space-y-4">
+            <div className="flex items-start gap-3">
+              <span className="size-10 rounded-xl bg-orange-red-light text-orange-red flex items-center justify-center shrink-0">
+                <HeartIcon className="size-5" />
               </span>
               <div>
-                <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_donate_title')}</h2>
+                <h2 className="text-base font-extrabold text-ink tracking-tight text-balance">{t('rewards_donate_title')}</h2>
                 <p className="text-xs text-muted text-pretty mt-0.5">{t('rewards_donate_subtitle')}</p>
               </div>
             </div>
 
-            {/* Cause selector */}
-            <div className="space-y-2" role="radiogroup" aria-label={t('rewards_donate_title')}>
+            <div className="space-y-2.5" role="radiogroup" aria-label={t('rewards_donate_title')}>
               {causes.map(cause => {
                 const selected = selectedCause?.id === cause.id;
                 return (
@@ -189,10 +180,10 @@ export default function RewardsPage() {
                     aria-checked={selected}
                     onClick={() => setSelectedCauseId(cause.id)}
                     className={cn(
-                      'w-full p-3.5 rounded-xl border text-left transition-colors duration-150 cursor-pointer',
+                      'w-full p-3.5 rounded-xl text-left transition-all duration-150 cursor-pointer',
                       selected
-                        ? 'border-primary bg-primary-lighter'
-                        : 'border-border bg-white hover:border-primary/40'
+                        ? 'bg-primary-lighter ring-2 ring-primary/60'
+                        : 'bg-sunken/70 hover:bg-sunken'
                     )}
                   >
                     <p className="text-xs font-bold text-ink">{t(cause.titleKey)}</p>
@@ -202,9 +193,8 @@ export default function RewardsPage() {
               })}
             </div>
 
-            {/* Amount selector */}
             <div>
-              <p className="text-xs font-semibold text-ink mb-2">
+              <p className="text-xs font-bold text-ink mb-2">
                 {t('rewards_select_amount')}
               </p>
               <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t('rewards_select_amount')}>
@@ -218,10 +208,10 @@ export default function RewardsPage() {
                       aria-checked={selected}
                       onClick={() => setDonationAmount(amt)}
                       className={cn(
-                        'min-h-11 py-2 rounded-xl border text-xs font-bold tabular transition-colors duration-150 cursor-pointer',
+                        'min-h-11 py-2 rounded-xl tabular text-xs font-extrabold transition-all duration-150 cursor-pointer',
                         selected
-                          ? 'border-primary text-primary-dark bg-primary-lighter'
-                          : 'border-border text-ink bg-white hover:border-primary/40'
+                          ? 'bg-primary text-white shadow-xs'
+                          : 'bg-sunken text-ink hover:bg-border/60'
                       )}
                     >
                       {amt} pts
@@ -240,7 +230,7 @@ export default function RewardsPage() {
                 type="button"
                 disabled={points < donationAmount}
                 onClick={() => setConfirmingDonation(true)}
-                className="w-full min-h-11 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-xs font-semibold transition-colors duration-150 cursor-pointer"
+                className="w-full min-h-11 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-dark disabled:opacity-40 text-white text-xs font-bold shadow-[0_4px_14px_-2px_rgba(13,122,87,0.34)] transition-all duration-150 cursor-pointer press-scale"
               >
                 {t('rewards_donate_cta', { amount: donationAmount })}
               </button>
@@ -249,9 +239,9 @@ export default function RewardsPage() {
                 role="alertdialog"
                 aria-labelledby="donate-confirm-title"
                 aria-describedby="donate-confirm-desc"
-                className="p-4 rounded-xl border border-border bg-sunken space-y-3"
+                className="p-4 rounded-xl bg-sunken space-y-3"
               >
-                <p id="donate-confirm-title" className="text-xs font-bold text-ink">
+                <p id="donate-confirm-title" className="text-xs font-extrabold text-ink">
                   {t('rewards_donate_confirm_title')}
                 </p>
                 <p id="donate-confirm-desc" className="text-xs text-muted text-pretty">
@@ -264,14 +254,14 @@ export default function RewardsPage() {
                   <button
                     type="button"
                     onClick={handleConfirmDonate}
-                    className="flex-1 min-h-11 py-2 px-3 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark cursor-pointer"
+                    className="flex-1 min-h-10 py-2 px-3 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark cursor-pointer"
                   >
                     {t('rewards_donate_confirm_btn')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmingDonation(false)}
-                    className="min-h-11 py-2 px-3 rounded-xl border border-border bg-white text-xs font-semibold text-muted hover:text-ink cursor-pointer"
+                    className="min-h-10 py-2 px-3 rounded-xl bg-white text-xs font-bold text-muted hover:text-ink shadow-xs cursor-pointer"
                   >
                     {t('profile_cancel')}
                   </button>
@@ -280,14 +270,14 @@ export default function RewardsPage() {
             )}
           </section>
 
-          {/* 6. Redemption: Coming Soon card only */}
-          <section className="border border-border rounded-2xl bg-sunken p-5 space-y-2">
+          {/* Redemption Coming Soon */}
+          <section className="rounded-2xl surface-hero-amber p-5 space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-bold text-ink text-balance inline-flex items-center gap-2">
-                <GiftIcon className="size-4 text-primary" />
+              <h2 className="text-sm font-extrabold text-ink text-balance inline-flex items-center gap-2">
+                <GiftIcon className="size-4 text-yellow-dark" />
                 <span>{t('rewards_redemption_title')}</span>
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-white border border-border text-[11px] font-semibold text-muted">
+              <span className="px-2.5 py-0.5 rounded-lg bg-white/90 text-[11px] font-bold text-yellow-dark shadow-xs">
                 {t('rewards_redemption_coming_soon')}
               </span>
             </div>
@@ -297,13 +287,13 @@ export default function RewardsPage() {
           </section>
         </div>
 
-        {/* RIGHT COLUMN: Ranks (Top 10) + Points History */}
+        {/* RIGHT COLUMN */}
         <div className="md:col-span-7 space-y-6">
-          {/* 4. Ranks: tabs "My area" and "By plastic type", top 10 list */}
-          <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_ranks_title')}</h2>
-              <div className="inline-flex p-1 rounded-xl bg-sunken border border-border" role="tablist">
+          {/* Community Ranks */}
+          <section className="rounded-2xl card-elevated overflow-hidden">
+            <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h2 className="text-base font-extrabold text-ink tracking-tight text-balance">{t('rewards_ranks_title')}</h2>
+              <div className="inline-flex p-1 rounded-xl bg-sunken" role="tablist">
                 {[
                   { id: 'area', label: t('rewards_ranks_tab_area') },
                   { id: 'plastic', label: t('rewards_ranks_tab_plastic') },
@@ -317,8 +307,8 @@ export default function RewardsPage() {
                       aria-selected={active}
                       onClick={() => setRankTab(tab.id)}
                       className={cn(
-                        'min-h-10 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer',
-                        active ? 'bg-primary text-white' : 'text-muted hover:text-ink'
+                        'min-h-9 px-3.5 py-1 rounded-lg text-xs font-bold transition-colors duration-150 cursor-pointer',
+                        active ? 'bg-white text-ink shadow-xs' : 'text-muted hover:text-ink'
                       )}
                     >
                       {tab.label}
@@ -333,91 +323,96 @@ export default function RewardsPage() {
                 <div
                   key={row.rank}
                   className={cn(
-                    'py-2.5 px-2.5 -mx-2.5 rounded-xl flex items-center justify-between gap-3',
-                    row.isCurrentUser && 'bg-primary-lighter border border-primary/25'
+                    'px-5 py-3.5 flex items-center justify-between gap-3',
+                    row.isCurrentUser && 'bg-primary-lighter/80'
                   )}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3.5 min-w-0">
                     <span
-                    className = {
-                      cn(
-                        'size-6 rounded-full text-xs font-bold tabular flex items-center justify-center shrink-0',
-                      row.rank <= 3
-                        ? 'bg-yellow-light text-yellow-dark border border-yellow/40'
-                        : 'bg-sunken text-muted'
+                      className={cn(
+                        'size-7 rounded-full tabular text-xs font-extrabold flex items-center justify-center shrink-0',
+                        row.rank === 1
+                          ? 'bg-yellow text-ink shadow-xs'
+                          : row.rank <= 3
+                            ? 'bg-primary text-white shadow-xs'
+                            : 'bg-sunken text-muted'
                       )}
                     >
                       {row.rank}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-ink truncate">
+                      <p className="text-sm font-bold text-ink truncate">
                         {row.name}{' '}
                         {row.isCurrentUser && (
-                          <span className="ml-1 px-1.5 py-0.5 rounded-md bg-primary text-white text-[10px] font-semibold">
+                          <span className="ml-1.5 px-2 py-0.5 rounded-lg bg-primary-light text-primary-dark text-[11px] font-bold">
                             {t('rewards_ranks_you')}
                           </span>
                         )}
                       </p>
-                      <p className="text-[11px] text-muted truncate">
+                      <p className="text-xs text-muted truncate">
                         {row.locality || row.detail}
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-ink tabular shrink-0">
-                    {row.value.toLocaleString('en-IN')} {row.unit}
+                  <span className="tabular text-sm font-extrabold text-ink shrink-0">
+                    {row.value.toLocaleString('en-IN')} <span className="text-xs font-semibold text-muted">{row.unit}</span>
                   </span>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* 2. Points History: earned, pending ("Awaiting weigh-in"), and donated */}
-          <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
-            <h2 className="text-sm font-bold text-ink text-balance">{t('rewards_history_title')}</h2>
+          {/* Points History */}
+          <section className="rounded-2xl card-elevated overflow-hidden">
+            <div className="px-5 pt-5 pb-0 border-b border-border-light">
+              <h2 className="text-base font-extrabold text-ink tracking-tight text-balance mb-3">{t('rewards_history_title')}</h2>
 
-            <div className="flex items-center gap-6 border-b border-border overflow-x-auto hide-scrollbar" role="tablist">
-              {[
-                { id: 'all', label: t('rewards_filter_all') },
-                { id: 'earned', label: t('rewards_filter_earned') },
-                { id: 'pending', label: t('rewards_filter_pending') },
-                { id: 'donated', label: t('rewards_filter_donated') },
-              ].map(tab => {
-                const active = historyFilter === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setHistoryFilter(tab.id)}
-                    className={cn(
-                      'min-h-11 pb-2.5 text-xs whitespace-nowrap transition-colors duration-150 cursor-pointer border-b-2 -mb-px',
-                      active
-                        ? 'border-primary text-ink font-bold'
-                        : 'border-transparent text-muted hover:text-ink font-medium'
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
+              <div className="flex items-center gap-6 overflow-x-auto hide-scrollbar" role="tablist">
+                {[
+                  { id: 'all', label: t('rewards_filter_all') },
+                  { id: 'earned', label: t('rewards_filter_earned') },
+                  { id: 'pending', label: t('rewards_filter_pending') },
+                  { id: 'donated', label: t('rewards_filter_donated') },
+                ].map(tab => {
+                  const active = historyFilter === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setHistoryFilter(tab.id)}
+                      className={cn(
+                        'min-h-10 pb-2.5 text-xs whitespace-nowrap transition-colors duration-150 cursor-pointer border-b-2 -mb-px',
+                        active
+                          ? 'border-primary text-ink font-bold'
+                          : 'border-transparent text-muted hover:text-ink font-medium'
+                      )}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {filteredHistory.length === 0 ? (
-              <EmptyState
-                title={t('ui_empty_default_title')}
-                description={t('ui_empty_default_description')}
-              />
+              <div className="p-5">
+                <EmptyState
+                  title={t('ui_empty_default_title')}
+                  description={t('ui_empty_default_description')}
+                />
+              </div>
             ) : (
               <div className="divide-y divide-border-light">
                 {filteredHistory.map(entry => (
                   <div
                     key={entry.id}
-                    className="py-3.5 first:pt-0 last:pb-0 flex items-start justify-between gap-4"
+                    className="px-5 py-3.5 flex items-start justify-between gap-4"
                   >
                     <div className="min-w-0 space-y-0.5">
                       <p className="text-sm font-semibold text-ink truncate">{entry.title}</p>
-                      <p className="text-xs text-muted tabular">
+                      <p className="font-mono-data text-xs text-muted">
                         {entry.subtitle} · {formatShortDate(entry.date)}
                       </p>
                     </div>
@@ -425,7 +420,7 @@ export default function RewardsPage() {
                     <div className="text-right shrink-0 space-y-0.5">
                       {entry.kind === 'earned' && (
                         <>
-                          <p className="text-sm font-bold text-primary tabular">
+                          <p className="font-mono-data text-sm font-bold text-primary">
                             +{entry.points} pts
                           </p>
                           <p className="text-[11px] text-muted">{t('rewards_filter_earned')}</p>
@@ -441,7 +436,7 @@ export default function RewardsPage() {
                       )}
                       {entry.kind === 'donated' && (
                         <>
-                          <p className="text-sm font-bold text-ink tabular">
+                          <p className="font-mono-data text-sm font-bold text-ink">
                             −{entry.points} pts
                           </p>
                           <p className="text-[11px] text-primary font-semibold">
@@ -457,8 +452,6 @@ export default function RewardsPage() {
           </section>
         </div>
       </div>
-
-      <BottomMist />
     </div>
   );
 }

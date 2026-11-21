@@ -2,29 +2,29 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 /**
- * Button — the primary interactive button primitive.
+ * Button — Tactile consumer button primitive.
  * Variants: primary | secondary | ghost | soft | danger | inverse
  * Sizes: sm (36px) | md (44px) | lg (48px)
  */
 const VARIANTS = {
   primary:
-    'bg-primary text-white hover:bg-primary-dark',
+    'bg-primary text-white shadow-[0_4px_14px_-2px_rgba(13,122,87,0.34)] hover:bg-primary-dark hover:shadow-[0_6px_18px_-2px_rgba(13,122,87,0.42)]',
   secondary:
-    'bg-white text-ink border border-border hover:border-primary/40 hover:bg-primary-lighter',
+    'bg-white text-ink shadow-xs border border-border/80 hover:bg-sunken/60',
   ghost:
     'bg-transparent text-muted hover:text-ink hover:bg-sunken',
   soft:
-    'bg-primary-light text-primary-dark hover:bg-primary/20',
+    'bg-primary-light text-primary-dark hover:bg-primary/15',
   danger:
-    'bg-white text-orange-red-dark border border-orange-red/30 hover:bg-orange-red-light',
+    'bg-orange-red-light text-orange-red-dark hover:bg-orange-red/15',
   inverse:
-    'bg-white text-primary-dark border border-border hover:bg-primary-lighter',
+    'bg-white text-primary-dark shadow-xs hover:bg-primary-lighter',
 };
 
 const SIZES = {
-  sm: 'min-h-9 px-3.5 text-caption gap-1.5 rounded-xl',
-  md: 'min-h-11 px-5 text-body-sm gap-2 rounded-xl',
-  lg: 'min-h-12 px-6 text-body gap-2 rounded-xl',
+  sm: 'min-h-9 px-3.5 text-xs gap-1.5 rounded-xl',
+  md: 'min-h-11 px-4 text-sm gap-2 rounded-xl',
+  lg: 'min-h-12 px-5 text-body gap-2 rounded-xl',
 };
 
 export function Spinner({ className = 'size-4' }) {
@@ -58,8 +58,8 @@ export default function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        'inline-flex items-center justify-center font-semibold select-none whitespace-nowrap cursor-pointer',
-        'transition-[transform,opacity] duration-150 ease-out active:scale-[0.98]',
+        'inline-flex items-center justify-center font-bold select-none whitespace-nowrap cursor-pointer',
+        'transition-[transform,opacity,background-color,box-shadow] duration-150 ease-out active:scale-[0.98]',
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100',
         VARIANTS[variant] || VARIANTS.primary,
         SIZES[size] || SIZES.md,
@@ -69,7 +69,7 @@ export default function Button({
       {...rest}
     >
       {loading ? <Spinner /> : leftIcon}
-      {children}
+      <span className="block">{children}</span>
       {!loading && rightIcon}
     </button>
   );

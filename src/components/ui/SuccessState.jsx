@@ -3,11 +3,11 @@ import Button from './Button';
 import { cn } from '../../utils/cn';
 
 /**
- * Reusable SuccessState component with animated badge illustration + ring burst.
+ * SuccessState — Architectural docket confirmation state (no cartoon confetti).
  */
 export default function SuccessState({
-  title = 'Success!',
-  description = 'Your action has been completed.',
+  title = 'Confirmed',
+  description = 'Your submission has been recorded.',
   actionLabel,
   onAction,
   secondaryActionLabel,
@@ -16,28 +16,23 @@ export default function SuccessState({
   className = '',
 }) {
   return (
-    <div className={cn('flex flex-col items-center justify-center min-h-[56dvh] px-6 py-8 animate-fade-in-up', className)}>
-      {/* Animated Celebration Emblem */}
-      <div className="relative size-24 flex items-center justify-center mb-6" aria-hidden="true">
-        <span className="absolute inset-0 rounded-full border-2 border-primary/35 animate-ring-burst" />
-        <span className="absolute inset-2 rounded-full bg-primary-light/70" />
-        <div className="relative size-20 rounded-full bg-primary flex items-center justify-center animate-scale-in">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+    <div className={cn('flex flex-col items-center justify-center min-h-[48dvh] px-6 py-8 animate-fade-in-up', className)}>
+      <div className="relative size-16 flex items-center justify-center mb-5" aria-hidden="true">
+        <div className="size-16 rounded-xl bg-primary-light border border-primary/30 flex items-center justify-center animate-scale-in">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0f4c3a" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
             <polyline
               points="20 6 9 17 4 12"
               style={{
                 strokeDasharray: 24,
                 strokeDashoffset: 0,
-                animation: 'checkmark 0.45s ease-out 0.15s both',
+                animation: 'checkmark 0.4s ease-out 0.1s both',
               }}
             />
           </svg>
         </div>
-        <span className="absolute -top-1 right-1 size-3 rounded-full bg-yellow animate-scale-in" />
-        <span className="absolute bottom-1 -left-1 size-2.5 rounded-full bg-primary-dark animate-scale-in" />
       </div>
 
-      <h2 className="text-title font-bold text-ink text-balance mb-2 text-center">
+      <h2 className="text-title font-bold text-ink text-balance mb-1.5 text-center">
         {title}
       </h2>
       <p className="text-body-sm text-muted text-pretty text-center max-w-sm mb-6 leading-relaxed">
@@ -50,7 +45,7 @@ export default function SuccessState({
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+      <div className="flex flex-col sm:flex-row gap-2.5 w-full max-w-sm">
         {actionLabel && onAction && (
           <Button
             variant="primary"

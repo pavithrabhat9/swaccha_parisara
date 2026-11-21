@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import OfflineBanner from '../ui/OfflineBanner';
 import AskChatSheet from '../chat/AskChatSheet';
 import { cn } from '../../utils/cn';
 
 /**
- * App shell layout wrapper.
- * Handles: OfflineBanner + scrollable content area + BottomNav + AskChatSheet.
- * Uses min-w-0 and max-w-full so horizontal carousels inside pages never expand the viewport width.
+ * AppShell — Civic Utility Layout Wrapper.
+ * Renders OfflineBanner, persistent TopBar (with desktop nav, Ask assistant, and language switch),
+ * main content area, mobile flat BottomNav dock, and AskChatSheet.
  */
 export default function AppShell({ children }) {
   const location = useLocation();
@@ -18,18 +19,18 @@ export default function AppShell({ children }) {
 
   return (
     <div className="flex flex-col min-h-dvh w-full max-w-full overflow-x-hidden bg-cream text-ink">
-      {/* Persistent Offline Banner */}
       <OfflineBanner />
 
-      {/* Main content area */}
+      <TopBar onOpenAsk={() => setAskOpen(true)} />
+
       <main
         className={cn(
           'flex-1 relative w-full min-w-0 max-w-full',
           isMapPage
-            ? 'md:pt-16'
+            ? ''
             : isAuthPage
-              ? 'pb-10 md:pt-16'
-              : 'pb-28 md:pb-10 md:pt-16'
+              ? 'pb-10'
+              : 'pb-20 md:pb-12'
         )}
       >
         <div key={location.pathname} className="page-enter w-full min-w-0 max-w-full">
@@ -37,10 +38,8 @@ export default function AppShell({ children }) {
         </div>
       </main>
 
-      {/* Responsive 5-tab navigation (Home, Map, Pickup, Rewards, Profile) */}
       <BottomNav />
 
-      {/* Ask Chatbot Sheet / Side Panel */}
       <AskChatSheet open={askOpen} onClose={() => setAskOpen(false)} />
     </div>
   );

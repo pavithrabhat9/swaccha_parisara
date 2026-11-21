@@ -9,7 +9,6 @@ import { aiApi, AI_PLASTIC_TYPES } from '../services/aiApi';
 import ActivePickupCard from '../components/pickup/ActivePickupCard';
 import TrashBankTab from '../components/pickup/TrashBankTab';
 import BusinessPage from './BusinessPage';
-import BottomMist from '../components/layout/BottomMist';
 import PermissionAlert from '../components/ui/PermissionAlert';
 import Chip from '../components/ui/Chip';
 import StatusBadge from '../components/ui/StatusBadge';
@@ -31,8 +30,7 @@ import {
 } from '../components/ui/Icons';
 
 /**
- * PickupPage — Stage 4 Center Tab:
- * Top Segmented Control: Home pickup | Trash bank | Business (Business shown only to business accounts).
+ * PickupPage — Collection Logistics Hub (Home Pickup | Trash Bank | Business).
  */
 export default function PickupPage() {
   const { t } = useTranslation();
@@ -58,12 +56,10 @@ export default function PickupPage() {
     setSearchParams(nextTab === 'home' ? {} : { tab: nextTab });
   };
 
-  // Home pickup request wizard state
   const [showRequestForm, setShowRequestForm] = useState(() => startParam === '1');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [historyFilter, setHistoryFilter] = useState('all');
 
-  // Step 1 & 2: Photo + Mock AI state
   const cameraInputRef = useRef(null);
   const fileInputRef = useRef(null);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -72,7 +68,6 @@ export default function PickupPage() {
   const [aiResult, setAiResult] = useState(null);
   const [selectedPlasticType, setSelectedPlasticType] = useState('PET');
 
-  // Step 3: Details state
   const [quantity, setQuantity] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [timeWindow, setTimeWindow] = useState('');
@@ -126,7 +121,7 @@ export default function PickupPage() {
           return;
         }
       } catch {
-        // ignore if browser doesn't support querying camera permission
+        // ignore if unsupported
       }
     }
     cameraInputRef.current?.click();
@@ -192,33 +187,39 @@ export default function PickupPage() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 md:py-8 space-y-6">
-      {/* === TOP SEGMENTED CONTROL === */}
-      <div
-        role="tablist"
-        aria-label={t('pickup')}
-        className="inline-flex w-full sm:w-auto p-1 rounded-2xl bg-sunken border border-border"
-      >
-        {segments.map(seg => {
-          const active = activeSegment === seg.id;
-          return (
-            <button
-              key={seg.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setSegment(seg.id)}
-              className={cn(
-                'flex-1 sm:flex-initial min-h-11 px-4 py-2 rounded-xl text-xs font-semibold transition-colors duration-150 cursor-pointer',
-                active
-                  ? 'bg-primary text-white'
-                  : 'text-muted hover:text-ink'
-              )}
-            >
-              {seg.label}
-            </button>
-          );
-        })}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+      {/* === HEADER + SEGMENTED SERVICE SWITCH === */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">
+          {t('pickup')}
+        </h1>
+
+        <div
+          role="tablist"
+          aria-label={t('pickup')}
+          className="inline-flex w-full sm:w-auto p-1 rounded-2xl bg-sunken"
+        >
+          {segments.map(seg => {
+            const active = activeSegment === seg.id;
+            return (
+              <button
+                key={seg.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSegment(seg.id)}
+                className={cn(
+                  'flex-1 sm:flex-initial min-h-9 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer',
+                  active
+                    ? 'bg-white text-ink shadow-xs'
+                    : 'text-muted hover:text-ink'
+                )}
+              >
+                {seg.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* === SEGMENT 1: HOME PICKUP === */}
@@ -231,34 +232,34 @@ export default function PickupPage() {
               <SkeletonCard />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start">
               {/* LEFT COLUMN: Request Home Pickup Wizard */}
-              <div className="md:col-span-5 lg:col-span-5 space-y-5">
+              <div className="md:col-span-5 space-y-5">
                 {!showRequestForm ? (
-                  <section className="border border-border rounded-2xl bg-white p-5 space-y-4">
+                  <section className="rounded-2xl card-elevated p-5 sm:p-6 space-y-4">
                     <div>
-                      <h1 className="text-base font-bold text-ink text-balance">{t('homePickup')}</h1>
-                      <p className="text-xs text-muted text-pretty mt-1">
+                      <h2 className="text-base font-extrabold text-ink tracking-tight text-balance">{t('homePickup')}</h2>
+                      <p className="text-xs text-muted text-pretty mt-1 leading-relaxed">
                         {t('pickup_ai_no_points_note')}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowRequestForm(true)}
-                      className="w-full min-h-11 py-3 px-4 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-dark transition-colors duration-150 flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full min-h-12 py-3 px-4 bg-primary text-white font-bold rounded-xl text-sm shadow-[0_6px_18px_-3px_rgba(13,122,87,0.38)] hover:bg-primary-dark transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer press-scale"
                     >
-                      <CameraIcon className="size-4" />
+                      <CameraIcon className="size-4.5" />
                       <span>{t('requestHomePickup')}</span>
                     </button>
                   </section>
                 ) : (
-                  <section className="border border-border rounded-2xl bg-white p-5 space-y-5">
+                  <section className="rounded-2xl card-elevated p-5 sm:p-6 space-y-5">
                     <div className="flex items-center justify-between pb-3 border-b border-border-light">
                       <h1 className="text-base font-bold text-ink text-balance">{t('requestPickup')}</h1>
                       <button
                         type="button"
                         onClick={() => setShowRequestForm(false)}
-                        className="touch-target size-11 flex items-center justify-center text-muted hover:text-ink hover:bg-sunken cursor-pointer rounded-full"
+                        className="touch-target size-10 flex items-center justify-center text-muted hover:text-ink hover:bg-sunken cursor-pointer rounded-lg"
                         title="Close"
                         aria-label="Close"
                       >
@@ -266,7 +267,7 @@ export default function PickupPage() {
                       </button>
                     </div>
 
-                    {/* STEP 1: PHOTO (Camera or File Upload + Permission Denied Fallback) */}
+                    {/* STEP 1: PHOTO */}
                     <div className="space-y-2.5">
                       <span className="block text-xs font-bold text-ink">
                         {t('pickup_step_1_photo')}
@@ -299,29 +300,27 @@ export default function PickupPage() {
 
                       {photoPreview ? (
                         <div className="space-y-2.5">
-                          <div className="relative rounded-xl overflow-hidden border border-border bg-sunken h-40">
+                          <div className="relative rounded-lg overflow-hidden border border-border bg-sunken h-40">
                             <img
                               src={photoPreview}
                               alt="Plastic waste preview"
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => fileInputRef.current?.click()}
-                              className="min-h-11 px-3.5 py-2 rounded-xl border border-border text-xs font-semibold text-ink hover:border-primary/40 hover:bg-primary-lighter cursor-pointer"
-                            >
-                              {t('pickup_change_photo')}
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="min-h-10 px-3.5 py-2 rounded-lg border border-border text-xs font-semibold text-ink hover:border-primary/40 hover:bg-sunken cursor-pointer"
+                          >
+                            {t('pickup_change_photo')}
+                          </button>
                         </div>
                       ) : (
                         <div className="grid grid-cols-2 gap-2.5">
                           <button
                             type="button"
                             onClick={handleOpenCamera}
-                            className="min-h-12 py-3 px-3 rounded-xl border border-border bg-sunken hover:border-primary hover:bg-primary-lighter text-xs font-semibold text-ink flex items-center justify-center gap-2 transition-colors duration-150 cursor-pointer"
+                            className="min-h-12 py-3 px-3 rounded-lg border border-border bg-cream hover:border-primary hover:bg-primary-lighter text-xs font-semibold text-ink flex items-center justify-center gap-2 transition-colors duration-150 cursor-pointer"
                           >
                             <CameraIcon className="size-4 text-primary" />
                             <span>{t('pickup_use_camera')}</span>
@@ -329,7 +328,7 @@ export default function PickupPage() {
                           <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="min-h-12 py-3 px-3 rounded-xl border border-border bg-sunken hover:border-primary hover:bg-primary-lighter text-xs font-semibold text-ink flex items-center justify-center gap-2 transition-colors duration-150 cursor-pointer"
+                            className="min-h-12 py-3 px-3 rounded-lg border border-border bg-cream hover:border-primary hover:bg-primary-lighter text-xs font-semibold text-ink flex items-center justify-center gap-2 transition-colors duration-150 cursor-pointer"
                           >
                             <UploadIcon className="size-4 text-primary" />
                             <span>{t('pickup_upload_file')}</span>
@@ -342,9 +341,9 @@ export default function PickupPage() {
                       )}
                     </div>
 
-                    {/* STEP 2: MOCK AI CLASSIFICATION */}
+                    {/* STEP 2: AI CLASSIFICATION */}
                     {(aiLoading || aiResult) && (
-                      <div className="p-4 rounded-xl border border-border bg-sunken space-y-3">
+                      <div className="p-4 rounded-lg border border-border bg-cream space-y-3">
                         <p className="text-xs font-bold text-ink">
                           {t('pickup_step_2_ai')}
                         </p>
@@ -358,7 +357,7 @@ export default function PickupPage() {
                           <>
                             <div className="flex items-center justify-between gap-2 text-xs">
                               <span className="text-muted">{t('pickup_ai_suggested_type')}:</span>
-                              <span className="font-bold text-primary">{selectedPlasticType}</span>
+                              <span className="font-mono-data font-bold text-primary">{selectedPlasticType}</span>
                             </div>
                             <div className="flex items-center justify-between gap-2 text-xs">
                               <span className="text-muted">{t('pickup_ai_confidence')}:</span>
@@ -371,7 +370,6 @@ export default function PickupPage() {
                               </span>
                             </div>
 
-                            {/* Editable plastic type chips */}
                             <div className="pt-2 border-t border-border space-y-1.5">
                               <p className="text-[11px] font-medium text-muted">
                                 {t('pickup_ai_edit_type')}
@@ -398,13 +396,12 @@ export default function PickupPage() {
                       </div>
                     )}
 
-                    {/* STEP 3: DETAILS (Bag Size, Saved Address, Time Window) */}
+                    {/* STEP 3: DETAILS */}
                     <div className="space-y-4 pt-1">
                       <p className="text-xs font-bold text-ink">
                         {t('pickup_step_3_details')}
                       </p>
 
-                      {/* Quantity tier */}
                       <div>
                         <span className="block text-xs font-semibold text-ink mb-2">
                           {t('quantity')}
@@ -420,7 +417,7 @@ export default function PickupPage() {
                                 aria-checked={selected}
                                 onClick={() => { setQuantity(tier.id); setErrors(prev => ({ ...prev, quantity: null })); }}
                                 className={cn(
-                                  'min-h-12 py-2.5 px-2 rounded-xl border text-center transition-colors duration-150 cursor-pointer',
+                                  'min-h-12 py-2.5 px-2 rounded-lg border text-center transition-colors duration-150 cursor-pointer',
                                   selected
                                     ? 'border-primary text-primary-dark bg-primary-lighter'
                                     : 'border-border bg-white text-ink hover:border-primary/40'
@@ -429,7 +426,7 @@ export default function PickupPage() {
                                 <p className={cn('text-xs font-semibold', selected ? 'text-primary-dark' : 'text-ink')}>
                                   {tier.label}
                                 </p>
-                                <p className="text-[10px] text-muted tabular mt-0.5">{tier.description}</p>
+                                <p className="font-mono-data text-[10px] text-muted mt-0.5">{tier.description}</p>
                               </button>
                             );
                           })}
@@ -439,7 +436,6 @@ export default function PickupPage() {
                         )}
                       </div>
 
-                      {/* Saved Address */}
                       <div>
                         <div className="flex items-center justify-between mb-1.5">
                           <label htmlFor="pickup-address-select" className="text-xs font-semibold text-ink">
@@ -448,7 +444,7 @@ export default function PickupPage() {
                           <button
                             type="button"
                             onClick={() => navigate('/profile?section=addresses')}
-                            className="min-h-9 px-2 text-xs font-semibold text-primary hover:underline cursor-pointer"
+                            className="min-h-8 px-2 text-xs font-semibold text-primary hover:underline cursor-pointer"
                           >
                             {t('pickup_manage_addresses')}
                           </button>
@@ -457,7 +453,7 @@ export default function PickupPage() {
                           id="pickup-address-select"
                           value={effectiveAddressId}
                           onChange={e => setSelectedAddressId(e.target.value)}
-                          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-xl text-xs bg-sunken focus:bg-white text-ink focus:outline-none focus:border-primary cursor-pointer"
+                          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-lg text-xs bg-white text-ink focus:outline-none focus:border-primary cursor-pointer"
                         >
                           {addresses.map(addr => (
                             <option key={addr.id} value={addr.id}>
@@ -467,7 +463,6 @@ export default function PickupPage() {
                         </select>
                       </div>
 
-                      {/* Time window */}
                       <div>
                         <span className="block text-xs font-semibold text-ink mb-2">
                           {t('preferredTime')}
@@ -483,7 +478,7 @@ export default function PickupPage() {
                                 aria-checked={selected}
                                 onClick={() => { setTimeWindow(tw.id); setErrors(prev => ({ ...prev, timeWindow: null })); }}
                                 className={cn(
-                                  'min-h-11 py-2.5 px-3 rounded-xl border text-xs font-semibold tabular transition-colors duration-150 cursor-pointer',
+                                  'min-h-11 py-2.5 px-3 rounded-lg border font-mono-data text-xs font-semibold transition-colors duration-150 cursor-pointer',
                                   selected
                                     ? 'border-primary text-primary-dark bg-primary-lighter'
                                     : 'border-border bg-white text-ink hover:border-primary/40'
@@ -519,7 +514,7 @@ export default function PickupPage() {
                       type="button"
                       onClick={handleRequestPickup}
                       disabled={submitting}
-                      className="w-full min-h-11 py-3 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-dark transition-colors duration-150 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full min-h-11 py-2.5 bg-primary text-white font-semibold rounded-lg text-sm hover:bg-primary-dark transition-colors duration-150 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {submitting ? (
                         <>
@@ -534,8 +529,8 @@ export default function PickupPage() {
                 )}
               </div>
 
-              {/* RIGHT COLUMN: Active Request Status Line + History */}
-              <div className="md:col-span-7 lg:col-span-7 space-y-6">
+              {/* RIGHT COLUMN: Active Request Docket + History Ledger */}
+              <div className="md:col-span-7 space-y-6">
                 {activePickup && (
                   <ActivePickupCard
                     pickup={activePickup}
@@ -543,42 +538,44 @@ export default function PickupPage() {
                   />
                 )}
 
-                <section className="rounded-2xl border border-border bg-white p-5 space-y-4">
-                  <h2 className="text-base font-bold text-ink text-balance">{t('pickupHistory')}</h2>
+                <section className="rounded-2xl card-elevated overflow-hidden">
+                  <div className="px-5 pt-5 pb-0 border-b border-border-light">
+                    <h2 className="text-base font-extrabold text-ink tracking-tight text-balance mb-3">{t('pickupHistory')}</h2>
 
-                  <div className="flex items-center gap-6 sm:gap-8 border-b border-border" role="tablist">
-                    {[
-                      { id: 'all', label: 'Total', count: pickups.length },
-                      { id: 'completed', label: 'Completed', count: completedCount },
-                      { id: 'pending', label: 'Pending', count: pendingCount },
-                    ].map(tab => {
-                      const active = historyFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          role="tab"
-                          aria-selected={active}
-                          onClick={() => setHistoryFilter(tab.id)}
-                          className={cn(
-                            'min-h-11 pb-2.5 text-sm transition-colors duration-150 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5',
-                            active
-                              ? 'border-primary text-ink font-bold'
-                              : 'border-transparent text-muted hover:text-ink font-medium'
-                          )}
-                        >
-                          <span>{tab.label}</span>
-                          <span className={cn('tabular', active ? 'text-primary font-bold' : 'text-muted')}>
-                            {tab.count}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    <div className="flex items-center gap-6" role="tablist">
+                      {[
+                        { id: 'all', label: 'Total', count: pickups.length },
+                        { id: 'completed', label: 'Completed', count: completedCount },
+                        { id: 'pending', label: 'Pending', count: pendingCount },
+                      ].map(tab => {
+                        const active = historyFilter === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={active}
+                            onClick={() => setHistoryFilter(tab.id)}
+                            className={cn(
+                              'min-h-10 pb-2.5 text-xs transition-colors duration-150 cursor-pointer border-b-2 -mb-px flex items-center gap-1.5',
+                              active
+                                ? 'border-primary text-ink font-bold'
+                                : 'border-transparent text-muted hover:text-ink font-medium'
+                            )}
+                          >
+                            <span>{tab.label}</span>
+                            <span className={cn('tabular', active ? 'text-primary font-extrabold' : 'text-muted')}>
+                              {tab.count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div>
                     {filteredPickups.length === 0 ? (
-                      <div className="pt-2">
+                      <div className="p-5">
                         <EmptyState
                           title={t('noPickupsYet')}
                           description={t('requestFirst')}
@@ -593,29 +590,29 @@ export default function PickupPage() {
                           return (
                             <div
                               key={pickup.id}
-                              className="py-4 first:pt-1 last:pb-1 flex items-start justify-between gap-4"
+                              className="px-5 py-4 flex items-start justify-between gap-4"
                             >
                               <div className="flex items-start gap-3.5 min-w-0">
                                 <div
-                                  className="size-10 rounded-xl border border-border bg-sunken flex items-center justify-center text-primary shrink-0 mt-0.5"
+                                  className="size-11 rounded-xl bg-primary-lighter flex items-center justify-center text-primary shrink-0"
                                   title={bag.label}
                                 >
                                   {bag.icon}
                                 </div>
-                                <div className="min-w-0 space-y-1">
+                                <div className="min-w-0 space-y-0.5">
                                   <div className="flex items-baseline gap-2 flex-wrap">
                                     <p className="text-sm font-bold text-ink leading-snug">
                                       {pickup.quantity}
                                     </p>
-                                    <span className="text-xs text-muted tabular">{bag.weight}</span>
+                                    <span className="tabular text-xs font-medium text-muted">{bag.weight}</span>
                                   </div>
-                                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted tabular">
-                                    <span className="inline-flex items-center gap-1 text-ink/85">
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
+                                    <span className="inline-flex items-center gap-1 text-ink/85 font-medium">
                                       <MapPinIcon className="size-3.5 text-primary shrink-0" />
                                       <span>{pickup.locality || user?.locality || 'Dakshina Kannada'}</span>
                                     </span>
                                     <span aria-hidden="true">·</span>
-                                    <span>{formatShortDate(pickup.date)}</span>
+                                    <span className="tabular">{formatShortDate(pickup.date)}</span>
                                   </div>
                                 </div>
                               </div>
@@ -623,7 +620,7 @@ export default function PickupPage() {
                               <div className="text-right shrink-0 space-y-1">
                                 <StatusBadge status={pickup.status} />
                                 {pickup.pointsEarned ? (
-                                  <p className="text-xs font-bold text-primary tabular">
+                                  <p className="tabular text-xs font-extrabold text-primary">
                                     +{pickup.pointsEarned} pts
                                   </p>
                                 ) : (
@@ -650,15 +647,14 @@ export default function PickupPage() {
         <TrashBankTab key={centerParam || 'list'} initialCenterId={centerParam} />
       )}
 
-      {/* === SEGMENT 3: BUSINESS (Business accounts only) === */}
+      {/* === SEGMENT 3: BUSINESS === */}
       {activeSegment === 'business' && isBusinessAccount && (
         <BusinessPage />
       )}
 
-      {/* Success Confirmation Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 border border-border shadow-modal">
+          <div className="bg-white rounded-xl max-w-sm w-full p-6 border border-border shadow-modal">
             <SuccessState
               title="Pickup Scheduled!"
               description={t('pickup_ai_no_points_note')}
@@ -668,8 +664,6 @@ export default function PickupPage() {
           </div>
         </div>
       )}
-
-      <BottomMist />
     </div>
   );
 }

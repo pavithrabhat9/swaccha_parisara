@@ -2,15 +2,12 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 /**
- * Chip — selectable pill (filters, tags, single/multi choice).
- * size: sm (36px) | md (44px) | lg (48px, for primary choices like waste type)
- * variant: solid (default) | glass (for floating over the map)
- * Active state uniformly uses brand primary green (#38761d).
+ * Chip — Tactile consumer filter/selection chip.
  */
 const SIZES = {
-  sm: 'min-h-9 px-3.5 text-caption gap-1.5',
-  md: 'min-h-11 px-4 text-body-sm gap-2',
-  lg: 'min-h-12 px-5 text-body-sm gap-2',
+  sm: 'min-h-9 px-3.5 text-xs gap-1.5',
+  md: 'min-h-10 px-4 text-sm gap-2',
+  lg: 'min-h-11 px-4 text-sm gap-2',
 };
 
 export default function Chip({
@@ -25,20 +22,20 @@ export default function Chip({
   const base =
     variant === 'glass'
       ? selected
-        ? 'bg-primary text-white border-primary'
-        : 'bg-white/95 glass text-ink border-border hover:border-primary/40 hover:text-primary'
+        ? 'bg-primary text-white shadow-sm'
+        : 'bg-white/92 glass text-ink shadow-xs hover:bg-white'
       : selected
-        ? 'bg-primary text-white border-primary'
-        : 'bg-white text-ink border-border hover:border-primary/40 hover:bg-primary-lighter hover:text-primary';
+        ? 'bg-primary text-white shadow-[0_3px_10px_-2px_rgba(13,122,87,0.35)]'
+        : 'bg-white text-ink shadow-xs hover:bg-primary-lighter hover:text-primary-dark';
 
   return (
     <button
       type="button"
       aria-pressed={selected}
       className={cn(
-        'inline-flex items-center justify-center shrink-0 rounded-full border font-semibold',
+        'inline-flex items-center justify-center shrink-0 rounded-xl font-semibold',
         'whitespace-nowrap select-none cursor-pointer',
-        'transition-[transform,opacity] duration-150 ease-out active:scale-[0.97]',
+        'transition-[transform,background-color,color,box-shadow] duration-150 ease-out active:scale-[0.975]',
         SIZES[size] || SIZES.md,
         base,
         className
@@ -46,7 +43,7 @@ export default function Chip({
       {...rest}
     >
       {icon}
-      {children}
+      <span className="block">{children}</span>
     </button>
   );
 }

@@ -21,12 +21,8 @@ import {
   XIcon,
 } from '../ui/Icons';
 
-const CARD = 'rounded-2xl bg-white border border-border p-5';
+const CARD = 'rounded-xl bg-white border border-border p-5';
 
-/**
- * 1. Edit Profile Sub-Page:
- * Name, Phone (read-only), Locality dropdown, Photo change (file upload, mock).
- */
 export function EditProfileView({ user, onSave, onCancel }) {
   const { t } = useTranslation();
   const fileRef = useRef(null);
@@ -54,45 +50,40 @@ export function EditProfileView({ user, onSave, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className={cn(CARD, 'space-y-5 max-w-xl mx-auto')}>
-      {/* Avatar with mock photo upload */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="relative">
+      <div className="flex items-center gap-4 pb-4 border-b border-border-light">
+        <div className="relative shrink-0">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={name}
-              className="size-20 rounded-full object-cover border-2 border-primary/20"
+              className="size-16 rounded-lg object-cover border border-border"
             />
           ) : (
-            <span className="size-20 rounded-full bg-primary text-white text-xl font-extrabold flex items-center justify-center">
+            <span className="size-16 rounded-lg bg-primary text-white font-mono-data text-lg font-bold flex items-center justify-center">
               {getInitials(name)}
             </span>
           )}
-          <span
-            aria-hidden="true"
-            className="absolute bottom-0 right-0 size-6 rounded-full bg-yellow border-2 border-white flex items-center justify-center text-ink"
-          >
-            <CameraIcon className="size-3.5" />
-          </span>
         </div>
 
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          onChange={handlePhotoChange}
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          className="min-h-11 px-4 py-2 rounded-xl bg-primary-light text-primary-dark text-xs font-semibold hover:bg-primary/20 transition-colors duration-150 cursor-pointer"
-        >
-          {t('profile_change_photo')}
-        </button>
+        <div className="space-y-1.5">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="min-h-10 px-3.5 py-2 rounded-lg border border-border bg-sunken hover:bg-primary-lighter text-ink text-xs font-semibold inline-flex items-center gap-1.5 transition-colors duration-150 cursor-pointer"
+          >
+            <CameraIcon className="size-3.5 text-primary" />
+            <span>{t('profile_change_photo')}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Name */}
       <div>
         <label htmlFor="edit-profile-name" className="block text-xs font-semibold text-ink mb-1.5">
           {t('yourName')}
@@ -102,11 +93,10 @@ export function EditProfileView({ user, onSave, onCancel }) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-xl text-sm bg-sunken focus:bg-white text-ink focus:outline-none focus:border-primary"
+          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-lg text-sm bg-white text-ink focus:outline-none focus:border-primary"
         />
       </div>
 
-      {/* Phone (read-only) */}
       <div>
         <label htmlFor="edit-profile-phone" className="block text-xs font-semibold text-ink mb-1.5">
           {t('phoneNumber')}
@@ -117,12 +107,11 @@ export function EditProfileView({ user, onSave, onCancel }) {
           readOnly
           disabled
           value={user?.phone ? `+91 ${user.phone}` : 'Google Account'}
-          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-xl text-sm bg-sunken text-muted tabular cursor-not-allowed"
+          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-lg text-sm bg-sunken text-muted font-mono-data cursor-not-allowed"
         />
         <p className="text-[11px] text-muted text-pretty mt-1">{t('profile_phone_readonly_hint')}</p>
       </div>
 
-      {/* Locality dropdown */}
       <div>
         <label htmlFor="edit-profile-locality" className="block text-xs font-semibold text-ink mb-1.5">
           {t('locality')}
@@ -131,7 +120,7 @@ export function EditProfileView({ user, onSave, onCancel }) {
           id="edit-profile-locality"
           value={locality}
           onChange={(e) => setLocality(e.target.value)}
-          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-xl text-sm bg-sunken focus:bg-white text-ink focus:outline-none focus:border-primary cursor-pointer"
+          className="w-full min-h-11 px-3.5 py-2.5 border border-border rounded-lg text-sm bg-white text-ink focus:outline-none focus:border-primary cursor-pointer"
         >
           {DK_LOCALITIES.map(loc => (
             <option key={loc} value={loc}>{loc}</option>
@@ -141,17 +130,17 @@ export function EditProfileView({ user, onSave, onCancel }) {
 
       {error && <p role="alert" className="text-xs font-semibold text-orange-red-dark">{error}</p>}
 
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex items-center gap-2.5 pt-2">
         <button
           type="submit"
-          className="flex-1 min-h-11 py-2.5 px-4 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer"
+          className="flex-1 min-h-11 py-2.5 px-4 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer"
         >
           {t('profile_save')}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 py-2.5 px-5 rounded-xl border border-border text-sm font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
+          className="min-h-11 py-2.5 px-5 rounded-lg border border-border bg-white text-sm font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
         >
           {t('profile_cancel')}
         </button>
@@ -160,10 +149,6 @@ export function EditProfileView({ user, onSave, onCancel }) {
   );
 }
 
-/**
- * 2. My Activity Sub-Page:
- * Two tabs: Pickups and Reports.
- */
 export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoading }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -171,11 +156,10 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
-      {/* Segmented Tabs: Pickups | Reports */}
       <div
         role="tablist"
         aria-label={t('profile_row_activity_title')}
-        className="grid grid-cols-2 p-1 rounded-2xl bg-sunken border border-border"
+        className="grid grid-cols-2 p-1 rounded-xl bg-sunken border border-border"
       >
         {[
           { id: 'pickups', label: t('profile_activity_tab_pickups'), count: pickups.length },
@@ -190,20 +174,19 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
               aria-selected={active}
               onClick={() => setTab(item.id)}
               className={cn(
-                'min-h-11 py-2 px-4 rounded-xl text-xs font-bold transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1.5',
-                active ? 'bg-primary text-white' : 'text-muted hover:text-ink'
+                'min-h-10 py-2 px-4 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer flex items-center justify-center gap-1.5',
+                active ? 'bg-white text-ink border border-border shadow-xs' : 'text-muted hover:text-ink'
               )}
             >
               <span>{item.label}</span>
-              <span className={cn('tabular', active ? 'text-white/90' : 'text-muted')}>
-                ({item.count})
+              <span className={cn('font-mono-data', active ? 'text-primary font-bold' : 'text-muted')}>
+                {item.count}
               </span>
             </button>
           );
         })}
       </div>
 
-      {/* TAB 1: PICKUPS */}
       {tab === 'pickups' && (
         <section className={CARD}>
           {pickupsLoading ? (
@@ -228,14 +211,14 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
                     className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="size-10 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0">
+                      <span className="size-10 rounded-lg bg-sunken border border-border text-primary flex items-center justify-center shrink-0">
                         {bag.icon}
                       </span>
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-ink truncate">
-                          {pickup.quantity} <span className="text-xs font-normal text-muted tabular">({bag.weight})</span>
+                          {pickup.quantity} <span className="font-mono-data text-xs font-normal text-muted">({bag.weight})</span>
                         </p>
-                        <p className="text-xs text-muted tabular truncate mt-0.5">
+                        <p className="font-mono-data text-xs text-muted truncate mt-0.5">
                           {pickup.locality || 'Kadri'} · {formatShortDate(pickup.date)}
                         </p>
                       </div>
@@ -243,7 +226,7 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
                     <div className="shrink-0 text-right space-y-1">
                       <StatusBadge status={pickup.status} />
                       {pickup.pointsEarned && (
-                        <p className="text-xs font-bold text-primary tabular">+{pickup.pointsEarned} pts</p>
+                        <p className="font-mono-data text-xs font-bold text-primary">+{pickup.pointsEarned} pts</p>
                       )}
                     </div>
                   </div>
@@ -254,7 +237,6 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
         </section>
       )}
 
-      {/* TAB 2: REPORTS */}
       {tab === 'reports' && (
         <section className={CARD}>
           {reportsLoading ? (
@@ -280,11 +262,11 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
                     <img
                       src={report.photoUrl}
                       alt={report.wasteType}
-                      className="size-12 rounded-xl object-cover bg-sunken border border-border shrink-0"
+                      className="size-12 rounded-lg object-cover bg-sunken border border-border shrink-0"
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-ink truncate">{report.wasteType}</p>
-                      <p className="text-xs text-muted tabular truncate mt-0.5">
+                      <p className="font-mono-data text-xs text-muted truncate mt-0.5">
                         {report.placeName} · {formatShortDate(report.createdAt)}
                       </p>
                     </div>
@@ -302,10 +284,6 @@ export function MyActivityView({ pickups, pickupsLoading, reports, reportsLoadin
   );
 }
 
-/**
- * 3. Address List Sub-Page:
- * List, add, edit, delete, set default (with locality dropdown).
- */
 export function AddressListView({
   addresses,
   loading,
@@ -376,7 +354,7 @@ export function AddressListView({
           <button
             type="button"
             onClick={openAdd}
-            className="min-h-11 px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer shrink-0"
+            className="min-h-10 px-4 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer shrink-0"
           >
             {t('profile_address_add')}
           </button>
@@ -395,7 +373,7 @@ export function AddressListView({
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="Home"
-              className="w-full min-h-11 px-3.5 py-2 border border-border rounded-xl text-sm bg-sunken focus:bg-white text-ink focus:outline-none focus:border-primary"
+              className="w-full min-h-11 px-3.5 py-2 border border-border rounded-lg text-sm bg-white text-ink focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -410,7 +388,7 @@ export function AddressListView({
               value={line}
               onChange={(e) => setLine(e.target.value)}
               placeholder="Flat / Street / Landmark"
-              className="w-full min-h-11 px-3.5 py-2 border border-border rounded-xl text-sm bg-sunken focus:bg-white text-ink focus:outline-none focus:border-primary"
+              className="w-full min-h-11 px-3.5 py-2 border border-border rounded-lg text-sm bg-white text-ink focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -422,7 +400,7 @@ export function AddressListView({
               id="addr-locality-select"
               value={locality}
               onChange={(e) => setLocality(e.target.value)}
-              className="w-full min-h-11 px-3.5 py-2 border border-border rounded-xl text-sm bg-sunken focus:bg-white text-ink focus:outline-none focus:border-primary cursor-pointer"
+              className="w-full min-h-11 px-3.5 py-2 border border-border rounded-lg text-sm bg-white text-ink focus:outline-none focus:border-primary cursor-pointer"
             >
               {DK_LOCALITIES.map(loc => (
                 <option key={loc} value={loc}>{loc}</option>
@@ -433,14 +411,14 @@ export function AddressListView({
           <div className="flex items-center gap-2.5 pt-1">
             <button
               type="submit"
-              className="min-h-11 px-5 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark cursor-pointer"
+              className="min-h-10 px-5 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-dark cursor-pointer"
             >
               {t('profile_save')}
             </button>
             <button
               type="button"
               onClick={() => setFormMode(null)}
-              className="min-h-11 px-4 py-2 rounded-xl border border-border text-xs font-semibold text-muted hover:text-ink cursor-pointer"
+              className="min-h-10 px-4 py-2 rounded-lg border border-border bg-white text-xs font-semibold text-muted hover:text-ink cursor-pointer"
             >
               {t('profile_cancel')}
             </button>
@@ -464,14 +442,14 @@ export function AddressListView({
                 className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div className="flex items-start gap-3 min-w-0">
-                  <span className="size-10 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0">
-                    <MapPinIcon className="size-5" />
+                  <span className="size-10 rounded-lg bg-sunken border border-border text-primary flex items-center justify-center shrink-0">
+                    <MapPinIcon className="size-4" />
                   </span>
                   <div className="min-w-0 space-y-0.5">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-bold text-ink">{addr.label}</p>
                       {addr.isDefault && (
-                        <span className="px-2 py-0.5 rounded-full bg-primary-light text-primary-dark text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-primary-light border border-primary/25 text-primary-dark font-mono-data text-[10px] font-semibold">
                           {t('profile_address_default_badge')}
                         </span>
                       )}
@@ -487,7 +465,7 @@ export function AddressListView({
                     <button
                       type="button"
                       onClick={() => onSetDefault(addr.id)}
-                      className="min-h-11 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-primary hover:border-primary cursor-pointer"
+                      className="min-h-10 px-3 py-1.5 rounded-lg border border-border text-xs font-semibold text-primary hover:border-primary cursor-pointer"
                     >
                       {t('profile_address_set_default')}
                     </button>
@@ -496,7 +474,7 @@ export function AddressListView({
                     type="button"
                     onClick={() => openEdit(addr)}
                     aria-label={`${t('profile_address_edit')} ${addr.label}`}
-                    className="min-h-11 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-ink hover:border-primary/40 inline-flex items-center gap-1 cursor-pointer"
+                    className="min-h-10 px-3 py-1.5 rounded-lg border border-border text-xs font-semibold text-ink hover:border-primary/40 inline-flex items-center gap-1 cursor-pointer"
                   >
                     <EditIcon className="size-3.5" />
                     <span>{t('profile_address_edit')}</span>
@@ -505,7 +483,7 @@ export function AddressListView({
                     type="button"
                     onClick={() => onDelete(addr.id)}
                     aria-label={`${t('profile_address_delete')} ${addr.label}`}
-                    className="min-h-11 px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-orange-red-dark hover:border-orange-red/40 inline-flex items-center gap-1 cursor-pointer"
+                    className="min-h-10 px-3 py-1.5 rounded-lg border border-border text-xs font-semibold text-orange-red-dark hover:border-orange-red/40 inline-flex items-center gap-1 cursor-pointer"
                   >
                     <TrashIcon className="size-3.5" />
                     <span>{t('profile_address_delete')}</span>
@@ -520,18 +498,14 @@ export function AddressListView({
   );
 }
 
-/**
- * 4. Notifications Sub-Page:
- * Three toggles (pickup updates, report status, NGO news) saved through preferencesApi.
- */
 export function NotificationsView({ preferences, loading, error, onToggle, onReload }) {
   const { t } = useTranslation();
 
   if (loading) {
     return (
       <div className="max-w-xl mx-auto space-y-2">
-        <Skeleton width="100%" height="56px" rounded="lg" />
-        <Skeleton width="100%" height="56px" rounded="lg" />
+        <Skeleton width="100%" height="56px" rounded="md" />
+        <Skeleton width="100%" height="56px" rounded="md" />
       </div>
     );
   }
@@ -588,9 +562,6 @@ export function NotificationsView({ preferences, loading, error, onToggle, onRel
   );
 }
 
-/**
- * 5. Delete Account Sub-Page (AlertDialog confirmation for irreversible action).
- */
 export function DeleteAccountView({ onCancel, onDeletedSignOut }) {
   const { t } = useTranslation();
   const [deleted, setDeleted] = useState(false);
@@ -615,12 +586,12 @@ export function DeleteAccountView({ onCancel, onDeletedSignOut }) {
       aria-describedby="delete-account-desc"
       className={cn(CARD, 'max-w-md mx-auto space-y-5')}
     >
-      <div className="size-12 rounded-full bg-orange-red-light text-orange-red-dark flex items-center justify-center">
-        <TrashIcon className="size-6" />
+      <div className="size-11 rounded-lg bg-orange-red-light border border-orange-red/30 text-orange-red-dark flex items-center justify-center">
+        <TrashIcon className="size-5" />
       </div>
 
       <div className="space-y-1.5">
-        <h2 id="delete-account-heading" className="text-base font-extrabold text-ink text-balance">
+        <h2 id="delete-account-heading" className="text-base font-bold text-ink text-balance">
           {t('profile_delete_warning_title')}
         </h2>
         <p id="delete-account-desc" className="text-xs text-muted text-pretty leading-relaxed">
@@ -632,14 +603,14 @@ export function DeleteAccountView({ onCancel, onDeletedSignOut }) {
         <button
           type="button"
           onClick={() => setDeleted(true)}
-          className="flex-1 min-h-11 py-2.5 px-4 rounded-xl bg-orange-red text-white text-xs font-bold hover:bg-orange-red-dark transition-colors duration-150 cursor-pointer"
+          className="flex-1 min-h-11 py-2.5 px-4 rounded-lg bg-orange-red text-white text-xs font-bold hover:bg-orange-red-dark transition-colors duration-150 cursor-pointer"
         >
           {t('profile_delete_confirm_btn')}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 py-2.5 px-5 rounded-xl border border-border text-xs font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
+          className="min-h-11 py-2.5 px-5 rounded-lg border border-border bg-white text-xs font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
         >
           {t('profile_cancel')}
         </button>
@@ -648,26 +619,23 @@ export function DeleteAccountView({ onCancel, onDeletedSignOut }) {
   );
 }
 
-/**
- * 6. About Swaccha Parisara Sub-Page.
- */
 export function AboutNgoView() {
   const { t } = useTranslation();
 
   return (
     <section className={cn(CARD, 'max-w-xl mx-auto space-y-4')}>
-      <h2 className="text-base font-extrabold text-ink text-balance">{t('profile_row_about_title')}</h2>
+      <h2 className="text-base font-bold text-ink text-balance">{t('profile_row_about_title')}</h2>
       <p className="text-xs text-muted text-pretty leading-relaxed">{t('profile_about_mission')}</p>
 
       <div className="pt-3 border-t border-border-light space-y-1.5">
         <p className="text-xs font-bold text-ink">{t('profile_contact_label')}</p>
         <p className="text-xs text-muted">{t('profile_contact_email')}</p>
-        <p className="text-xs text-muted tabular">{t('profile_contact_phone')}</p>
+        <p className="font-mono-data text-xs text-muted">{t('profile_contact_phone')}</p>
         <p className="text-xs text-muted text-pretty">{t('profile_contact_office')}</p>
       </div>
 
       <div className="pt-3 border-t border-border-light">
-        <p className="text-xs font-semibold text-muted tabular">{t('profile_version_label')}</p>
+        <p className="font-mono-data text-xs font-semibold text-muted">{t('profile_version_label')}</p>
       </div>
     </section>
   );
@@ -681,10 +649,6 @@ const LANGUAGES = [
   { code: 'bea', label: 'Beary', disabled: true },
 ];
 
-/**
- * 7. Language Selection Sheet:
- * English and ಕನ್ನಡ selectable; Tulu, Konkani and Beary disabled with a "Coming Soon" tag.
- */
 export function LanguageSheet({ open, onClose }) {
   const { t, i18n } = useTranslation();
 
@@ -715,17 +679,17 @@ export function LanguageSheet({ open, onClose }) {
         aria-modal="true"
         aria-label={t('profile_lang_sheet_title')}
         onClick={(e) => e.stopPropagation()}
-        className="w-full md:max-w-sm bg-white rounded-t-2xl md:rounded-2xl shadow-modal p-5 space-y-4 animate-slide-up"
+        className="w-full md:max-w-sm bg-white rounded-t-xl md:rounded-xl border border-border shadow-modal p-5 space-y-4 animate-slide-up"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-extrabold text-ink text-balance">{t('profile_lang_sheet_title')}</h2>
+          <h2 className="text-base font-bold text-ink text-balance">{t('profile_lang_sheet_title')}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={t('profile_cancel')}
-            className="size-11 rounded-full text-muted hover:text-ink hover:bg-sunken flex items-center justify-center cursor-pointer"
+            className="size-10 rounded-lg text-muted hover:text-ink hover:bg-sunken flex items-center justify-center cursor-pointer"
           >
-            <XIcon className="size-5" />
+            <XIcon className="size-4" />
           </button>
         </div>
 
@@ -745,15 +709,15 @@ export function LanguageSheet({ open, onClose }) {
                     : 'text-ink hover:text-primary cursor-pointer'
                 )}
               >
-                <span className={cn('text-sm', active ? 'font-extrabold text-primary' : 'font-semibold')}>
+                <span className={cn('text-sm', active ? 'font-bold text-primary' : 'font-medium')}>
                   {lang.label}
                 </span>
                 {lang.disabled ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-sunken border border-border text-[11px] font-semibold text-muted">
+                  <span className="px-2 py-0.5 rounded bg-sunken border border-border font-mono-data text-[10px] font-semibold text-muted">
                     {t('profile_lang_coming_soon')}
                   </span>
                 ) : active ? (
-                  <CheckCircleIcon className="size-5 text-primary shrink-0" />
+                  <CheckCircleIcon className="size-4 text-primary shrink-0" />
                 ) : null}
               </button>
             );
@@ -765,9 +729,6 @@ export function LanguageSheet({ open, onClose }) {
   );
 }
 
-/**
- * 8. Sign Out Confirmation AlertDialog.
- */
 export function SignOutConfirmDialog({ open, onConfirm, onCancel }) {
   const { t } = useTranslation();
 
@@ -793,9 +754,9 @@ export function SignOutConfirmDialog({ open, onConfirm, onCancel }) {
         aria-labelledby="signout-dialog-title"
         aria-describedby="signout-dialog-desc"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm bg-white rounded-2xl shadow-modal p-5 space-y-4 animate-scale-in"
+        className="w-full max-w-sm bg-white rounded-xl border border-border shadow-modal p-5 space-y-4 animate-scale-in"
       >
-        <h2 id="signout-dialog-title" className="text-base font-extrabold text-ink text-balance">
+        <h2 id="signout-dialog-title" className="text-base font-bold text-ink text-balance">
           {t('profile_signout_confirm_title')}
         </h2>
         <p id="signout-dialog-desc" className="text-xs text-muted text-pretty leading-relaxed">
@@ -805,14 +766,14 @@ export function SignOutConfirmDialog({ open, onConfirm, onCancel }) {
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 min-h-11 py-2.5 px-4 rounded-xl bg-orange-red text-white text-xs font-bold hover:bg-orange-red-dark transition-colors duration-150 cursor-pointer"
+            className="flex-1 min-h-11 py-2.5 px-4 rounded-lg bg-orange-red text-white text-xs font-bold hover:bg-orange-red-dark transition-colors duration-150 cursor-pointer"
           >
             {t('signOut')}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 min-h-11 py-2.5 px-4 rounded-xl border border-border text-xs font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
+            className="flex-1 min-h-11 py-2.5 px-4 rounded-lg border border-border bg-white text-xs font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
           >
             {t('profile_cancel')}
           </button>

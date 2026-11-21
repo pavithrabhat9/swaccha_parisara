@@ -9,8 +9,7 @@ import { cn } from '../../utils/cn';
 const TYPE_ICONS = { pickup: TruckIcon, points: GiftIcon, report: MapPinIcon };
 
 /**
- * Notification inbox: bottom sheet on mobile, popover anchored under the bell on desktop.
- * Rendered in a portal so it is never trapped by an animated ancestor.
+ * NotificationInbox — Tactile consumer notifications sheet / desktop popover.
  */
 export default function NotificationInbox({
   open,
@@ -56,17 +55,16 @@ export default function NotificationInbox({
         }
         className="
           w-full max-h-[78dvh] flex flex-col overflow-hidden outline-none
-          bg-white rounded-t-2xl shadow-modal animate-slide-up
-          md:fixed md:w-[380px] md:max-h-[70dvh] md:rounded-2xl md:shadow-elevated md:border md:border-border
-          md:animate-slide-down md:top-[var(--pop-top,72px)] md:right-[var(--pop-right,24px)]
+          bg-white rounded-t-3xl shadow-modal animate-slide-up
+          md:fixed md:w-[380px] md:max-h-[70dvh] md:rounded-2xl md:shadow-elevated
+          md:animate-slide-down md:top-[var(--pop-top,64px)] md:right-[var(--pop-right,24px)]
         "
       >
-        {/* Header */}
         <div className="flex items-center justify-between gap-2 px-5 pt-4 pb-3 border-b border-border-light shrink-0">
           <div className="min-w-0">
-            <h2 className="text-base font-bold text-ink text-balance">{t('home_inbox_title')}</h2>
+            <h2 className="text-base font-extrabold text-ink text-balance">{t('home_inbox_title')}</h2>
             {unreadCount > 0 && (
-              <p className="text-[11px] font-semibold text-primary tabular">
+              <p className="tabular text-xs font-bold text-primary">
                 {unreadCount} {t('home_inbox_unread')}
               </p>
             )}
@@ -76,7 +74,7 @@ export default function NotificationInbox({
               type="button"
               onClick={onMarkAllRead}
               disabled={unreadCount === 0}
-              className="min-h-11 px-2.5 text-xs font-semibold text-primary hover:text-primary-dark disabled:text-muted-light disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+              className="min-h-10 px-2.5 text-xs font-bold text-primary hover:bg-primary-light/60 disabled:text-muted-light disabled:cursor-not-allowed cursor-pointer rounded-xl"
             >
               {t('home_inbox_mark_all')}
             </button>
@@ -84,14 +82,13 @@ export default function NotificationInbox({
               type="button"
               onClick={onClose}
               aria-label={t('home_inbox_close')}
-              className="touch-target size-11 rounded-full text-muted hover:text-ink hover:bg-sunken flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="touch-target size-10 rounded-xl text-muted hover:text-ink hover:bg-sunken flex items-center justify-center cursor-pointer"
             >
-              <XIcon className="size-5" />
+              <XIcon className="size-4" />
             </button>
           </div>
         </div>
 
-        {/* List or empty state */}
         <div className="flex-1 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="p-4">
@@ -110,30 +107,32 @@ export default function NotificationInbox({
                       type="button"
                       onClick={() => onMarkRead(n.id)}
                       className={cn(
-                        'w-full min-h-11 px-5 py-3.5 flex items-start gap-3 text-left cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:bg-primary-lighter',
-                        n.unread ? 'bg-primary-lighter' : 'bg-white hover:bg-sunken'
+                        'w-full min-h-11 px-5 py-3.5 flex items-start gap-3 text-left cursor-pointer transition-colors duration-150',
+                        n.unread ? 'bg-primary-lighter/80' : 'bg-white hover:bg-sunken/60'
                       )}
                     >
                       <span
-                        className="size-9 rounded-full bg-primary-light text-primary flex items-center justify-center shrink-0"
+                        className={cn(
+                          'size-10 rounded-xl flex items-center justify-center shrink-0',
+                          n.unread ? 'bg-primary text-white' : 'bg-sunken text-primary'
+                        )}
                         aria-hidden="true"
                       >
                         <Icon className="size-4" />
                       </span>
                       <span className="min-w-0 flex-1 space-y-0.5">
-                        <span className="flex items-center gap-2">
-                          <span className={cn('text-sm text-ink truncate', n.unread ? 'font-bold' : 'font-semibold')}>
+                        <span className="flex items-center justify-between gap-2">
+                          <span className={cn('text-sm text-ink truncate', n.unread ? 'font-extrabold' : 'font-semibold')}>
                             {n.title}
                           </span>
                           {n.unread && (
-                            <>
-                              <span aria-hidden="true" className="size-2 rounded-full bg-orange-red shrink-0" />
-                              <span className="sr-only">{t('home_inbox_unread')}</span>
-                            </>
+                            <span className="px-2 py-0.5 rounded-md bg-primary-light text-primary-dark text-[10px] font-bold shrink-0">
+                              {t('home_inbox_unread')}
+                            </span>
                           )}
                         </span>
                         <span className="block text-xs text-muted text-pretty leading-snug">{n.body}</span>
-                        <span className="block text-[11px] text-muted-light tabular">
+                        <span className="block tabular text-[11px] text-muted-light">
                           {formatTimeAgo(n.createdAt, i18n.language)}
                         </span>
                       </span>
@@ -146,7 +145,7 @@ export default function NotificationInbox({
         </div>
 
         <p
-          className="px-5 py-2.5 text-[11px] text-muted-light border-t border-border-light shrink-0"
+          className="px-5 py-2.5 text-[11px] text-muted-light border-t border-border-light shrink-0 bg-cream/70"
           style={{ paddingBottom: 'calc(0.625rem + env(safe-area-inset-bottom, 0px))' }}
         >
           {t('sample_data_note')}

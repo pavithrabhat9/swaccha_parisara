@@ -7,9 +7,6 @@ export function useToast() {
   return useContext(ToastContext);
 }
 
-/**
- * Global toast notification system.
- */
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
@@ -46,28 +43,34 @@ export function ToastProvider({ children }) {
             role="status"
             onClick={() => dismissToast(toast.id)}
             className={cn(
-              'pointer-events-auto cursor-pointer max-w-sm w-full px-4 py-3 rounded-2xl',
-              'shadow-elevated flex items-center gap-3 text-body-sm font-semibold',
+              'pointer-events-auto cursor-pointer max-w-sm w-full px-4 py-3 rounded-lg border',
+              'shadow-elevated flex items-center gap-3 text-xs font-semibold',
               toast.exiting ? 'animate-toast-out' : 'animate-toast-in',
-              toast.type === 'success' && 'bg-primary text-white',
-              toast.type === 'info' && 'bg-yellow text-ink',
-              toast.type === 'error' && 'bg-orange-red text-white'
+              toast.type === 'success' && 'bg-primary text-white border-primary-dark',
+              toast.type === 'info' && 'bg-white text-ink border-border',
+              toast.type === 'error' && 'bg-orange-red text-white border-orange-red-dark'
             )}
           >
-            <span className="size-6 rounded-full bg-white/20 flex items-center justify-center shrink-0" aria-hidden="true">
+            <span
+              className={cn(
+                'size-5 rounded flex items-center justify-center shrink-0',
+                toast.type === 'info' ? 'bg-yellow-light text-yellow-dark' : 'bg-white/20 text-white'
+              )}
+              aria-hidden="true"
+            >
               {toast.type === 'success' && (
-                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}
               {toast.type === 'info' && (
-                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="16" x2="12" y2="12" />
                   <line x1="12" y1="8" x2="12.01" y2="8" />
                 </svg>
               )}
               {toast.type === 'error' && (
-                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="8" x2="12" y2="12" />
                   <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>

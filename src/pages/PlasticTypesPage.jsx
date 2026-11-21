@@ -10,35 +10,29 @@ import Chip from '../components/ui/Chip';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
 import { SkeletonCard } from '../components/ui/Skeleton';
-import BottomMist from '../components/layout/BottomMist';
 import { ArrowLeftIcon } from '../components/ui/Icons';
 import { cn } from '../utils/cn';
 
 const TAG_STYLES = {
   recyclable: {
-    className: 'bg-primary-light text-primary-dark border-primary/25',
-    dotClass: 'bg-primary',
+    className: 'bg-primary text-white shadow-xs',
     labelKey: 'kyp_tag_recyclable',
     answerKey: 'kyp_pickup_answer_yes',
   },
   special: {
-    className: 'bg-yellow-light text-yellow-dark border-yellow/40',
-    dotClass: 'bg-yellow',
+    className: 'bg-yellow text-ink shadow-xs',
     labelKey: 'kyp_tag_special',
     answerKey: 'kyp_pickup_answer_special',
   },
   not_recyclable: {
-    className: 'bg-orange-red-light text-orange-red-dark border-orange-red/30',
-    dotClass: 'bg-orange-red',
+    className: 'bg-orange-red text-white shadow-xs',
     labelKey: 'kyp_tag_not_recyclable',
     answerKey: 'kyp_pickup_answer_no',
   },
 };
 
 /**
- * PlasticTypesPage (/learn/plastic-types) — "Know your plastic"
- * Filter chips: All, Recyclable, Special handling, Not recyclable.
- * Renders resin codes 1 to 7 in a 1-col mobile / 2-col desktop grid.
+ * PlasticTypesPage (/learn/plastic-types) — Warm, scannable consumer plastic guide.
  */
 export default function PlasticTypesPage() {
   const { t } = useTranslation();
@@ -46,28 +40,26 @@ export default function PlasticTypesPage() {
   const { items, loading, error, activeFilter, setActiveFilter, retry } = usePlasticTypes();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 md:py-8 space-y-6">
-      {/* Header: Back button + Page Title */}
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
       <div className="space-y-2">
         <button
           type="button"
           onClick={() => navigate(-1)}
           aria-label={t('kyp_back')}
-          className="min-h-11 -ml-2 px-2 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+          className="min-h-10 -ml-2 px-2.5 text-xs font-bold text-primary hover:bg-primary-light/70 inline-flex items-center gap-1.5 cursor-pointer rounded-xl transition-colors duration-150"
         >
           <ArrowLeftIcon className="size-4" />
           <span>{t('kyp_back')}</span>
         </button>
 
         <div>
-          <h1 className="text-xl font-extrabold text-ink text-balance">
+          <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">
             {t('kyp_page_title')}
           </h1>
-          <p className="text-xs text-muted text-pretty mt-1">{t('kyp_page_subtitle')}</p>
+          <p className="text-sm text-muted text-pretty mt-1">{t('kyp_page_subtitle')}</p>
         </div>
       </div>
 
-      {/* Filter Chips: All, Recyclable, Special handling, Not recyclable */}
       <div
         role="tablist"
         aria-label={t('kyp_page_title')}
@@ -84,7 +76,6 @@ export default function PlasticTypesPage() {
         ))}
       </div>
 
-      {/* States & Resin Code Cards (1 column mobile, 2 columns desktop) */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5" aria-busy="true">
           <SkeletonCard />
@@ -115,9 +106,8 @@ export default function PlasticTypesPage() {
             return (
               <article
                 key={plastic.code}
-                className="rounded-2xl bg-white border border-border overflow-hidden flex flex-col"
+                className="rounded-2xl card-elevated overflow-hidden flex flex-col"
               >
-                {/* Top image + resin code number + category tag */}
                 <div className="relative h-40 w-full bg-sunken">
                   <img
                     src={plastic.imageUrl}
@@ -126,44 +116,39 @@ export default function PlasticTypesPage() {
                     className="w-full h-full object-cover"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 bg-ink/55" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent" />
 
-                  {/* Resin code number badge (1 to 7) */}
-                  <div className="absolute top-3 left-3 size-10 rounded-full bg-white text-ink font-extrabold text-base tabular flex items-center justify-center">
+                  <div className="absolute top-3 left-3 size-9 rounded-xl bg-white/95 glass text-ink tabular font-extrabold text-sm flex items-center justify-center shadow-xs">
                     #{plastic.code}
                   </div>
 
-                  {/* Color-coded tag */}
                   <span
                     className={cn(
-                      'absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border',
+                      'absolute top-3 right-3 inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold',
                       tag.className
                     )}
                   >
-                    <span className={cn('size-1.5 rounded-full', tag.dotClass)} aria-hidden="true" />
                     {t(tag.labelKey)}
                   </span>
 
-                  {/* Name & full chemical name */}
                   <div className="absolute bottom-3 left-4 right-4">
                     <h2 className="text-base font-extrabold text-white text-balance leading-tight">
                       {plastic.name}
                     </h2>
-                    <p className="text-xs text-white/90 truncate">{plastic.fullName}</p>
+                    <p className="text-xs text-white/90 truncate mt-0.5">{plastic.fullName}</p>
                   </div>
                 </div>
 
-                {/* Body: example items + "Can I put this in a pickup?" */}
-                <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <p className="text-xs font-bold text-ink mb-2">
+                    <p className="text-xs font-bold text-muted mb-2">
                       {t('kyp_examples_label')}
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {plastic.examples.map(ex => (
                         <span
                           key={ex}
-                          className="px-2.5 py-1 rounded-lg bg-sunken border border-border text-xs font-medium text-ink"
+                          className="px-2.5 py-1 rounded-lg bg-sunken text-xs font-semibold text-ink"
                         >
                           {ex}
                         </span>
@@ -171,15 +156,23 @@ export default function PlasticTypesPage() {
                     </div>
                   </div>
 
-                  {/* Short line: "Can I put this in a pickup?" */}
                   <div className="pt-3 border-t border-border-light space-y-1">
                     <p className="text-xs font-bold text-ink">
                       {t('kyp_pickup_question')}
                     </p>
-                    <p className="text-xs font-semibold text-primary-dark">
+                    <p
+                      className={cn(
+                        'text-xs font-bold',
+                        category === 'recyclable'
+                          ? 'text-primary'
+                          : category === 'special'
+                            ? 'text-yellow-dark'
+                            : 'text-orange-red-dark'
+                      )}
+                    >
                       {t(tag.answerKey)}
                     </p>
-                    <p className="text-[11px] text-muted text-pretty leading-relaxed">
+                    <p className="text-xs text-muted text-pretty leading-relaxed pt-0.5">
                       {plastic.tip}
                     </p>
                   </div>
@@ -189,8 +182,6 @@ export default function PlasticTypesPage() {
           })}
         </div>
       )}
-
-      <BottomMist />
     </div>
   );
 }

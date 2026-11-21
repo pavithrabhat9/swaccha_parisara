@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { DK_LOCALITIES } from '../../data/mockPickups';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import ErrorState from '../ui/ErrorState';
+import { BrandMark } from '../ui/Icons';
 import { cn } from '../../utils/cn';
 
 const LABEL_CLASS = 'block text-xs font-semibold text-ink mb-1.5';
 const INPUT_CLASS =
-  'w-full min-h-11 px-3.5 py-2.5 border border-border rounded-xl text-sm font-medium ' +
-  'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-sunken focus:bg-white text-ink placeholder:text-muted-light';
+  'w-full min-h-11 px-3.5 py-2.5 border border-border rounded-lg text-sm font-medium ' +
+  'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white text-ink placeholder:text-muted-light';
 const PRIMARY_BUTTON =
-  'w-full min-h-11 py-3 bg-primary text-white font-semibold rounded-xl text-sm ' +
+  'w-full min-h-11 py-2.5 bg-primary text-white font-semibold rounded-lg text-sm ' +
   'hover:bg-primary-dark transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer';
 
 const ACCOUNT_TYPES = [
@@ -18,7 +19,6 @@ const ACCOUNT_TYPES = [
   { id: 'business', labelKey: 'auth_account_business' },
 ];
 
-/** Sign-up details: name, locality and account type. Mounted only on the setup step. */
 function SetupStep({ user, onSubmit }) {
   const { t } = useTranslation();
   const [name, setName] = useState(user?.name || '');
@@ -68,9 +68,9 @@ function SetupStep({ user, onSubmit }) {
                 aria-checked={selected}
                 onClick={() => setAccountType(type.id)}
                 className={cn(
-                  'min-h-11 py-2.5 px-3 rounded-xl border text-sm font-semibold transition-colors duration-150 cursor-pointer',
+                  'min-h-11 py-2.5 px-3 rounded-lg border text-xs font-semibold transition-colors duration-150 cursor-pointer',
                   selected
-                    ? 'border-primary text-primary-dark bg-primary-lighter'
+                    ? 'border-primary text-primary bg-primary-lighter'
                     : 'border-border bg-white text-ink hover:border-primary/40'
                 )}
               >
@@ -94,7 +94,7 @@ function SetupStep({ user, onSubmit }) {
 }
 
 /**
- * Phone + OTP + sign-up flow (mock). Steps: phone (or Google) -> OTP -> sign-up details.
+ * LoginFlow — Civic identity sign-in & registration sheet.
  */
 export default function LoginFlow({ authHook }) {
   const { t } = useTranslation();
@@ -153,30 +153,24 @@ export default function LoginFlow({ authHook }) {
   }[authStep];
 
   return (
-    <div className="flex flex-col items-center px-5 py-7 max-w-sm w-full mx-auto bg-white rounded-2xl border border-border">
-      {/* Brand icon container */}
-      <div className="size-12 rounded-2xl border border-primary/20 bg-primary-lighter flex items-center justify-center mb-4">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38761d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-          <line x1="12" y1="22.08" x2="12" y2="12" />
-        </svg>
+    <div className="flex flex-col px-6 py-7 max-w-sm w-full mx-auto bg-white rounded-xl border border-border">
+      <div className="flex items-center gap-3 pb-5 mb-5 border-b border-border-light">
+        <BrandMark className="size-10 rounded-md shrink-0" />
+        <div className="min-w-0">
+          <h1 className="text-lg font-bold text-ink text-balance leading-tight">{heading}</h1>
+          <p className="text-xs text-muted text-pretty mt-0.5">{subheading}</p>
+        </div>
       </div>
 
-      <h1 className="text-xl font-bold text-ink text-balance mb-1 text-center">{heading}</h1>
-      <p className="text-sm text-muted text-pretty text-center mb-6">{subheading}</p>
-
-      {/* Offline notice: sign-up / log-in need a connection */}
       {!isOnline && (
         <div
           role="status"
-          className="w-full mb-4 border border-yellow/40 bg-yellow-light rounded-xl px-3.5 py-2.5 text-xs font-medium text-ink text-pretty"
+          className="w-full mb-4 border border-yellow/40 bg-yellow-light rounded-lg px-3.5 py-2.5 text-xs font-medium text-ink text-pretty"
         >
           {t('auth_offline_notice')}
         </div>
       )}
 
-      {/* === PHONE STEP === */}
       {authStep === 'phone' && (
         <div className="w-full space-y-4">
           <div>
@@ -184,29 +178,29 @@ export default function LoginFlow({ authHook }) {
               type="button"
               onClick={handleGoogle}
               disabled={!isOnline || busy}
-              className="w-full min-h-11 py-3 px-4 bg-white text-ink font-semibold rounded-xl text-sm border border-border hover:border-primary/40 hover:bg-primary-lighter transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer inline-flex items-center justify-center gap-2.5"
+              className="w-full min-h-11 py-2.5 px-4 bg-white text-ink font-semibold rounded-lg text-sm border border-border hover:border-primary/50 hover:bg-sunken transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer inline-flex items-center justify-center gap-2.5"
             >
               <span
                 aria-hidden="true"
-                className="size-5 rounded-full border border-border bg-sunken flex items-center justify-center text-[11px] font-bold text-primary"
+                className="size-5 rounded border border-border bg-sunken flex items-center justify-center font-mono-data text-[11px] font-bold text-primary"
               >
                 G
               </span>
               <span>{busy ? t('auth_signing_in') : t('auth_google')}</span>
             </button>
-            <p className="mt-1.5 text-[11px] text-muted text-pretty text-center">{t('auth_google_stub_note')}</p>
+            <p className="mt-1.5 text-[11px] text-muted text-pretty">{t('auth_google_stub_note')}</p>
           </div>
 
           <div className="flex items-center gap-3" aria-hidden="true">
             <span className="flex-1 h-px bg-border" />
-            <span className="text-[11px] font-semibold text-muted uppercase">{t('auth_or')}</span>
+            <span className="font-mono-data text-[10px] font-semibold text-muted uppercase">{t('auth_or')}</span>
             <span className="flex-1 h-px bg-border" />
           </div>
 
           <div>
             <label htmlFor="auth-phone" className={LABEL_CLASS}>{t('phoneNumber')}</label>
             <div className="flex">
-              <span className="flex items-center px-3.5 bg-border-light rounded-l-xl border border-r-0 border-border text-sm font-semibold text-muted tabular">
+              <span className="flex items-center px-3 bg-sunken rounded-l-lg border border-r-0 border-border font-mono-data text-xs font-semibold text-muted">
                 +91
               </span>
               <input
@@ -220,7 +214,7 @@ export default function LoginFlow({ authHook }) {
                 onBlur={handlePhoneBlur}
                 placeholder={t('auth_phone_placeholder')}
                 maxLength={10}
-                className={cn(INPUT_CLASS, 'rounded-l-none tabular')}
+                className={cn(INPUT_CLASS, 'rounded-l-none font-mono-data')}
               />
             </div>
             {phoneError && (
@@ -239,7 +233,6 @@ export default function LoginFlow({ authHook }) {
         </div>
       )}
 
-      {/* === OTP STEP === */}
       {authStep === 'otp' && (
         <div className="w-full space-y-4">
           <div>
@@ -253,11 +246,11 @@ export default function LoginFlow({ authHook }) {
               onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
               placeholder={t('auth_otp_placeholder')}
               maxLength={4}
-              className={cn(INPUT_CLASS, 'text-center text-xl font-bold tabular placeholder:text-sm')}
+              className={cn(INPUT_CLASS, 'text-center text-xl font-bold font-mono-data placeholder:text-sm')}
             />
           </div>
 
-          <div className="border border-border bg-sunken rounded-xl px-3.5 py-2.5 text-xs text-center text-pretty">
+          <div className="border border-border bg-sunken rounded-lg px-3.5 py-2.5 text-xs text-pretty">
             <span className="font-semibold text-ink">{t('auth_demo_mode')}</span>{' '}
             <span className="text-muted">{t('auth_demo_otp_hint')}</span>
           </div>
@@ -274,17 +267,15 @@ export default function LoginFlow({ authHook }) {
           <button
             type="button"
             onClick={() => { setOtp(''); setError(''); setAuthStep('phone'); }}
-            className="w-full min-h-11 text-sm font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
+            className="w-full min-h-11 text-xs font-semibold text-muted hover:text-ink transition-colors duration-150 cursor-pointer"
           >
             {t('auth_change_number')}
           </button>
         </div>
       )}
 
-      {/* === SIGN-UP DETAILS STEP === */}
       {authStep === 'setup' && <SetupStep user={user} onSubmit={handleSetup} />}
 
-      {/* Recoverable error state */}
       {error && (
         <div className="w-full mt-4">
           <ErrorState

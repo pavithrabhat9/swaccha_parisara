@@ -1,69 +1,69 @@
 @import "tailwindcss";
 
 /* =============================================
-   SWACHHA PARISARA — Design Tokens (single source of truth)
-   Palette: #38761d green · #000 · #fff · #fab328 yellow · #f25628 orange-red
-   Everything below is the palette itself or a tint/shade/mix of it.
+   SWACHHA PARISARA — Sunlit Coastal Consumer App Tokens
+   Tactile, warm emerald & sunlit mist palette (Urban Company / Apple Health sensibility)
    ============================================= */
 
 @theme {
-  /* ---------- Brand ---------- */
-  --color-primary: #38761d;
-  --color-primary-dark: #2a5a15;        /* shade of primary */
-  --color-primary-deep: #1d3f0e;        /* deeper shade */
-  --color-primary-light: #e3eedd;       /* tint, selected fills */
-  --color-primary-lighter: #f2f7ef;     /* faint tint, hover */
+  /* ---------- Brand Emerald ---------- */
+  --color-primary: #0d7a57;             /* Vibrant Coastal Emerald */
+  --color-primary-dark: #096144;        /* Pressed / hover shade */
+  --color-primary-deep: #064733;        /* Deep emerald anchor */
+  --color-primary-light: #e5f6ef;       /* Fresh Mint tint */
+  --color-primary-lighter: #f2fbf7;     /* Soft Mint wash */
 
-  /* ---------- Neutrals (black/white with a hint of primary) ---------- */
-  --color-black: #000000;
+  /* ---------- Sunlit Neutral Surfaces ---------- */
+  --color-black: #101916;
   --color-white: #ffffff;
-  --color-cream: #ffffff;               /* app background — white by request */
-  --color-surface: #ffffff;
-  --color-sunken: #f6f8f4;              /* inputs, inset areas */
-  --color-ink: #10180c;                 /* near-black for large display text */
-  --color-muted: #565b54;               /* secondary text, 6.9:1 on white */
-  --color-muted-light: #636860;         /* tertiary text, >= 5.4:1 on white */
-  --color-border: #e4e9e1;
-  --color-border-light: #eff3ec;
+  --color-cream: #f4f7f5;               /* Clean Cool Mist ground (zero beige) */
+  --color-surface: #ffffff;             /* Elevated Pure White card */
+  --color-sunken: #edf2ef;              /* Soft Cool Sage well */
+  --color-ink: #101916;                 /* Rich Charcoal Ink */
+  --color-muted: #52635c;               /* Balanced Slate Secondary */
+  --color-muted-light: #75867f;         /* Quiet Tertiary Metadata */
+  --color-border: #e2e9e5;              /* Whisper Hairline */
+  --color-border-light: #eef3f0;        /* Soft Row Divider */
 
-  /* ---------- Status ---------- */
-  --color-yellow: #fab328;
-  --color-yellow-dark: #8f5e00;         /* WCAG AA >= 5.2:1 on yellow-light/white */
-  --color-yellow-light: #fef4dc;
-  --color-orange-red: #f25628;
-  --color-orange-red-dark: #b83710;     /* WCAG AA >= 5.4:1 on orange-red-light/white */
-  --color-orange-red-light: #feeee8;
-  --color-green-success: #38761d;
-  --color-green-success-light: #e3eedd;
+  /* ---------- Warm Consumer Accents & Semantics ---------- */
+  --color-yellow: #f59e0b;              /* Sunlit Marigold (points, rewards, pending) */
+  --color-yellow-dark: #b45309;         /* Warm Amber Ink (5.2:1 on wash) */
+  --color-yellow-light: #fef5e0;        /* Warm Marigold Wash */
+  --color-orange-red: #e05232;          /* Terracotta Coral (alerts, high hotspots) */
+  --color-orange-red-dark: #b43518;     /* Deep Coral Ink */
+  --color-orange-red-light: #fff0ec;    /* Soft Coral Wash */
+  --color-green-success: #0d7a57;
+  --color-green-success-light: #e5f6ef;
 
-  /* Severity scale for the heat map: yellow → mix → orange-red */
-  --color-severity-low: #fab328;
-  --color-severity-mid: #f68428;        /* 50/50 mix of yellow + orange-red */
-  --color-severity-high: #f25628;
+  /* District map severity scale */
+  --color-severity-low: #f59e0b;
+  --color-severity-mid: #f97316;
+  --color-severity-high: #e05232;
 
-  /* ---------- Typography ---------- */
-  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-brand: 'Outfit', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  /* ---------- Typography (Distinctive Warm Consumer Pairing) ---------- */
+  --font-sans: 'Figtree', 'Noto Sans Kannada', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-brand: 'Bricolage Grotesque', 'Noto Sans Kannada', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Figtree', 'Noto Sans Kannada', ui-sans-serif, system-ui, sans-serif;
 
   --text-display: 2rem;
-  --text-display--line-height: 1.08;
-  --text-display--letter-spacing: -0.03em;
+  --text-display--line-height: 1.12;
+  --text-display--letter-spacing: -0.025em;
   --text-display--font-weight: 800;
 
   --text-title: 1.375rem;
-  --text-title--line-height: 1.2;
+  --text-title--line-height: 1.24;
   --text-title--letter-spacing: -0.02em;
   --text-title--font-weight: 700;
 
   --text-heading: 1.0625rem;
-  --text-heading--line-height: 1.3;
+  --text-heading--line-height: 1.32;
   --text-heading--letter-spacing: -0.015em;
   --text-heading--font-weight: 700;
 
   --text-body: 0.9375rem;
   --text-body--line-height: 1.55;
 
-  --text-body-sm: 0.8125rem;
+  --text-body-sm: 0.875rem;
   --text-body-sm--line-height: 1.5;
 
   --text-caption: 0.75rem;
@@ -72,32 +72,33 @@
   --text-micro: 0.6875rem;
   --text-micro--line-height: 1.3;
 
-  /* ---------- Shadows (offset + soft blur, tinted with ink) ---------- */
-  --shadow-xs: 0 1px 2px rgba(16, 24, 12, 0.05);
-  --shadow-card: 0 2px 8px -2px rgba(16, 24, 12, 0.07);
-  --shadow-elevated: 0 4px 12px -2px rgba(16, 24, 12, 0.08), 0 14px 28px -8px rgba(16, 24, 12, 0.14);
-  --shadow-modal: 0 -4px 16px -4px rgba(16, 24, 12, 0.08), 0 -18px 40px -12px rgba(16, 24, 12, 0.2);
-  --shadow-nav: 0 4px 20px -4px rgba(16, 24, 12, 0.16);
-  --shadow-fab: 0 4px 14px -2px rgba(56, 118, 29, 0.35);
-  --shadow-pill: 0 2px 6px -1px rgba(56, 118, 29, 0.32);
+  /* ---------- Soft Layered Consumer Elevation ---------- */
+  --shadow-xs: 0 1px 3px rgba(16, 25, 22, 0.05);
+  --shadow-card: 0 1px 2px rgba(16, 25, 22, 0.04), 0 8px 24px -6px rgba(16, 25, 22, 0.07);
+  --shadow-card-hover: 0 2px 6px rgba(16, 25, 22, 0.06), 0 14px 32px -8px rgba(16, 25, 22, 0.12);
+  --shadow-elevated: 0 6px 20px -4px rgba(16, 25, 22, 0.10), 0 16px 36px -8px rgba(16, 25, 22, 0.14);
+  --shadow-modal: 0 -6px 24px -4px rgba(16, 25, 22, 0.10), 0 -20px 44px -10px rgba(16, 25, 22, 0.18);
+  --shadow-nav: 0 -4px 20px -4px rgba(16, 25, 22, 0.07);
+  --shadow-fab: 0 8px 20px -4px rgba(13, 122, 87, 0.42), 0 2px 6px rgba(13, 122, 87, 0.22);
+  --shadow-pill: 0 2px 8px rgba(16, 25, 22, 0.08);
 
-  /* ---------- Radii (cards stay at 12-16px; pills for small controls) ---------- */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
+  /* ---------- Intentional Consumer Radius Scale ---------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
   --radius-xl: 16px;
-  --radius-2xl: 16px;
-  --radius-3xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
   --radius-full: 9999px;
 
   /* ---------- Layout ---------- */
   --container-app: 72rem;
   --container-form: 40rem;
-  --height-topbar: 56px;
+  --height-topbar: 60px;
   --height-bottomnav: 64px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ---------- Motion (exponential ease-out only, never bounce/elastic) ---------- */
+  /* ---------- Motion (tactile spring-out feel) ---------- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -140,11 +141,10 @@ a {
   flex-direction: column;
 }
 
-/* Visible, consistent keyboard focus ring */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 ::selection {
@@ -152,18 +152,17 @@ a {
   color: var(--color-ink);
 }
 
-/* Themed subtle scrollbar for desktop, hidden on touch carousels */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-sunken);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: #cdd9d3;
   border-radius: 9999px;
 }
 
@@ -181,7 +180,44 @@ a {
 }
 
 /* =============================================
-   LEAFLET OVERRIDES
+   EXPRESSIVE CONSUMER SURFACES
+   ============================================= */
+.card-elevated {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(16, 25, 22, 0.045);
+}
+
+.card-interactive {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(16, 25, 22, 0.045);
+  transition: transform 0.18s var(--ease-out-expo), box-shadow 0.2s var(--ease-out-expo);
+}
+
+@media (hover: hover) {
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+.card-interactive:active {
+  transform: scale(0.985);
+}
+
+.surface-hero-emerald {
+  background: linear-gradient(135deg, #085a40 0%, #0e7d59 54%, #15976c 100%);
+  box-shadow: 0 12px 32px -8px rgba(9, 97, 68, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.surface-hero-amber {
+  background: linear-gradient(135deg, #ffffff 0%, #fef5e0 100%);
+  box-shadow: var(--shadow-card);
+}
+
+/* =============================================
+   LEAFLET OVERRIDES (CIRCULAR TACTILE PINS)
    ============================================= */
 @import "leaflet/dist/leaflet.css";
 
@@ -191,14 +227,14 @@ a {
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: var(--radius-lg) !important;
+  border-radius: 16px !important;
   box-shadow: var(--shadow-elevated) !important;
   padding: 0 !important;
 }
 
 .leaflet-popup-content {
   margin: 0 !important;
-  padding: 12px 14px !important;
+  padding: 14px 16px !important;
   font-family: var(--font-sans) !important;
   font-size: 13px !important;
   line-height: 1.5 !important;
@@ -210,11 +246,10 @@ a {
 
 .leaflet-control-attribution {
   font-size: 10px !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  border-radius: 8px 0 0 0;
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-radius: 6px 0 0 0;
 }
 
-/* Marker cluster overrides */
 .marker-cluster-small,
 .marker-cluster-medium,
 .marker-cluster-large {
@@ -223,7 +258,7 @@ a {
 
 .marker-cluster-small div {
   background: var(--color-severity-low) !important;
-  color: var(--color-black) !important;
+  color: var(--color-white) !important;
 }
 
 .marker-cluster-medium div {
@@ -237,22 +272,24 @@ a {
 }
 
 .marker-cluster div {
-  width: 36px !important;
-  height: 36px !important;
-  margin-left: 2px !important;
-  margin-top: 2px !important;
-  border-radius: 50% !important;
+  width: 38px !important;
+  height: 38px !important;
+  margin-left: 1px !important;
+  margin-top: 1px !important;
+  border-radius: 9999px !important;
+  border: 2.5px solid #ffffff !important;
+  box-shadow: 0 4px 12px rgba(16, 25, 22, 0.24) !important;
   font-family: var(--font-sans) !important;
   font-variant-numeric: tabular-nums !important;
   font-size: 13px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
 /* =============================================
-   KEYFRAMES (compositor properties only: transform & opacity)
+   KEYFRAMES (compositor properties only)
    ============================================= */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -265,7 +302,7 @@ a {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -275,13 +312,13 @@ a {
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.94); }
+  from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes ringBurst {
-  0% { transform: scale(0.75); opacity: 0.65; }
-  100% { transform: scale(1.65); opacity: 0; }
+  0% { transform: scale(0.8); opacity: 0.55; }
+  100% { transform: scale(1.45); opacity: 0; }
 }
 
 @keyframes pulse {
@@ -289,43 +326,37 @@ a {
   50% { opacity: 0.45; }
 }
 
-@keyframes checkmark {
-  0% { stroke-dashoffset: 24; }
-  100% { stroke-dashoffset: 0; }
-}
-
 @keyframes toastIn {
-  from { transform: translateY(-16px) scale(0.97); opacity: 0; }
+  from { transform: translateY(-12px) scale(0.97); opacity: 0; }
   to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 @keyframes toastOut {
   from { transform: translateY(0) scale(1); opacity: 1; }
-  to { transform: translateY(-12px) scale(0.97); opacity: 0; }
+  to { transform: translateY(-10px) scale(0.97); opacity: 0; }
 }
 
 /* =============================================
-   ANIMATION UTILITIES (exponential ease-out)
+   ANIMATION UTILITIES
    ============================================= */
-.animate-fade-in { animation: fadeIn 0.2s var(--ease-out-soft) both; }
-.animate-fade-in-up { animation: fadeInUp 0.28s var(--ease-out-expo) both; }
-.animate-slide-up { animation: slideUp 0.25s var(--ease-out-expo) both; }
-.animate-slide-down { animation: slideDown 0.18s var(--ease-out-expo) both; }
-.animate-scale-in { animation: scaleIn 0.24s var(--ease-out-expo) both; }
+.animate-fade-in { animation: fadeIn 0.18s var(--ease-out-soft) both; }
+.animate-fade-in-up { animation: fadeInUp 0.26s var(--ease-out-expo) both; }
+.animate-slide-up { animation: slideUp 0.24s var(--ease-out-expo) both; }
+.animate-slide-down { animation: slideDown 0.16s var(--ease-out-expo) both; }
+.animate-scale-in { animation: scaleIn 0.22s var(--ease-out-expo) both; }
 .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 .animate-toast-in { animation: toastIn 0.22s var(--ease-out-expo) both; }
-.animate-toast-out { animation: toastOut 0.18s ease-out forwards; }
+.animate-toast-out { animation: toastOut 0.16s ease-out forwards; }
 
 .animate-ring-burst {
-  animation: ringBurst 0.9s var(--ease-out-expo) 0.15s both;
+  animation: ringBurst 0.8s var(--ease-out-expo) 0.12s both;
 }
 
 .animate-shimmer {
-  background-color: var(--color-border-light);
+  background-color: var(--color-sunken);
   animation: pulse 1.6s ease-in-out infinite;
 }
 
-/* Route transition — opacity-only so position:fixed children are never trapped */
 .page-enter {
   animation: fadeIn 0.18s ease-out;
 }
@@ -333,46 +364,43 @@ a {
 /* =============================================
    CUSTOM UTILITIES
    ============================================= */
-
-/* Touch target minimum 44px */
 .touch-target {
   min-width: 44px;
   min-height: 44px;
 }
 
-/* Active press feedback (<= 200ms, compositor transform only) */
 .press-scale {
-  transition: transform 0.15s var(--ease-out-expo);
+  transition: transform 0.14s var(--ease-out-expo);
 }
 
 .press-scale:active {
-  transform: scale(0.97);
+  transform: scale(0.975);
 }
 
-/* Hover lift for interactive cards (pointer devices only, <= 200ms) */
 @media (hover: hover) {
   .hover-lift {
-    transition: transform 0.18s var(--ease-out-expo);
+    transition: transform 0.18s var(--ease-out-expo), box-shadow 0.2s var(--ease-out-expo);
   }
 
   .hover-lift:hover {
     transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
   }
 }
 
-/* Frosted overlays for floating map controls */
 .glass {
-  backdrop-filter: blur(12px) saturate(1.25);
-  -webkit-backdrop-filter: blur(12px) saturate(1.25);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
-/* Numeric text that doesn't jitter while counting */
-.tabular {
+.tabular,
+.font-mono-data {
+  font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
 
 /* =============================================
-   REDUCED MOTION — intentional alternative that preserves state change & hierarchy
+   REDUCED MOTION
    ============================================= */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -402,27 +430,9 @@ a {
   }
 
   .press-scale:active,
-  .hover-lift:hover {
+  .hover-lift:hover,
+  .card-interactive:hover,
+  .card-interactive:active {
     transform: none !important;
   }
-}
-
-/* =============================================
-   BOTTOM MIST - soft fade above & behind the curved mobile bottom bar
-   ============================================= */
-.bottom-mist {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(88px + var(--height-bottomnav, 64px) + env(safe-area-inset-bottom, 0px));
-  z-index: 30;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(255, 255, 255, 0.78) 45%,
-    var(--color-cream, #ffffff) 68%,
-    var(--color-cream, #ffffff) 100%
-  );
 }

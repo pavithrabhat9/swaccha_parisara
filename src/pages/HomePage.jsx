@@ -8,20 +8,19 @@ import ScheduledPickupCard from '../components/home/ScheduledPickupCard';
 import LearnCarousel from '../components/home/LearnCarousel';
 import VideoModal from '../components/home/VideoModal';
 import { HomeLeftSkeleton, HomeLearnSkeleton } from '../components/home/HomeSkeleton';
-import BottomMist from '../components/layout/BottomMist';
 import ErrorState from '../components/ui/ErrorState';
 import { ChevronRightIcon, TruckIcon } from '../components/ui/Icons';
 
 function SectionHeader({ id, title, actionLabel, onAction }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <h2 id={id} className="text-base font-extrabold text-ink text-balance">{title}</h2>
+      <h2 id={id} className="text-base font-extrabold text-ink tracking-tight text-balance">{title}</h2>
       <button
         type="button"
         onClick={onAction}
-        className="min-h-11 pl-3 -mr-1 text-xs font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+        className="min-h-9 px-2.5 -mr-1 text-xs font-bold text-primary hover:text-primary-dark hover:bg-primary-light/60 inline-flex items-center gap-0.5 cursor-pointer rounded-xl transition-colors duration-150"
       >
-        {actionLabel}
+        <span>{actionLabel}</span>
         <ChevronRightIcon className="size-3.5" />
       </button>
     </div>
@@ -29,9 +28,7 @@ function SectionHeader({ id, title, actionLabel, onAction }) {
 }
 
 /**
- * HomePage — greeting row (rewards pill + notification inbox), contribution card,
- * scheduled pickups, Learn highlights and the bottom mist.
- * Mobile: single column. Desktop: left = contribution + pickups, right = Learn grid.
+ * HomePage — Civic Recovery & Collection Operations Dashboard.
  */
 export default function HomePage() {
   const { t } = useTranslation();
@@ -51,9 +48,9 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 md:pt-8 pb-14 md:pb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-x-8 md:gap-y-6 md:items-start">
-          {/* 1. Greeting row */}
+          {/* 1. Resident Greeting Row */}
           <div className="md:col-span-12">
             <HomeGreetingRow
               greetingKey={home.greetingKey}
@@ -87,7 +84,7 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              {/* 2 + 3. Contribution card and scheduled pickups */}
+              {/* 2 + 3. Recovery Ledger + Collection Dockets */}
               <div className="md:col-span-7 space-y-6">
                 <ContributionCard
                   summary={home.summary}
@@ -96,23 +93,26 @@ export default function HomePage() {
                 />
 
                 <section aria-labelledby="home-scheduled-title" className="space-y-3">
-                  <h2 id="home-scheduled-title" className="text-base font-extrabold text-ink text-balance">
-                    {t('home_scheduled_title')}
-                  </h2>
+                  <SectionHeader
+                    id="home-scheduled-title"
+                    title={t('home_scheduled_title')}
+                    actionLabel={t('pickup')}
+                    onAction={() => navigate('/pickup')}
+                  />
 
                   {visiblePickups.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {visiblePickups.map(item => (
                         <ScheduledPickupCard key={item.id} item={item} />
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-2xl bg-white border border-dashed border-border p-6 text-center space-y-3">
+                    <div className="rounded-xl bg-white border border-border p-6 text-center space-y-3">
                       <span
                         aria-hidden="true"
-                        className="mx-auto size-12 rounded-full bg-primary-light text-primary flex items-center justify-center"
+                        className="mx-auto size-11 rounded-lg bg-sunken border border-border text-primary flex items-center justify-center"
                       >
-                        <TruckIcon className="size-6" />
+                        <TruckIcon className="size-5" />
                       </span>
                       <div>
                         <p className="text-sm font-bold text-ink text-balance">{t('home_scheduled_empty_title')}</p>
@@ -121,7 +121,7 @@ export default function HomePage() {
                       <button
                         type="button"
                         onClick={() => navigate('/pickup?tab=home&start=1')}
-                        className="min-h-11 px-5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        className="min-h-10 px-4 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer"
                       >
                         {t('home_no_pickup_cta')}
                       </button>
@@ -130,7 +130,7 @@ export default function HomePage() {
                 </section>
               </div>
 
-              {/* 4. Learn */}
+              {/* 4. Reference & Segregation Guides */}
               <section aria-labelledby="home-learn-title" className="md:col-span-5 space-y-3">
                 <SectionHeader
                   id="home-learn-title"
@@ -141,7 +141,7 @@ export default function HomePage() {
                 <LearnCarousel items={home.learn} onOpenItem={handleOpenLearnItem} />
               </section>
 
-              <p className="md:col-span-12 text-center text-[11px] text-muted-light">
+              <p className="md:col-span-12 pt-2 border-t border-border-light text-center font-mono-data text-[11px] text-muted-light">
                 {t('sample_data_note')}
               </p>
             </>
@@ -150,9 +150,6 @@ export default function HomePage() {
       </div>
 
       <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />
-
-      {/* 5. Bottom mist above the bar */}
-      <BottomMist />
     </>
   );
 }

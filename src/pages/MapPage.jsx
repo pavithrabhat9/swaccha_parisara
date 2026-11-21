@@ -9,12 +9,11 @@ import CountUp from '../components/ui/CountUp';
 import { SkeletonMap } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
-import { MapPinIcon, ClockIcon } from '../components/ui/Icons';
+import { MapPinIcon, ClockIcon, PlusIcon } from '../components/ui/Icons';
 import { WASTE_TYPE_OPTIONS, STATUS_OPTIONS } from '../data/mockReports';
 import { cn } from '../utils/cn';
 import 'leaflet/dist/leaflet.css';
 
-// Fix Leaflet default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -23,43 +22,33 @@ L.Icon.Default.mergeOptions({
 });
 
 /**
- * Create palette-strict severity markers with embedded count and green selection ring.
- * Palette only: #fab328 (low), #f68428 (mid mix), #f25628 (high), #38761d (cleared/active ring).
+ * Tactile circular map pins in the Sunlit Coastal palette:
+ * #0d7a57 (Cleared), #e05232 (High 8+), #f97316 (Mid 4-7), #f59e0b (Low 1-3).
  */
 function createIntensityIcon(reportCount, status, isSelected) {
   const isCleared = status === 'Cleared';
   let bg;
-  let textColor;
   let size;
-  let ringColor;
 
   if (isCleared) {
-    bg = '#38761d';
-    textColor = '#ffffff';
-    size = 30;
-    ringColor = 'rgba(56, 118, 29, 0.25)';
+    bg = '#0d7a57';
+    size = 32;
   } else if (reportCount >= 8) {
-    bg = '#f25628';
-    textColor = '#ffffff';
-    size = 36;
-    ringColor = 'rgba(242, 86, 40, 0.30)';
+    bg = '#e05232';
+    size = 38;
   } else if (reportCount >= 4) {
-    bg = '#f68428';
-    textColor = '#ffffff';
-    size = 31;
-    ringColor = 'rgba(246, 132, 40, 0.26)';
+    bg = '#f97316';
+    size = 34;
   } else {
-    bg = '#fab328';
-    textColor = '#000000';
-    size = 26;
-    ringColor = 'rgba(250, 179, 40, 0.28)';
+    bg = '#f59e0b';
+    size = 30;
   }
 
-  const scale = isSelected ? 1.16 : 1;
-  const border = isSelected ? '3px solid #38761d' : '2.5px solid #ffffff';
-  const halo = isSelected
-    ? '0 0 0 6px rgba(56, 118, 29, 0.35), 0 8px 20px rgba(0, 0, 0, 0.22)'
-    : `0 0 0 5px ${ringColor}, 0 4px 12px rgba(0, 0, 0, 0.18)`;
+  const scale = isSelected ? 1.18 : 1;
+  const border = isSelected ? '3px solid #101916' : '2.5px solid #ffffff';
+  const shadow = isSelected
+    ? '0 0 0 5px rgba(13, 122, 87, 0.28), 0 8px 20px rgba(16, 25, 22, 0.28)'
+    : '0 4px 12px rgba(16, 25, 22, 0.24)';
 
   return L.divIcon({
     className: 'custom-intensity-marker',
@@ -67,16 +56,16 @@ function createIntensityIcon(reportCount, status, isSelected) {
       width: ${size}px;
       height: ${size}px;
       background: ${bg};
-      color: ${textColor};
+      color: #ffffff;
       border-radius: 9999px;
       border: ${border};
-      box-shadow: ${halo};
+      box-shadow: ${shadow};
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'DM Sans', system-ui, sans-serif;
+      font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
       font-variant-numeric: tabular-nums;
-      font-size: ${reportCount >= 8 ? 12 : 11}px;
+      font-size: ${reportCount >= 8 ? 13 : 12}px;
       font-weight: 800;
       transform: scale(${scale});
       transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -86,22 +75,20 @@ function createIntensityIcon(reportCount, status, isSelected) {
   });
 }
 
-// User location dot — strictly in brand palette (#38761d + white border)
 const userIcon = L.divIcon({
   className: 'user-location-dot',
   html: `<div style="
     width: 16px;
     height: 16px;
-    background: #38761d;
-    border-radius: 50%;
+    background: #0d7a57;
+    border-radius: 9999px;
     border: 3px solid #ffffff;
-    box-shadow: 0 0 0 5px rgba(56, 118, 29, 0.25), 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0 5px rgba(13, 122, 87, 0.24), 0 3px 8px rgba(16, 25, 22, 0.22);
   "></div>`,
   iconSize: [16, 16],
   iconAnchor: [8, 8],
 });
 
-// Map setup, size invalidation on resize/mount, & click-to-dismiss handler
 function MapController({ onDismiss }) {
   const map = useMap();
   useEffect(() => {
@@ -125,7 +112,7 @@ function MapController({ onDismiss }) {
 }
 
 /**
- * MapPage — Full-bleed Leaflet map showing plastic waste reports across Dakshina Kannada.
+ * MapPage — Dakshina Kannada Civic Waste Survey Map.
  */
 export default function MapPage() {
   const { t } = useTranslation();
@@ -174,12 +161,12 @@ export default function MapPage() {
     (filters.wasteType !== 'All' ? 1 : 0) + (filters.status !== 'All' ? 1 : 0);
 
   if (loading) {
-    return <SkeletonMap className="fixed inset-x-0 top-0 md:top-16 bottom-0 z-0" />;
+    return <SkeletonMap className="fixed inset-x-0 top-14 bottom-15 md:bottom-0 z-0" />;
   }
 
   if (!filteredReports) {
     return (
-      <div className="fixed inset-x-0 top-0 md:top-16 bottom-0 z-0 flex items-center justify-center p-4">
+      <div className="fixed inset-x-0 top-14 bottom-15 md:bottom-0 z-0 flex items-center justify-center p-4 bg-cream">
         <ErrorState
           title={t('map_unavailable_title')}
           description={t('map_unavailable_description')}
@@ -190,42 +177,41 @@ export default function MapPage() {
   }
 
   return (
-    <div className="fixed inset-x-0 top-0 md:top-16 bottom-0 z-0 overflow-hidden select-none">
-      {/* === TOP FLOATING BAR === */}
-      <div className="absolute top-3 md:top-4 left-3 right-3 md:left-6 md:right-auto md:w-84 z-20 flex flex-col gap-2 pointer-events-none">
-        <div className="flex flex-wrap items-center gap-1.5 pointer-events-auto">
+    <div className="fixed inset-x-0 top-15 bottom-16 md:bottom-0 z-0 overflow-hidden select-none">
+      {/* === TOP FLOATING FILTER HUD === */}
+      <div className="absolute top-3 md:top-4 left-3 right-3 md:left-5 md:right-auto md:w-84 z-20 flex flex-col gap-2 pointer-events-none">
+        <div className="flex flex-wrap items-center gap-2 pointer-events-auto">
           <button
             type="button"
             onClick={() => setShowFilters(prev => !prev)}
             aria-expanded={showFilters}
             className={cn(
-              'min-h-11 px-4 rounded-2xl shadow-elevated text-caption font-bold',
-              'inline-flex items-center gap-2 press-scale transition-colors duration-150 cursor-pointer border',
+              'min-h-10 px-4 rounded-xl shadow-elevated text-xs font-bold',
+              'inline-flex items-center gap-2 press-scale transition-colors duration-150 cursor-pointer',
               showFilters || activeFilterCount > 0
-                ? 'bg-primary text-white border-primary'
-                : 'bg-white/95 glass text-ink border-border hover:border-primary/40'
+                ? 'bg-primary text-white'
+                : 'bg-white/95 glass text-ink hover:bg-white'
             )}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <line x1="4" y1="6" x2="20" y2="6" />
               <line x1="8" y1="12" x2="16" y2="12" />
               <line x1="11" y1="18" x2="13" y2="18" />
             </svg>
             <span>{t('filter')}</span>
             {activeFilterCount > 0 && (
-              <span className="size-5 rounded-full bg-white text-primary text-[11px] font-extrabold tabular inline-flex items-center justify-center">
+              <span className="size-5 rounded-full bg-white text-primary tabular text-[11px] font-extrabold inline-flex items-center justify-center">
                 {activeFilterCount}
               </span>
             )}
           </button>
 
-          {/* Active filter summary tags (1-tap clear) */}
           {filters.wasteType !== 'All' && (
             <button
               type="button"
               onClick={() => setFilters(f => ({ ...f, wasteType: 'All' }))}
               aria-label={`Clear ${filters.wasteType} filter`}
-              className="min-h-9 px-3.5 rounded-full bg-primary text-white text-xs font-semibold inline-flex items-center gap-1.5 press-scale cursor-pointer"
+              className="min-h-9 px-3 rounded-lg bg-primary text-white text-xs font-semibold inline-flex items-center gap-1.5 press-scale cursor-pointer"
             >
               <span className="truncate max-w-[120px]">{filters.wasteType}</span>
               <span aria-hidden="true">×</span>
@@ -236,7 +222,7 @@ export default function MapPage() {
               type="button"
               onClick={() => setFilters(f => ({ ...f, status: 'All' }))}
               aria-label={`Clear ${filters.status} filter`}
-              className="min-h-9 px-3.5 rounded-full bg-primary text-white text-xs font-semibold inline-flex items-center gap-1.5 press-scale cursor-pointer"
+              className="min-h-9 px-3 rounded-lg bg-primary text-white text-xs font-semibold inline-flex items-center gap-1.5 press-scale cursor-pointer"
             >
               <span>{filters.status}</span>
               <span aria-hidden="true">×</span>
@@ -244,10 +230,8 @@ export default function MapPage() {
           )}
         </div>
 
-        {/* Expanded filter card */}
         {showFilters && (
-          <div className="pointer-events-auto bg-white/98 glass rounded-2xl shadow-elevated border border-border p-3.5 animate-slide-down space-y-3.5 max-h-[60dvh] overflow-y-auto">
-            {/* Waste type section */}
+          <div className="pointer-events-auto bg-white/98 glass rounded-xl shadow-elevated border border-border p-4 animate-slide-down space-y-3.5 max-h-[58dvh] overflow-y-auto">
             <div>
               <p className="text-xs font-bold text-ink mb-2">
                 {t('map_filter_waste_type')}
@@ -262,7 +246,7 @@ export default function MapPage() {
                       aria-pressed={active}
                       onClick={() => setFilters(f => ({ ...f, wasteType: type }))}
                       className={cn(
-                        'min-h-9 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-150 press-scale cursor-pointer border',
+                        'min-h-9 px-3 py-1 rounded-lg text-xs font-semibold transition-colors duration-150 press-scale cursor-pointer border',
                         active
                           ? 'bg-primary text-white border-primary'
                           : 'bg-sunken text-ink border-border hover:border-primary/40 hover:text-primary'
@@ -275,8 +259,7 @@ export default function MapPage() {
               </div>
             </div>
 
-            {/* Status section */}
-            <div className="pt-2.5 border-t border-border-light">
+            <div className="pt-3 border-t border-border-light">
               <p className="text-xs font-bold text-ink mb-2">
                 {t('map_filter_status')}
               </p>
@@ -290,7 +273,7 @@ export default function MapPage() {
                       aria-pressed={active}
                       onClick={() => setFilters(f => ({ ...f, status }))}
                       className={cn(
-                        'min-h-9 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-150 press-scale cursor-pointer border',
+                        'min-h-9 px-3 py-1 rounded-lg text-xs font-semibold transition-colors duration-150 press-scale cursor-pointer border',
                         active
                           ? 'bg-primary text-white border-primary'
                           : 'bg-sunken text-ink border-border hover:border-primary/40 hover:text-primary'
@@ -303,20 +286,19 @@ export default function MapPage() {
               </div>
             </div>
 
-            {/* Footer actions */}
             {activeFilterCount > 0 && (
-              <div className="pt-2 border-t border-border-light flex items-center justify-between">
+              <div className="pt-2.5 border-t border-border-light flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setFilters({ wasteType: 'All', status: 'All' })}
-                  className="min-h-9 px-2 text-caption font-semibold text-orange-red-dark hover:underline cursor-pointer"
+                  className="min-h-9 px-2 text-xs font-semibold text-orange-red-dark hover:underline cursor-pointer"
                 >
                   {t('clearFilters')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowFilters(false)}
-                  className="min-h-9 px-3.5 py-1 rounded-full bg-primary text-white text-xs font-semibold tabular press-scale cursor-pointer"
+                  className="min-h-9 px-3.5 py-1 rounded-lg bg-primary text-white font-mono-data text-xs font-semibold press-scale cursor-pointer"
                 >
                   {filteredReports.length} {t('reports')}
                 </button>
@@ -326,7 +308,7 @@ export default function MapPage() {
         )}
       </div>
 
-      {/* === EMPTY STATE OVERLAY (when 0 markers match) === */}
+      {/* === EMPTY STATE OVERLAY === */}
       {markers.length === 0 && (
         <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 z-10 max-w-sm mx-auto">
           <EmptyState
@@ -339,94 +321,84 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* === BOTTOM BAR: COLLECTIVE IMPACT (bottom-left) + DENSITY LEGEND (bottom-right) === */}
+      {/* === BOTTOM CARTOGRAPHIC TELEMETRY & LEGEND BAR === */}
       <div
         className={cn(
-          'absolute left-3 right-3 md:left-6 md:right-6 bottom-[96px] md:bottom-6 z-10',
+          'absolute left-3 right-3 md:left-5 md:right-5 bottom-4 md:bottom-5 z-10',
           'flex items-end justify-between gap-2 pointer-events-none',
           'transition-opacity duration-150',
           selectedReport ? 'opacity-0 md:opacity-100' : 'opacity-100'
         )}
       >
-        {/* Collective Impact Pill */}
-        <div className="pointer-events-auto bg-white/95 glass rounded-2xl shadow-elevated border border-border px-3 py-2 md:px-3.5 md:py-2.5 flex items-center gap-2.5 min-w-0">
-          <span className="hidden sm:flex size-8 rounded-xl bg-primary-light items-center justify-center text-primary shrink-0" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <polyline points="9 12 11 14 15 10" />
-            </svg>
-          </span>
-          <div className="leading-tight min-w-0">
-            <div className="flex items-center gap-1 text-[11px] md:text-caption font-extrabold text-ink tabular whitespace-nowrap">
-              <CountUp value={impactStats.spots} duration={700} />
-              <span>{t('reports')}</span>
-              <span className="text-muted-light" aria-hidden="true">·</span>
-              <span className="text-primary">
-                <CountUp value={impactStats.cleared} duration={700} /> {t('impact_spots_cleared')}
-              </span>
-            </div>
-            <p className="hidden sm:block text-[11px] font-medium text-muted tabular mt-0.5">
-              <CountUp value={impactStats.totalVolumeReports} duration={900} /> {t('impact_community_reports')}
-            </p>
+        {/* District Impact Summary */}
+        <div className="pointer-events-auto bg-white/95 glass rounded-2xl shadow-elevated px-4 py-3 min-w-0">
+          <div className="flex items-center gap-1.5 tabular text-xs font-extrabold text-ink whitespace-nowrap">
+            <CountUp value={impactStats.spots} duration={700} />
+            <span className="font-semibold text-muted">{t('reports')}</span>
+            <span className="text-border" aria-hidden="true">·</span>
+            <span className="text-primary">
+              <CountUp value={impactStats.cleared} duration={700} /> {t('impact_spots_cleared')}
+            </span>
           </div>
+          <p className="hidden sm:block tabular text-[11px] font-medium text-muted mt-0.5">
+            <CountUp value={impactStats.totalVolumeReports} duration={900} /> {t('impact_community_reports')}
+          </p>
         </div>
 
-        {/* Right stack: Floating "+ Report" button + Severity / Density Legend */}
-        <div className="flex flex-col items-end gap-2 shrink-0">
+        {/* Right stack: Report Action + Density Legend */}
+        <div className="flex flex-col items-end gap-2.5 shrink-0">
           <button
             type="button"
             onClick={() => navigate('/report')}
             aria-label={t('map_report_plastic_waste')}
-            className="pointer-events-auto touch-target h-11 px-4 rounded-full bg-primary hover:bg-primary-dark text-white text-caption font-bold shadow-fab inline-flex items-center justify-center gap-1.5 press-scale transition-colors duration-150 cursor-pointer"
+            className="pointer-events-auto touch-target h-12 px-5 rounded-2xl bg-primary hover:bg-primary-dark text-white text-sm font-bold shadow-fab inline-flex items-center justify-center gap-1.5 press-scale transition-colors duration-150 cursor-pointer"
           >
-            <span>{t('map_fab_report')}</span>
+            <PlusIcon className="size-4" />
+            <span>{t('map_fab_report').replace(/^\+\s*/, '')}</span>
           </button>
 
-          {/* Severity / Density Legend */}
-          <div className="pointer-events-auto bg-white/95 glass px-2.5 py-2 md:px-3.5 md:py-2.5 rounded-2xl shadow-elevated border border-border shrink-0">
-            <p className="text-[10px] font-bold text-muted mb-1">{t('density')}</p>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <span className="size-2.5 rounded-full bg-severity-low ring-2 ring-severity-low/30" />
-                <span className="text-[10px] font-semibold text-ink">{t('low')}</span>
+          <div className="pointer-events-auto bg-white/95 glass px-3.5 py-2 rounded-xl shadow-elevated shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-bold text-muted">{t('density')}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-severity-low" />
+                <span className="text-[11px] font-semibold text-ink">{t('low')}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="size-3 rounded-full bg-severity-mid ring-2 ring-severity-mid/30" />
-                <span className="text-[10px] font-semibold text-ink">{t('mid')}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-severity-mid" />
+                <span className="text-[11px] font-semibold text-ink">{t('mid')}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="size-3.5 rounded-full bg-severity-high ring-2 ring-severity-high/30" />
-                <span className="text-[10px] font-semibold text-ink">{t('high')}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-severity-high" />
+                <span className="text-[11px] font-semibold text-ink">{t('high')}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* === SELECTED PIN BOTTOM SHEET (Mobile) / FLOATING DETAIL CARD (Desktop) === */}
+      {/* === SELECTED SITE INSPECTOR CARD === */}
       {selectedReport && (
         <div
           role="dialog"
           aria-label={selectedReport.placeName}
           className="
-            absolute inset-x-3 bottom-[96px] md:inset-x-auto md:right-6 md:bottom-6 md:w-96
-            z-30 bg-white rounded-2xl shadow-modal border border-border
+            absolute inset-x-3 bottom-4 md:inset-x-auto md:right-5 md:bottom-5 md:w-96
+            z-30 bg-white rounded-2xl shadow-modal
             p-4 animate-slide-up
           "
         >
-          {/* Drag/tap handle bar (tap to dismiss) */}
           <button
             type="button"
             onClick={() => setSelectedReportId(null)}
             aria-label={t('map')}
             className="w-full flex justify-center pb-2.5 cursor-pointer"
           >
-            <span className="w-10 h-1.5 rounded-full bg-border" />
+            <span className="w-10 h-1 rounded-full bg-border" />
           </button>
 
-          {/* Padded image + core details */}
           <div className="flex gap-3.5 items-start">
-            <div className="relative size-24 sm:size-28 rounded-xl overflow-hidden bg-sunken border border-border shrink-0">
+            <div className="relative size-24 rounded-lg overflow-hidden bg-sunken border border-border shrink-0">
               <img
                 src={selectedReport.photoUrl}
                 alt={selectedReport.wasteType}
@@ -435,32 +407,30 @@ export default function MapPage() {
               />
               <span
                 className={cn(
-                  'absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold tabular',
+                  'absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded font-mono-data text-[10px] font-bold text-white',
                   selectedReport.reportCount >= 8
-                    ? 'bg-orange-red text-white'
+                    ? 'bg-orange-red'
                     : selectedReport.reportCount >= 4
-                      ? 'bg-severity-mid text-white'
-                      : 'bg-yellow text-ink'
+                      ? 'bg-severity-mid'
+                      : 'bg-severity-low'
                 )}
               >
-                {selectedReport.reportCount} {t('reports')}
+                {selectedReport.reportCount}×
               </span>
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <StatusBadge status={selectedReport.status} />
-              </div>
+              <StatusBadge status={selectedReport.status} />
 
-              <h3 className="text-body sm:text-heading font-bold text-ink text-balance truncate mt-1">
+              <h3 className="text-sm sm:text-base font-bold text-ink text-balance truncate mt-1.5">
                 {selectedReport.placeName}
               </h3>
 
-              <p className="text-caption font-semibold text-primary mt-0.5">
+              <p className="text-xs font-semibold text-primary mt-0.5">
                 {selectedReport.wasteType}
               </p>
 
-              <div className="flex items-center gap-1.5 text-caption text-muted tabular mt-2">
+              <div className="flex items-center gap-1.5 font-mono-data text-[11px] text-muted mt-2">
                 <ClockIcon className="size-3.5 text-muted-light shrink-0" />
                 <span>
                   {t('firstReported')} {selectedReport.daysSinceFirst} {t('daysAgo')}
@@ -470,29 +440,27 @@ export default function MapPage() {
           </div>
 
           {selectedReport.note && (
-            <p className="mt-3 pt-3 border-t border-border-light text-caption text-muted text-pretty line-clamp-2 leading-relaxed">
+            <p className="mt-3 pt-3 border-t border-border-light text-xs text-muted text-pretty line-clamp-2 leading-relaxed">
               {selectedReport.note}
             </p>
           )}
 
-          {/* Footer metadata strip */}
           <div className="mt-3 pt-2.5 border-t border-border-light flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted tabular">
+            <span className="inline-flex items-center gap-1 font-mono-data text-[11px] font-medium text-muted">
               <MapPinIcon className="size-3.5 text-primary" />
               {selectedReport.lat.toFixed(3)}, {selectedReport.lng.toFixed(3)}
             </span>
             <button
               type="button"
               onClick={() => navigate('/report')}
-              className="min-h-9 px-2 text-caption font-bold text-primary hover:text-primary-dark press-scale cursor-pointer"
+              className="min-h-9 px-2.5 rounded-lg bg-primary-lighter text-xs font-semibold text-primary hover:bg-primary-light cursor-pointer"
             >
-              + {t('map_report_plastic_waste')} →
+              + {t('map_report_plastic_waste')}
             </button>
           </div>
         </div>
       )}
 
-      {/* === LEAFLET MAP === */}
       <MapContainer
         center={[12.9141, 74.8560]}
         zoom={11}

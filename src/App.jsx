@@ -46,8 +46,8 @@ function Landing() {
 /** Shown for a moment while the saved session / onboarding flag are read. */
 function BootSplash() {
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-white" role="status" aria-live="polite">
-      <BrandMark className="size-12 rounded-2xl animate-pulse" />
+    <div className="min-h-dvh flex items-center justify-center bg-cream" role="status" aria-live="polite">
+      <BrandMark className="size-12 rounded-xl animate-pulse" />
     </div>
   );
 }

@@ -2,16 +2,14 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 /**
- * Card — base surface (16px radius, single elevation declaration: border or fill).
- * tone: default (white + border) | sunken (soft inset) | tint (green wash) | primary (solid brand hero)
- * padding: none | sm | md | lg
- * interactive: adds hover lift + press feedback (use for tappable cards)
+ * Card — Soft-elevated consumer surface.
+ * Uses ambient depth rather than heavy wireframe borders.
  */
 const TONES = {
-  default: 'bg-white border border-border',
-  sunken: 'bg-sunken border border-border-light',
-  tint: 'bg-primary-lighter border border-primary/15',
-  primary: 'bg-primary text-white',
+  default: 'card-elevated',
+  sunken: 'bg-sunken',
+  tint: 'bg-primary-lighter',
+  primary: 'surface-hero-emerald text-white',
   outline: 'bg-white border border-border',
 };
 
@@ -19,7 +17,7 @@ const PADDING = {
   none: '',
   sm: 'p-4',
   md: 'p-5',
-  lg: 'p-6 md:p-7',
+  lg: 'p-6',
 };
 
 export default function Card({

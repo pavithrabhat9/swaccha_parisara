@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { PICKUP_STATUS_STEPS, STATUS_LABEL_KEYS, getStatusStepIndex } from '../../utils/pickupStatusUtils';
 import { cn } from '../../utils/cn';
 
-/** Small 4-step timeline: Requested, Scheduled, On the way, Completed. */
+/** 4-step transit-line docket status progression. */
 export default function PickupStatusTimeline({ status }) {
   const { t } = useTranslation();
   const currentIndex = getStatusStepIndex(status);
@@ -22,14 +22,14 @@ export default function PickupStatusTimeline({ status }) {
             {i > 0 && (
               <span
                 aria-hidden="true"
-                className={cn('absolute top-[7px] right-1/2 w-full h-0.5', reached ? 'bg-primary' : 'bg-border')}
+                className={cn('absolute top-[6px] right-1/2 w-full h-0.5', reached ? 'bg-primary' : 'bg-border')}
               />
             )}
             <span
               className={cn(
-                'relative z-10 size-4 rounded-full border-2',
+                'relative z-10 size-3.5 rounded-sm border-2',
                 reached ? 'bg-primary border-primary' : 'bg-white border-border',
-                current && 'ring-4 ring-primary/20'
+                current && 'ring-3 ring-primary/20'
               )}
             />
             <span

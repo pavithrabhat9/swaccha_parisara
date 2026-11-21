@@ -2,11 +2,12 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import NotificationInbox from './NotificationInbox';
-import { BellIcon, LeafIcon } from '../ui/Icons';
+import { BellIcon, StarIcon } from '../ui/Icons';
 
 /**
- * Greeting row: avatar + time-of-day greeting + first name on the left,
- * Rewards pill and notification bell (with unread dot and inbox) on the right.
+ * HomeGreetingRow — Warm consumer greeting header.
+ * Left: soft emerald monogram avatar + greeting + resident name.
+ * Right: sunlit marigold rewards points chip (StarIcon, zero fake dots) + elevated bell.
  */
 export default function HomeGreetingRow({
   greetingKey,
@@ -42,27 +43,29 @@ export default function HomeGreetingRow({
       <div className="flex items-center gap-3 min-w-0">
         <span
           aria-hidden="true"
-          className="size-11 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center shrink-0"
+          className="size-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white text-sm font-extrabold flex items-center justify-center shrink-0 shadow-xs"
         >
           {initials}
         </span>
         <div className="min-w-0 leading-tight">
-          <p className="text-xs text-muted">{t(greetingKey)}</p>
-          <p className="text-base font-extrabold text-ink truncate">{firstName}</p>
+          <p className="text-xs font-medium text-muted">{t(greetingKey)}</p>
+          <h1 className="text-lg sm:text-xl font-extrabold text-ink truncate tracking-tight mt-0.5">
+            {firstName}
+          </h1>
         </div>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        {/* Rewards pill */}
+        {/* Sunlit marigold rewards balance button */}
         <button
           type="button"
           onClick={() => navigate('/rewards')}
           aria-label={t('home_rewards_pill_aria', { points: formattedPoints })}
-          className="min-h-11 pl-3 pr-3.5 rounded-full bg-white border border-border inline-flex items-center gap-1.5 cursor-pointer press-scale hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="min-h-10 px-3.5 rounded-xl bg-yellow-light hover:bg-yellow/25 text-yellow-dark inline-flex items-center gap-1.5 cursor-pointer press-scale shadow-xs transition-colors duration-150"
         >
-          <LeafIcon className="size-4 text-primary" />
-          <span className="text-sm font-bold text-ink tabular">{formattedPoints}</span>
-          <span className="hidden min-[380px]:inline text-xs font-medium text-muted">{t('rewards')}</span>
+          <StarIcon className="size-4 text-yellow shrink-0" />
+          <span className="tabular text-sm font-extrabold text-ink">{formattedPoints}</span>
+          <span className="hidden min-[380px]:inline text-xs font-semibold text-yellow-dark">pts</span>
         </button>
 
         {/* Notification bell */}
@@ -77,14 +80,16 @@ export default function HomeGreetingRow({
               ? t('home_notifications_aria_unread', { count: unreadCount })
               : t('home_notifications_aria')
           }
-          className="relative size-11 rounded-full bg-white border border-border flex items-center justify-center text-ink cursor-pointer press-scale hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="relative size-10 rounded-xl bg-white shadow-xs hover:shadow-card flex items-center justify-center text-ink cursor-pointer press-scale transition-shadow duration-150"
         >
-          <BellIcon className="size-5" />
+          <BellIcon className="size-4.5" />
           {unreadCount > 0 && (
             <span
               aria-hidden="true"
-              className="absolute top-2.5 right-2.5 size-2.5 rounded-full bg-orange-red ring-2 ring-white"
-            />
+              className="absolute -top-1 -right-1 min-w-4.5 h-4.5 px-1 rounded-lg bg-orange-red text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-cream tabular"
+            >
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
           )}
         </button>
       </div>
