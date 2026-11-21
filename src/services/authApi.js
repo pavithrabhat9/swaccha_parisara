@@ -1,5 +1,4 @@
-const AUTH_STORAGE_KEY = 'swachha_auth';
-const ACCOUNTS_STORAGE_KEY = 'swachha_accounts';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 /**
  * Identifier an account is stored under.
@@ -11,37 +10,28 @@ export const accountKeyFor = (user) => {
 };
 
 const readAccounts = () => {
-  try {
-    return JSON.parse(localStorage.getItem(ACCOUNTS_STORAGE_KEY)) || {};
-  } catch {
-    return {};
-  }
+  const accounts = storageAdapter.get(STORAGE_KEYS.ACCOUNTS, {});
+  return accounts && typeof accounts === 'object' ? accounts : {};
 };
 
 export const authApi = {
   /** Current session user (null when logged out). */
   getUser: async () => {
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch { return null; }
+    return storageAdapter.get(STORAGE_KEYS.AUTH_SESSION, null);
   },
 
   /**
    * Saves the session user and, once the profile is complete, remembers the account
    * so logging in again with the same phone / Google identity restores it.
-   * STUB: local-only account registry that mimics a server-side users table.
    */
   saveUser: async (user) => {
-    try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      const key = accountKeyFor(user);
-      if (key && user?.name) {
-        const accounts = readAccounts();
-        accounts[key] = user;
-        localStorage.setItem(ACCOUNTS_STORAGE_KEY, JSON.stringify(accounts));
-      }
-    } catch { /* ignore storage errors */ }
+    storageAdapter.set(STORAGE_KEYS.AUTH_SESSION, user);
+    const key = accountKeyFor(user);
+    if (key && user?.name) {
+      const accounts = readAccounts();
+      accounts[key] = user;
+      storageAdapter.set(STORAGE_KEYS.ACCOUNTS, accounts);
+    }
     return user;
   },
 
@@ -53,8 +43,6 @@ export const authApi = {
 
   /** Ends the session only; the account stays registered for the next login. */
   removeUser: async () => {
-    try {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    } catch { /* ignore storage errors */ }
+    storageAdapter.remove(STORAGE_KEYS.AUTH_SESSION);
   },
 };

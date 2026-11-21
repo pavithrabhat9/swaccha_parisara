@@ -1,4 +1,4 @@
-const ONBOARDING_STORAGE_KEY = 'swachha_onboarding_seen';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 /**
  * Remembers whether the first-launch onboarding has been shown.
@@ -6,17 +6,10 @@ const ONBOARDING_STORAGE_KEY = 'swachha_onboarding_seen';
  */
 export const onboardingApi = {
   hasSeen: async () => {
-    try {
-      return localStorage.getItem(ONBOARDING_STORAGE_KEY) === '1';
-    } catch {
-      return false;
-    }
+    return storageAdapter.getRaw(STORAGE_KEYS.ONBOARDING_SEEN) === '1';
   },
 
   markSeen: async () => {
-    try {
-      localStorage.setItem(ONBOARDING_STORAGE_KEY, '1');
-    } catch { /* ignore storage errors */ }
+    storageAdapter.setRaw(STORAGE_KEYS.ONBOARDING_SEEN, '1');
   },
 };
-

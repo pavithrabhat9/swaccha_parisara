@@ -66,7 +66,7 @@ export default function ContributionCard({ summary, isNewUser, onSchedule }) {
             )}
           </div>
 
-          <div className="hidden min-[380px]:block w-[112px] sm:w-[136px] shrink-0">
+          <div className="hidden min-[380px]:block w-[132px] sm:w-[164px] aspect-[4/3] rounded-xl overflow-hidden bg-white shadow-sm ring-1 ring-white/25 shrink-0">
             <ContributionIllustration />
           </div>
         </div>

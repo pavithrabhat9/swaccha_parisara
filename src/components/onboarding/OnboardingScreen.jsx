@@ -55,7 +55,7 @@ export default function OnboardingScreen({ onFinish }) {
 
       <div className="flex-1 min-h-0 flex flex-col items-center justify-center px-6 text-center overflow-y-auto">
         <div key={step.id} className="w-full max-w-sm flex flex-col items-center">
-          <div className="w-full max-w-[276px] aspect-[4/3] animate-scale-in">
+          <div className="w-full max-w-[328px] sm:max-w-[356px] aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-card border border-border/70 animate-scale-in">
             <Illustration />
           </div>
           <h1 className="mt-6 text-2xl font-extrabold text-ink tracking-tight text-balance animate-fade-in-up">

@@ -1,20 +1,15 @@
-const STORAGE_KEY = 'swachha_business';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 export const businessApi = {
   getSubscription: async () => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch { return null; }
+    return storageAdapter.get(STORAGE_KEYS.BUSINESS, null);
   },
-  
+
   createSubscription: async (data) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    return data;
+    return storageAdapter.set(STORAGE_KEYS.BUSINESS, data);
   },
-  
+
   updateSubscription: async (data) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    return data;
-  }
+    return storageAdapter.set(STORAGE_KEYS.BUSINESS, data);
+  },
 };

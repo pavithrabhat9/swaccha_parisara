@@ -6,8 +6,10 @@ import { usePickups } from '../hooks/usePickups';
 import { useAddresses } from '../hooks/useAddresses';
 import { useToast } from '../components/ui/Toast';
 import { aiApi, AI_PLASTIC_TYPES } from '../services/aiApi';
+import { webApiAdapter } from '../services/storageAdapter';
 import ActivePickupCard from '../components/pickup/ActivePickupCard';
 import TrashBankTab from '../components/pickup/TrashBankTab';
+import { PickupIllustration } from '../components/onboarding/OnboardingIllustrations';
 import BusinessPage from './BusinessPage';
 import PermissionAlert from '../components/ui/PermissionAlert';
 import Chip from '../components/ui/Chip';
@@ -87,9 +89,12 @@ export default function PickupPage() {
     }
 
     setErrors(prev => ({ ...prev, photo: null }));
-    const reader = new FileReader();
-    reader.onloadend = () => setPhotoPreview(reader.result);
-    reader.readAsDataURL(file);
+    try {
+      const dataUrl = await webApiAdapter.readFileAsDataUrl(file);
+      setPhotoPreview(dataUrl);
+    } catch {
+      // ignore preview read error
+    }
 
     setAiLoading(true);
     setAiResult(null);
@@ -113,16 +118,10 @@ export default function PickupPage() {
   };
 
   const handleOpenCamera = async () => {
-    if (navigator.permissions?.query) {
-      try {
-        const status = await navigator.permissions.query({ name: 'camera' });
-        if (status.state === 'denied') {
-          setCameraDenied(true);
-          return;
-        }
-      } catch {
-        // ignore if unsupported
-      }
+    const state = await webApiAdapter.checkCameraPermission();
+    if (state === 'denied') {
+      setCameraDenied(true);
+      return;
     }
     cameraInputRef.current?.click();
   };
@@ -237,6 +236,12 @@ export default function PickupPage() {
               <div className="md:col-span-5 space-y-5">
                 {!showRequestForm ? (
                   <section className="rounded-2xl card-elevated p-5 sm:p-6 space-y-4">
+                    <div
+                      className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-border/70 shadow-xs"
+                      aria-hidden="true"
+                    >
+                      <PickupIllustration />
+                    </div>
                     <div>
                       <h2 className="text-base font-extrabold text-ink tracking-tight text-balance">{t('homePickup')}</h2>
                       <p className="text-xs text-muted text-pretty mt-1 leading-relaxed">

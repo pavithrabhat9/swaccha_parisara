@@ -6,29 +6,15 @@ import {
   INITIAL_DONATIONS,
 } from '../data/mockRewards';
 import { delay } from '../utils/asyncUtils';
-
-const DONATIONS_STORAGE_KEY = 'swachha_donations';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 const readStoredDonations = () => {
-  try {
-    const raw = localStorage.getItem(DONATIONS_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch {
-    // ignore storage errors
-  }
-  return null;
+  const parsed = storageAdapter.get(STORAGE_KEYS.DONATIONS, null);
+  return Array.isArray(parsed) ? parsed : null;
 };
 
 const writeStoredDonations = (list) => {
-  try {
-    localStorage.setItem(DONATIONS_STORAGE_KEY, JSON.stringify(list));
-  } catch {
-    // ignore storage errors
-  }
-  return list;
+  return storageAdapter.set(STORAGE_KEYS.DONATIONS, list);
 };
 
 /**
@@ -54,4 +40,3 @@ export const rewardsApi = {
     return writeStoredDonations(next);
   },
 };
-

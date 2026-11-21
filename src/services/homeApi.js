@@ -1,6 +1,7 @@
 import { pickupApi } from './pickupApi';
 import { reportApi } from './reportApi';
 import { businessApi } from './businessApi';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 import { MOCK_NOTIFICATIONS, LEARN_HIGHLIGHTS } from '../data/mockHome';
 import {
   buildContributionSummary,
@@ -9,18 +10,12 @@ import {
 } from '../utils/homeUtils';
 import { delay } from '../utils/asyncUtils';
 
-const NOTIFICATIONS_READ_KEY = 'swachha_notifications_read';
-
 // STUB: sample figure for "kg this month" until a backend aggregate exists.
 const SAMPLE_KG_THIS_MONTH = 6.4;
 
 const readReadIds = () => {
-  try {
-    const raw = localStorage.getItem(NOTIFICATIONS_READ_KEY);
-    return new Set(raw ? JSON.parse(raw) : []);
-  } catch {
-    return new Set();
-  }
+  const list = storageAdapter.get(STORAGE_KEYS.NOTIFICATIONS_READ, []);
+  return new Set(Array.isArray(list) ? list : []);
 };
 
 /**
@@ -58,7 +53,6 @@ export const homeApi = {
 
     return {
       summary,
-      // Planned trash-bank drop-offs cannot be scheduled in the app yet, so none are passed in
       upcoming: buildUpcomingPickups({ pickups, business, dropOffs: [] }),
       notifications,
       learn: LEARN_HIGHLIGHTS.map(item => ({ ...item })),
@@ -69,11 +63,6 @@ export const homeApi = {
   markNotificationsRead: async (ids) => {
     const readIds = readReadIds();
     ids.forEach(id => readIds.add(id));
-    try {
-      localStorage.setItem(NOTIFICATIONS_READ_KEY, JSON.stringify([...readIds]));
-    } catch {
-      // ignore storage errors
-    }
+    storageAdapter.set(STORAGE_KEYS.NOTIFICATIONS_READ, [...readIds]);
   },
 };
-

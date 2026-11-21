@@ -1,6 +1,5 @@
 import { delay } from '../utils/asyncUtils';
-
-const ADDRESSES_STORAGE_KEY = 'swachha_addresses';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 const DEFAULT_SAMPLE_ADDRESSES = [
   {
@@ -20,25 +19,12 @@ const DEFAULT_SAMPLE_ADDRESSES = [
 ];
 
 const readStoredAddresses = () => {
-  try {
-    const raw = localStorage.getItem(ADDRESSES_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch {
-    // ignore storage read errors
-  }
-  return null;
+  const parsed = storageAdapter.get(STORAGE_KEYS.ADDRESSES, null);
+  return Array.isArray(parsed) ? parsed : null;
 };
 
 const writeStoredAddresses = (list) => {
-  try {
-    localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify(list));
-  } catch {
-    // ignore storage write errors
-  }
-  return list;
+  return storageAdapter.set(STORAGE_KEYS.ADDRESSES, list);
 };
 
 /**
@@ -61,4 +47,3 @@ export const addressesApi = {
     return writeStoredAddresses(addresses);
   },
 };
-

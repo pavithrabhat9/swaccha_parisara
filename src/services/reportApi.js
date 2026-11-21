@@ -1,23 +1,16 @@
 import { initialMockReports } from '../data/mockReports';
-
-const STORAGE_KEY = 'swachha_reports';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 export const reportApi = {
   getReports: async () => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.length > 0) return parsed;
-      }
-    } catch { /* ignore */ }
+    const stored = storageAdapter.get(STORAGE_KEYS.REPORTS, null);
+    if (Array.isArray(stored) && stored.length > 0) {
+      return stored;
+    }
     return [...initialMockReports];
   },
 
   saveReports: async (reports) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
-    } catch { /* ignore */ }
-    return reports;
-  }
+    return storageAdapter.set(STORAGE_KEYS.REPORTS, reports);
+  },
 };

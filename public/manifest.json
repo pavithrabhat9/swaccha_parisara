@@ -30,5 +30,28 @@
       "purpose": "maskable"
     }
   ],
+  "shortcuts": [
+    {
+      "name": "Report Plastic Waste",
+      "short_name": "Report Waste",
+      "description": "Pin a plastic waste hotspot on the Dakshina Kannada map",
+      "url": "/report",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Schedule Home Pickup",
+      "short_name": "Pickup",
+      "description": "Book a doorstep recyclable plastic pickup",
+      "url": "/pickup?tab=home&start=1",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "District Waste Map",
+      "short_name": "Waste Map",
+      "description": "Explore reported and cleared waste spots across Dakshina Kannada",
+      "url": "/map",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
   "categories": ["utilities", "lifestyle"]
 }

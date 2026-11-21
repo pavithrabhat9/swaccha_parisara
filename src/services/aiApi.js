@@ -1,4 +1,5 @@
 import { delay } from '../utils/asyncUtils';
+import { webApiAdapter } from './storageAdapter';
 
 export const AI_PLASTIC_TYPES = ['PET', 'HDPE', 'LDPE', 'PP', 'Other'];
 
@@ -15,7 +16,7 @@ const SAMPLE_PREDICTIONS = [
  */
 export const aiApi = {
   analyzePlasticPhoto: async (fileName = '') => {
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    if (!webApiAdapter.isOnline()) {
       throw new Error('Offline');
     }
     await delay(650);
@@ -27,4 +28,3 @@ export const aiApi = {
     };
   },
 };
-

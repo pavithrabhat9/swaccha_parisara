@@ -2,9 +2,14 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CheckCircleIcon, LockIcon } from '../ui/Icons';
+import {
+  PickupIllustration,
+  RewardsIllustration,
+  ReportIllustration,
+} from '../onboarding/OnboardingIllustrations';
 
 /**
- * LoginGate — Warm consumer access prompt for members-only tabs.
+ * LoginGate — Warm consumer access prompt for members-only tabs with Line-interior spot scene.
  */
 export default function LoginGate({ featureKey }) {
   const { t } = useTranslation();
@@ -12,10 +17,22 @@ export default function LoginGate({ featureKey }) {
   const location = useLocation();
 
   const benefits = [t('gate_benefit_1'), t('gate_benefit_2'), t('gate_benefit_3')];
+  const GateIllustration =
+    featureKey === 'rewards'
+      ? RewardsIllustration
+      : featureKey === 'pickup'
+        ? PickupIllustration
+        : ReportIllustration;
 
   return (
     <div className="max-w-md mx-auto px-4 sm:px-6 py-8 md:py-12">
       <section className="rounded-2xl card-elevated overflow-hidden">
+        <div
+          className="w-full aspect-[4/3] bg-white border-b border-border/70"
+          aria-hidden="true"
+        >
+          <GateIllustration />
+        </div>
         <div className="p-6 space-y-5">
           <div className="flex items-start gap-3.5">
             <div className="size-11 rounded-xl bg-primary-light flex items-center justify-center text-primary shrink-0">

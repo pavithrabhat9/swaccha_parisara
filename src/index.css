@@ -98,9 +98,16 @@
   --height-bottomnav: 64px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ---------- Motion (tactile spring-out feel) ---------- */
+  /* ---------- Motion (tactile spring-out feel + Tailwind v4 --animate-* tokens) ---------- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-in: fadeIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in-up: fadeInUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-up: slideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-down: slideDown 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-scale-in: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-toast-in: toastIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-toast-out: toastOut 0.16s ease-out forwards;
 }
 
 /* =============================================

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import { useReports } from '../hooks/useReports';
 import { useToast } from '../components/ui/Toast';
+import { webApiAdapter } from '../services/storageAdapter';
 import SuccessState from '../components/ui/SuccessState';
 import ErrorState from '../components/ui/ErrorState';
 import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
@@ -63,40 +64,33 @@ export default function ReportPage() {
   const [errors, setErrors] = useState({});
 
   const detectLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationStatus('manual');
-      return;
-    }
     setLocationStatus('detecting');
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+    webApiAdapter
+      .getCurrentPosition({ enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 })
+      .then((coords) => {
+        setLocation(coords);
         setLocationStatus('done');
-      },
-      () => {
+      })
+      .catch(() => {
         setLocationStatus('manual');
         setLocation({ lat: 12.9141, lng: 74.8560 });
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-    );
+      });
   };
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+    webApiAdapter
+      .getCurrentPosition({ enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 })
+      .then((coords) => {
+        setLocation(coords);
         setLocationStatus('done');
-      },
-      () => {
+      })
+      .catch(() => {
         setLocationStatus('manual');
         setLocation({ lat: 12.9141, lng: 74.8560 });
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-    );
+      });
   }, []);
 
-  const handlePhotoSelect = (e) => {
+  const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
@@ -105,9 +99,12 @@ export default function ReportPage() {
     }
     setPhoto(file);
     setErrors(prev => ({ ...prev, photo: null }));
-    const reader = new FileReader();
-    reader.onload = (ev) => setPhotoPreview(ev.target.result);
-    reader.readAsDataURL(file);
+    try {
+      const dataUrl = await webApiAdapter.readFileAsDataUrl(file);
+      setPhotoPreview(dataUrl);
+    } catch {
+      // ignore file read error
+    }
   };
 
   const handleSubmit = () => {

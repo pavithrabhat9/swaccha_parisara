@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ToastProvider } from './components/ui/Toast';
 import AuthProvider from './context/AuthProvider';
@@ -7,47 +7,42 @@ import { useOnboarding } from './hooks/useOnboarding';
 import AppShell from './components/layout/AppShell';
 import OnboardingScreen from './components/onboarding/OnboardingScreen';
 import RequireAuth from './components/auth/RequireAuth';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import { BrandMark } from './components/ui/Icons';
-import HomePage from './pages/HomePage';
-import MapPage from './pages/MapPage';
-import ReportPage from './pages/ReportPage';
-import PickupPage from './pages/PickupPage';
-import RewardsPage from './pages/RewardsPage';
-import LearnPage from './pages/LearnPage';
-import PlasticTypesPage from './pages/PlasticTypesPage';
-import BusinessPage from './pages/BusinessPage';
-import ProfilePage from './pages/ProfilePage';
-import AuthPage from './pages/AuthPage';
-import LegalPage from './pages/LegalPage';
+import { ROUTES } from './routes/routeConfig';
 
-/**
- * Swachha Parisara — Citizen App V2 (mock data)
- * Plastic Waste Reporting & Recycling for Dakshina Kannada
- *
- * Routes:
- *   /          → landing redirect: logged-in → /home, guest → /map
- *   /auth      → Sign up / Log in (after onboarding, or from the login gate)
- *   /map       → Map (public, guests can use it and the Report flow)
- *   /report    → Report (public, launched from the Map "+ Report" button)
- *   /home      → Home            (members only)
- *   /pickup    → Pickup          (members only)
- *   /rewards   → Rewards         (members only)
- *   /profile   → Profile         (members only)
- *   /learn     → Learn & Segregate (public, not a tab)
- *   /business  → Business Collaboration (not a tab)
- */
+// Lazy-loaded route chunks for React 19 + React Router v7 production scaling
+const HomePage = lazy(() => import('./pages/HomePage'));
+const MapPage = lazy(() => import('./pages/MapPage'));
+const ReportPage = lazy(() => import('./pages/ReportPage'));
+const PickupPage = lazy(() => import('./pages/PickupPage'));
+const RewardsPage = lazy(() => import('./pages/RewardsPage'));
+const LearnPage = lazy(() => import('./pages/LearnPage'));
+const PlasticTypesPage = lazy(() => import('./pages/PlasticTypesPage'));
+const BusinessPage = lazy(() => import('./pages/BusinessPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const LegalPage = lazy(() => import('./pages/LegalPage'));
 
 /** Landing redirect based on the session. */
 function Landing() {
   const { isLoggedIn } = useAuth();
-  return <Navigate to={isLoggedIn ? '/home' : '/map'} replace />;
+  return <Navigate to={isLoggedIn ? ROUTES.HOME : ROUTES.MAP} replace />;
 }
 
-/** Shown for a moment while the saved session / onboarding flag are read. */
+/** Shown for a moment while the saved session / onboarding flag or route chunk loads. */
 function BootSplash() {
   return (
     <div className="min-h-dvh flex items-center justify-center bg-cream" role="status" aria-live="polite">
       <BrandMark className="size-12 rounded-xl animate-pulse" />
+    </div>
+  );
+}
+
+function RouteFallback() {
+  return (
+    <div className="min-h-[60dvh] flex items-center justify-center" role="status" aria-live="polite">
+      <BrandMark className="size-10 rounded-xl animate-pulse" />
     </div>
   );
 }
@@ -67,7 +62,7 @@ function AppRoutes() {
       <OnboardingScreen
         onFinish={async () => {
           await complete();
-          navigate(isLoggedIn ? '/home' : '/auth', { replace: true });
+          navigate(isLoggedIn ? ROUTES.HOME : ROUTES.AUTH, { replace: true });
         }}
       />
     );
@@ -75,37 +70,43 @@ function AppRoutes() {
 
   return (
     <AppShell>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/auth" element={<AuthPage />} />
+      <ErrorBoundary>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path={ROUTES.ROOT} element={<Landing />} />
+            <Route path={ROUTES.AUTH} element={<AuthPage />} />
 
-        {/* Public */}
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/report" element={<ReportPage />} />
-        <Route path="/learn" element={<LearnPage />} />
-        <Route path="/learn/plastic-types" element={<PlasticTypesPage />} />
-        <Route path="/business" element={<BusinessPage />} />
-        <Route path="/privacy" element={<LegalPage docType="privacy" />} />
-        <Route path="/terms" element={<LegalPage docType="terms" />} />
+            {/* Public routes */}
+            <Route path={ROUTES.MAP} element={<MapPage />} />
+            <Route path={ROUTES.REPORT} element={<ReportPage />} />
+            <Route path={ROUTES.LEARN} element={<LearnPage />} />
+            <Route path={ROUTES.PLASTIC_TYPES} element={<PlasticTypesPage />} />
+            <Route path={ROUTES.BUSINESS} element={<BusinessPage />} />
+            <Route path={ROUTES.PRIVACY} element={<LegalPage docType="privacy" />} />
+            <Route path={ROUTES.TERMS} element={<LegalPage docType="terms" />} />
 
-        {/* Members only: guests see the "Log in to use this" gate at the same URL */}
-        <Route path="/home" element={<RequireAuth featureKey="home"><HomePage /></RequireAuth>} />
-        <Route path="/pickup" element={<RequireAuth featureKey="pickup"><PickupPage /></RequireAuth>} />
-        <Route path="/rewards" element={<RequireAuth featureKey="rewards"><RewardsPage /></RequireAuth>} />
-        <Route path="/profile" element={<RequireAuth featureKey="profile"><ProfilePage /></RequireAuth>} />
+            {/* Members-only routes: guests see the "Log in to use this" gate at the same URL */}
+            <Route path={ROUTES.HOME} element={<RequireAuth featureKey="home"><HomePage /></RequireAuth>} />
+            <Route path={ROUTES.PICKUP} element={<RequireAuth featureKey="pickup"><PickupPage /></RequireAuth>} />
+            <Route path={ROUTES.REWARDS} element={<RequireAuth featureKey="rewards"><RewardsPage /></RequireAuth>} />
+            <Route path={ROUTES.PROFILE} element={<RequireAuth featureKey="profile"><ProfilePage /></RequireAuth>} />
 
-        <Route path="*" element={<Landing />} />
-      </Routes>
+            <Route path="*" element={<Landing />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </AppShell>
   );
 }
 
 export default function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </ToastProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }

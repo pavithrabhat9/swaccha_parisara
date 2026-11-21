@@ -1,32 +1,22 @@
 import { mockPickupHistory, mockUserProfile } from '../data/mockPickups';
-
-const PICKUP_STORAGE_KEY = 'swachha_pickups';
-const PROFILE_STORAGE_KEY = 'swachha_profile';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 export const pickupApi = {
   getPickups: async () => {
-    try {
-      const stored = localStorage.getItem(PICKUP_STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
-    } catch { /* ignore */ }
-    return [...mockPickupHistory];
+    const stored = storageAdapter.get(STORAGE_KEYS.PICKUPS, null);
+    return Array.isArray(stored) ? stored : [...mockPickupHistory];
   },
 
   getProfile: async () => {
-    try {
-      const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
-    } catch { /* ignore */ }
-    return { ...mockUserProfile };
+    const stored = storageAdapter.get(STORAGE_KEYS.PROFILE, null);
+    return stored && typeof stored === 'object' ? stored : { ...mockUserProfile };
   },
 
   savePickups: async (pickups) => {
-    localStorage.setItem(PICKUP_STORAGE_KEY, JSON.stringify(pickups));
-    return pickups;
+    return storageAdapter.set(STORAGE_KEYS.PICKUPS, pickups);
   },
 
   saveProfile: async (profile) => {
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
-    return profile;
-  }
+    return storageAdapter.set(STORAGE_KEYS.PROFILE, profile);
+  },
 };

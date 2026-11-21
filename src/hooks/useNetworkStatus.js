@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
+import { webApiAdapter } from '../services/storageAdapter';
 
 /**
- * Custom hook to detect browser online/offline status.
+ * Custom hook to detect browser online/offline status via WebApiAdapter.
  */
 export function useNetworkStatus() {
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean'
-      ? navigator.onLine
-      : true
-  );
+  const [isOnline, setIsOnline] = useState(() => webApiAdapter.isOnline());
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

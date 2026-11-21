@@ -1,4 +1,4 @@
-const PREFS_STORAGE_KEY = 'swachha_notification_prefs';
+import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 const DEFAULT_PREFERENCES = {
   pickupUpdates: true,
@@ -8,25 +8,15 @@ const DEFAULT_PREFERENCES = {
 
 export const preferencesApi = {
   getPreferences: async () => {
-    try {
-      const raw = localStorage.getItem(PREFS_STORAGE_KEY);
-      if (raw) {
-        return { ...DEFAULT_PREFERENCES, ...JSON.parse(raw) };
-      }
-    } catch {
-      // ignore storage read errors
+    const stored = storageAdapter.get(STORAGE_KEYS.NOTIFICATION_PREFS, null);
+    if (stored && typeof stored === 'object') {
+      return { ...DEFAULT_PREFERENCES, ...stored };
     }
     return { ...DEFAULT_PREFERENCES };
   },
 
   savePreferences: async (prefs) => {
     const merged = { ...DEFAULT_PREFERENCES, ...prefs };
-    try {
-      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(merged));
-    } catch {
-      // ignore storage write errors
-    }
-    return merged;
+    return storageAdapter.set(STORAGE_KEYS.NOTIFICATION_PREFS, merged);
   },
 };
-

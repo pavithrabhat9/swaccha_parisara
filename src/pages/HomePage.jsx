@@ -9,7 +9,8 @@ import LearnCarousel from '../components/home/LearnCarousel';
 import VideoModal from '../components/home/VideoModal';
 import { HomeLeftSkeleton, HomeLearnSkeleton } from '../components/home/HomeSkeleton';
 import ErrorState from '../components/ui/ErrorState';
-import { ChevronRightIcon, TruckIcon } from '../components/ui/Icons';
+import EmptyState from '../components/ui/EmptyState';
+import { ChevronRightIcon } from '../components/ui/Icons';
 
 function SectionHeader({ id, title, actionLabel, onAction }) {
   return (
@@ -107,25 +108,12 @@ export default function HomePage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-xl bg-white border border-border p-6 text-center space-y-3">
-                      <span
-                        aria-hidden="true"
-                        className="mx-auto size-11 rounded-lg bg-sunken border border-border text-primary flex items-center justify-center"
-                      >
-                        <TruckIcon className="size-5" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-bold text-ink text-balance">{t('home_scheduled_empty_title')}</p>
-                        <p className="text-xs text-muted text-pretty mt-1">{t('home_scheduled_empty_text')}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => navigate('/pickup?tab=home&start=1')}
-                        className="min-h-10 px-4 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors duration-150 cursor-pointer"
-                      >
-                        {t('home_no_pickup_cta')}
-                      </button>
-                    </div>
+                    <EmptyState
+                      title={t('home_scheduled_empty_title')}
+                      description={t('home_scheduled_empty_text')}
+                      actionLabel={t('home_no_pickup_cta')}
+                      onAction={() => navigate('/pickup?tab=home&start=1')}
+                    />
                   )}
                 </section>
               </div>
