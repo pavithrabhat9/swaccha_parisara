@@ -19,25 +19,29 @@ export function usePrefersReducedMotion() {
 }
 
 /**
- * Animates a number from its previous value to `value` with an ease-out curve.
- * Respects `prefers-reduced-motion`.
+ * Animates a number from 0 to `value` once per component mount (visit) with an ease-out curve.
+ * Subsequent re-renders with the same value or updated value snap or transition without re-running from 0.
+ * Never animates when `prefers-reduced-motion` is on.
  */
 export function useCountUp(value, duration = 900) {
   const reduced = usePrefersReducedMotion();
   const target = Number(value) || 0;
   const [display, setDisplay] = useState(() => (reduced ? target : 0));
+  const hasAnimatedRef = useRef(false);
   const currentRef = useRef(reduced ? target : 0);
 
   useEffect(() => {
-    const from = currentRef.current;
-    if (reduced || from === target) {
+    if (reduced || target === 0 || hasAnimatedRef.current) {
       const id = requestAnimationFrame(() => {
         currentRef.current = target;
+        hasAnimatedRef.current = true;
         setDisplay(target);
       });
       return () => cancelAnimationFrame(id);
     }
 
+    hasAnimatedRef.current = true;
+    const from = 0;
     let frame;
     let start;
     const tick = (ts) => {
