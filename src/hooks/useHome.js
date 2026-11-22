@@ -161,6 +161,10 @@ export function useHome() {
     }
   }, []);
 
+  const resolveNotificationTarget = useCallback((notif) => {
+    return homeApi.resolveNotificationTarget(notif);
+  }, []);
+
   const unreadCount = (notifications || []).filter((n) => n.unread).length;
   const fallbackFirstName = t('home_default_resident', { defaultValue: 'Resident' });
 
@@ -183,5 +187,6 @@ export function useHome() {
     markAllRead,
     markRead,
     deleteNotification,
+    resolveNotificationTarget,
   };
 }

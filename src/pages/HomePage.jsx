@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHome } from '../hooks/useHome';
 import { useToast } from '../components/ui/Toast';
-import { pickupApi } from '../services/pickupApi';
-import { reportApi } from '../services/reportApi';
 import HomeGreetingRow from '../components/home/HomeGreetingRow';
 import ContributionCard from '../components/home/ContributionCard';
 import ScheduledPickupCard from '../components/home/ScheduledPickupCard';
@@ -39,6 +37,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const home = useHome();
+  const { resolveNotificationTarget } = home;
   const [activeVideo, setActiveVideo] = useState(null);
 
   const visiblePickups = home.upcoming.slice(0, 2);
@@ -53,38 +52,14 @@ export default function HomePage() {
 
   const handleSelectNotification = useCallback(async (notif) => {
     if (!notif) return;
-    if (notif.type === 'points') {
-      navigate('/rewards');
-      return;
+    const { path, missing } = await resolveNotificationTarget(notif);
+    if (missing) {
+      showToast(t('home_notif_target_missing'), 'info', 3000);
     }
-    if (notif.type === 'pickup') {
-      if (notif.targetId) {
-        const existing = await pickupApi.getPickupById(notif.targetId);
-        if (!existing || existing.status === 'Cancelled') {
-          showToast(t('home_notif_target_missing'), 'info', 3000);
-          navigate('/pickup?tab=home');
-          return;
-        }
-        navigate(`/pickup?tab=home&pickupId=${encodeURIComponent(notif.targetId)}`);
-        return;
-      }
-      navigate('/pickup?tab=home');
-      return;
+    if (path) {
+      navigate(path);
     }
-    if (notif.type === 'report') {
-      if (notif.targetId) {
-        const existing = await reportApi.getReportById(notif.targetId);
-        if (!existing) {
-          showToast(t('home_notif_target_missing'), 'info', 3000);
-          navigate('/map');
-          return;
-        }
-        navigate(`/map?report=${encodeURIComponent(notif.targetId)}`);
-        return;
-      }
-      navigate('/map');
-    }
-  }, [navigate, showToast, t]);
+  }, [resolveNotificationTarget, navigate, showToast, t]);
 
   return (
     <>

@@ -122,3 +122,4 @@ test('formatShortDate formats dates using Intl for the active language (en and k
   assert.ok(enStr.includes('22') && enStr.includes('2026'));
   assert.ok(knStr.includes('22') && knStr.includes('2026'));
 });
+

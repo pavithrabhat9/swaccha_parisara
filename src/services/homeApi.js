@@ -50,7 +50,7 @@ export const homeApi = {
     return {
       summary,
       upcoming: buildUpcomingPickups({ pickups, business, dropOffs: [] }),
-      notifications: isNewUser ? [] : notifications,
+      notifications,
       learn,
       learnError,
       isNewUser,
@@ -63,5 +63,39 @@ export const homeApi = {
 
   deleteNotification: async (id) => {
     return notificationApi.deleteNotification(id);
+  },
+
+  resolveNotificationTarget: async (notif) => {
+    if (!notif) return { path: null, missing: false };
+    if (notif.type === 'points') {
+      return { path: '/rewards', missing: false };
+    }
+    if (notif.type === 'pickup') {
+      if (notif.targetId) {
+        const existing = await pickupApi.getPickupById(notif.targetId);
+        if (!existing || existing.status === 'Cancelled') {
+          return { path: '/pickup?tab=home', missing: true };
+        }
+        return {
+          path: `/pickup?tab=home&pickupId=${encodeURIComponent(notif.targetId)}`,
+          missing: false,
+        };
+      }
+      return { path: '/pickup?tab=home', missing: false };
+    }
+    if (notif.type === 'report') {
+      if (notif.targetId) {
+        const existing = await reportApi.getReportById(notif.targetId);
+        if (!existing) {
+          return { path: '/map', missing: true };
+        }
+        return {
+          path: `/map?report=${encodeURIComponent(notif.targetId)}`,
+          missing: false,
+        };
+      }
+      return { path: '/map', missing: false };
+    }
+    return { path: null, missing: false };
   },
 };

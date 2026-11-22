@@ -10,3 +10,4 @@ export const learnApi = {
     return LEARN_HIGHLIGHTS.map((item) => ({ ...item }));
   },
 };
+

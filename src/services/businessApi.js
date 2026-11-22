@@ -2,14 +2,17 @@ import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
 
 export const businessApi = {
   getSubscription: async () => {
-    return storageAdapter.get(STORAGE_KEYS.BUSINESS, null);
+    const key = storageAdapter.scopedKey(STORAGE_KEYS.BUSINESS);
+    return storageAdapter.get(key, null);
   },
 
   createSubscription: async (data) => {
-    return storageAdapter.set(STORAGE_KEYS.BUSINESS, data);
+    const key = storageAdapter.scopedKey(STORAGE_KEYS.BUSINESS);
+    return storageAdapter.set(key, data);
   },
 
   updateSubscription: async (data) => {
-    return storageAdapter.set(STORAGE_KEYS.BUSINESS, data);
+    const key = storageAdapter.scopedKey(STORAGE_KEYS.BUSINESS);
+    return storageAdapter.set(key, data);
   },
 };

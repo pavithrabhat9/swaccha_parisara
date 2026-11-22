@@ -171,3 +171,44 @@ test('corrupted stored data falls back safely and Learn failure does not break t
   assert.equal(restored.learnError, false);
   assert.equal(restored.learn.length, 6);
 });
+
+test('homeApi.resolveNotificationTarget routes valid and missing/deleted targets safely without crashing', async () => {
+  await authApi.saveUser(DEMO_USER);
+
+  const validPickup = await homeApi.resolveNotificationTarget({
+    type: 'pickup',
+    targetId: 'PU-006',
+  });
+  assert.deepEqual(validPickup, {
+    path: '/pickup?tab=home&pickupId=PU-006',
+    missing: false,
+  });
+
+  await pickupApi.cancelPickup('PU-006');
+  const cancelledPickup = await homeApi.resolveNotificationTarget({
+    type: 'pickup',
+    targetId: 'PU-006',
+  });
+  assert.deepEqual(cancelledPickup, {
+    path: '/pickup?tab=home',
+    missing: true,
+  });
+
+  const missingReport = await homeApi.resolveNotificationTarget({
+    type: 'report',
+    targetId: 'RPT-NON-EXISTENT',
+  });
+  assert.deepEqual(missingReport, {
+    path: '/map',
+    missing: true,
+  });
+
+  const pointsTarget = await homeApi.resolveNotificationTarget({
+    type: 'points',
+  });
+  assert.deepEqual(pointsTarget, {
+    path: '/rewards',
+    missing: false,
+  });
+});
+

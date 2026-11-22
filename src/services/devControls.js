@@ -75,6 +75,22 @@ export const devControls = {
     }
     return advancePickupHandler(pickupId);
   },
+
+  resetSeed() {
+    return this.resetDemoData();
+  },
+
+  resetAllData() {
+    return this.resetDemoData();
+  },
+
+  simulateError(target = true) {
+    return this.setSimulation({ fail: target });
+  },
+
+  simulateSlow(ms = 1200) {
+    return this.setSimulation({ delayMs: ms });
+  },
 };
 
 // Expose on `window.__swachhaDev` ONLY in dev builds or when VITE_ENABLE_DEV_CONTROLS === 'true'

@@ -17,6 +17,12 @@ export const reportApi = {
   },
 
   saveReports: async (reports) => {
-    return storageAdapter.set(STORAGE_KEYS.REPORTS, reports);
+    const userKey = storageAdapter.getCurrentUserKey();
+    const stamped = Array.isArray(reports)
+      ? reports.map((r) =>
+          r && String(r.id).startsWith('RP-') && !r.userKey ? { ...r, userKey } : r
+        )
+      : reports;
+    return storageAdapter.set(STORAGE_KEYS.REPORTS, stamped);
   },
 };
