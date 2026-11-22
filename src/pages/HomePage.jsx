@@ -107,11 +107,7 @@ export default function HomePage() {
             <>
               {/* 2 + 3. Recovery Ledger + Collection Dockets */}
               <div className="md:col-span-7 space-y-6">
-                <ContributionCard
-                  summary={home.summary}
-                  isNewUser={home.isNewUser}
-                  onSchedule={() => navigate('/pickup?tab=home&start=1')}
-                />
+                <ContributionCard summary={home.summary} />
 
                 <section aria-labelledby="home-scheduled-title" className="space-y-3">
                   <SectionHeader
@@ -158,7 +154,7 @@ export default function HomePage() {
                 )}
               </section>
 
-              <p className="md:col-span-12 pt-2 border-t border-border-light text-center font-mono-data text-[11px] text-muted-light">
+              <p className="md:col-span-12 pt-2 border-t border-white text-center font-mono-data text-[11px] text-muted-light">
                 {t('sample_data_note')}
               </p>
             </>

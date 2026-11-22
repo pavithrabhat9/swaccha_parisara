@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import NotificationInbox from './NotificationInbox';
@@ -24,18 +24,9 @@ export default function HomeGreetingRow({
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const bellRef = useRef(null);
   const [inboxOpen, setInboxOpen] = useState(false);
-  const [anchor, setAnchor] = useState(null);
 
   const openInbox = () => {
-    const rect = bellRef.current?.getBoundingClientRect();
-    if (rect) {
-      setAnchor({
-        top: Math.round(rect.bottom + 8),
-        right: Math.max(8, Math.round(window.innerWidth - rect.right)),
-      });
-    }
     setInboxOpen(true);
   };
 
@@ -79,7 +70,6 @@ export default function HomeGreetingRow({
 
         {/* Notification bell */}
         <button
-          ref={bellRef}
           type="button"
           onClick={openInbox}
           aria-haspopup="dialog"
@@ -106,7 +96,6 @@ export default function HomeGreetingRow({
       <NotificationInbox
         open={inboxOpen}
         onClose={() => setInboxOpen(false)}
-        anchor={anchor}
         notifications={notifications}
         onMarkAllRead={onMarkAllRead}
         onMarkRead={onMarkRead}

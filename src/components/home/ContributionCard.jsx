@@ -11,7 +11,7 @@ const formatKg = (value) =>
  * Anchors the home dashboard with rich emerald depth, crisp white figures,
  * sunlit accent visual, and translucent stat tiles inside.
  */
-export default function ContributionCard({ summary, isNewUser, onSchedule }) {
+export default function ContributionCard({ summary }) {
   const { t } = useTranslation();
 
   const stats = [
@@ -46,24 +46,6 @@ export default function ContributionCard({ summary, isNewUser, onSchedule }) {
                 {t('home_kg_contributed')}
               </span>
             </p>
-
-            {isNewUser && (
-              <div className="mt-4 pt-4 border-t border-white/15 space-y-3">
-                <div>
-                  <p className="text-sm font-bold text-white text-balance">{t('home_no_pickup_title')}</p>
-                  <p className="text-xs text-white/80 text-pretty mt-0.5 leading-relaxed">
-                    {t('home_contribution_empty_text')}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={onSchedule}
-                  className="min-h-11 px-4 rounded-xl bg-white text-primary-dark text-xs font-extrabold hover:bg-primary-lighter transition-colors duration-150 cursor-pointer shadow-xs press-scale"
-                >
-                  {t('home_no_pickup_cta')}
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="hidden min-[380px]:block w-[132px] sm:w-[164px] aspect-[4/3] rounded-xl overflow-hidden bg-white shadow-sm ring-1 ring-white/25 shrink-0">
