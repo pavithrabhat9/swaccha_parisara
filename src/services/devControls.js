@@ -6,6 +6,12 @@ let simulationConfig = {
   delayMs: null, // null uses default service delay; 0 skips delay in tests
 };
 
+let advancePickupHandler = null;
+
+export function registerAdvancePickupHandler(fn) {
+  advancePickupHandler = fn;
+}
+
 const isNodeTest =
   typeof globalThis !== 'undefined' && Boolean(globalThis.process?.env?.NODE_TEST_CONTEXT);
 
@@ -64,8 +70,10 @@ export const devControls = {
    * Developer helper to advance a pickup's lifecycle (`Requested -> Scheduled -> On the way -> Completed`).
    */
   async advancePickupStatus(pickupId) {
-    const { pickupApi } = await import('./pickupApi');
-    return pickupApi.advancePickupStatus(pickupId);
+    if (!advancePickupHandler) {
+      throw new Error('pickupApi handler not registered');
+    }
+    return advancePickupHandler(pickupId);
   },
 };
 

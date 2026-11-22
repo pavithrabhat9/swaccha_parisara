@@ -3,7 +3,7 @@ import { PICKUP_STATUS_STEPS } from '../utils/pickupStatusUtils';
 import { getCompletedPickupWeightKg } from '../utils/homeUtils';
 import { storageAdapter, STORAGE_KEYS, DEMO_USER_KEY } from './storageAdapter';
 import { notificationApi } from './notificationApi';
-import { devControls } from './devControls';
+import { devControls, registerAdvancePickupHandler } from './devControls';
 
 function resolveTierForQuantity(quantityLabel = '') {
   const q = String(quantityLabel).toLowerCase();
@@ -168,3 +168,5 @@ export const pickupApi = {
     return updatedPickup;
   },
 };
+
+registerAdvancePickupHandler((pickupId) => pickupApi.advancePickupStatus(pickupId));
