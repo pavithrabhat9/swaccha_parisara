@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrandMark } from '../ui/Icons';
 import { ReportIllustration, PickupIllustration, RewardsIllustration } from './OnboardingIllustrations';
 import { cn } from '../../utils/cn';
 
@@ -37,17 +36,14 @@ export default function OnboardingScreen({ onFinish }) {
       className="fixed inset-0 z-50 bg-cream flex flex-col"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="flex items-center justify-between px-4 sm:px-6 h-15 bg-white/95 glass shadow-xs shrink-0">
-        <div className="flex items-center gap-2.5">
-          <BrandMark className="size-9 rounded-xl shadow-xs" />
-          <span className="font-brand text-base font-extrabold text-ink whitespace-nowrap">
-            {t('appTitle')}
-          </span>
-        </div>
+      <div
+        className="flex items-center justify-end px-4 sm:px-6 pt-3 pb-1 shrink-0"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
+      >
         <button
           type="button"
           onClick={onFinish}
-          className="touch-target px-3 rounded-xl text-xs font-bold text-muted hover:text-ink hover:bg-sunken transition-colors duration-150 cursor-pointer"
+          className="touch-target px-3.5 rounded-xl text-xs font-bold text-muted hover:text-ink hover:bg-sunken transition-colors duration-150 cursor-pointer"
         >
           {t('onboarding_skip')}
         </button>

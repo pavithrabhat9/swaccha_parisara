@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   usePlasticTypes,
@@ -9,8 +8,8 @@ import {
 import Chip from '../components/ui/Chip';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
+import PageTopBar from '../components/layout/PageTopBar';
 import { SkeletonCard } from '../components/ui/Skeleton';
-import { ArrowLeftIcon } from '../components/ui/Icons';
 import { cn } from '../utils/cn';
 
 const TAG_STYLES = {
@@ -36,35 +35,20 @@ const TAG_STYLES = {
  */
 export default function PlasticTypesPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { items, loading, error, activeFilter, setActiveFilter, retry } = usePlasticTypes();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
-      <div className="space-y-2">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          aria-label={t('kyp_back')}
-          className="min-h-10 -ml-2 px-2.5 text-xs font-bold text-primary hover:bg-primary-light/70 inline-flex items-center gap-1.5 cursor-pointer rounded-xl transition-colors duration-150"
+    <div>
+      <PageTopBar title={t('kyp_page_title')} />
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+        <p className="text-sm text-muted text-pretty">{t('kyp_page_subtitle')}</p>
+
+        <div
+          role="tablist"
+          aria-label={t('kyp_page_title')}
+          className="flex flex-wrap items-center gap-2"
         >
-          <ArrowLeftIcon className="size-4" />
-          <span>{t('kyp_back')}</span>
-        </button>
-
-        <div>
-          <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">
-            {t('kyp_page_title')}
-          </h1>
-          <p className="text-sm text-muted text-pretty mt-1">{t('kyp_page_subtitle')}</p>
-        </div>
-      </div>
-
-      <div
-        role="tablist"
-        aria-label={t('kyp_page_title')}
-        className="flex flex-wrap items-center gap-2"
-      >
         {PLASTIC_FILTER_OPTIONS.map(opt => (
           <Chip
             key={opt.id}
@@ -182,6 +166,7 @@ export default function PlasticTypesPage() {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }

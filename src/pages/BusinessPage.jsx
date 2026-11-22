@@ -1,11 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/ui/Toast';
 import StatusBadge from '../components/ui/StatusBadge';
 import EmptyState from '../components/ui/EmptyState';
 import SuccessState from '../components/ui/SuccessState';
 import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
 import ErrorState from '../components/ui/ErrorState';
+import PageTopBar from '../components/layout/PageTopBar';
 import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
 import { CADENCE_OPTIONS, VOLUME_OPTIONS } from '../data/mockBusinesses';
 import { useBusinessSubscription } from '../hooks/useBusinessSubscription';
@@ -14,8 +14,7 @@ import { cn } from '../utils/cn';
 /**
  * BusinessPage — Commercial & Institutional Recurring Collection Portal.
  */
-export default function BusinessPage() {
-  const navigate = useNavigate();
+export default function BusinessPage({ embedded = false }) {
   const { showToast } = useToast();
 
   const {
@@ -58,10 +57,13 @@ export default function BusinessPage() {
 
   if (loading) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-4" aria-busy="true">
-        <Skeleton width="180px" height="24px" rounded="sm" />
-        <SkeletonCard />
-        <SkeletonCard />
+      <div>
+        {!embedded && <PageTopBar title="Business Pickup" />}
+        <div className="max-w-lg mx-auto px-4 py-6 space-y-4" aria-busy="true">
+          <Skeleton width="180px" height="24px" rounded="sm" />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       </div>
     );
   }
@@ -69,22 +71,13 @@ export default function BusinessPage() {
   if (step === 'dashboard' && business) {
     const cadenceLabel = CADENCE_OPTIONS.find(c => c.id === business.cadence)?.label || business.cadence;
     return (
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
-        <button
-          type="button"
-          onClick={() => navigate('/learn')}
-          className="min-h-10 -ml-2 px-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-dark transition-colors duration-150 cursor-pointer rounded-lg"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Back to Learn
-        </button>
-
-        <div>
-          <h1 className="text-xl font-bold text-ink text-balance">{business.name}</h1>
-          <p className="text-xs text-muted text-pretty mt-0.5">{business.address}</p>
-        </div>
+      <div>
+        {!embedded && <PageTopBar title={business.name || 'Business Pickup'} />}
+        <div className={cn('max-w-lg mx-auto space-y-5 animate-fade-in-up', !embedded && 'px-4 py-6')}>
+          <div>
+            <h2 className="text-xl font-bold text-ink text-balance">{business.name}</h2>
+            <p className="text-xs text-muted text-pretty mt-0.5">{business.address}</p>
+          </div>
 
         <section
           className={cn(
@@ -153,31 +146,23 @@ export default function BusinessPage() {
             </div>
           )}
         </section>
+        </div>
       </div>
     );
   }
 
   if (step === 'signup') {
     return (
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
-        <button
-          type="button"
-          onClick={() => navigate('/learn')}
-          className="min-h-10 -ml-2 px-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-dark transition-colors duration-150 cursor-pointer rounded-lg"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Back to Learn
-        </button>
-
-        <section className="rounded-xl border border-border bg-white p-5 space-y-5">
-          <div className="pb-4 border-b border-border-light">
-            <h1 className="text-xl font-bold text-ink text-balance">Business Pickup Signup</h1>
-            <p className="text-xs text-muted text-pretty mt-1">
-              Set up a recurring plastic waste pickup schedule for your establishment.
-            </p>
-          </div>
+      <div>
+        {!embedded && <PageTopBar title="Business Pickup Signup" />}
+        <div className={cn('max-w-lg mx-auto space-y-5 animate-fade-in-up', !embedded && 'px-4 py-6')}>
+          <section className="rounded-xl border border-border bg-white p-5 space-y-5">
+            <div className="pb-4 border-b border-border-light">
+              <h2 className="text-xl font-bold text-ink text-balance">Business Pickup Signup</h2>
+              <p className="text-xs text-muted text-pretty mt-1">
+                Set up a recurring plastic waste pickup schedule for your establishment.
+              </p>
+            </div>
 
           {[
             { field: 'name', id: 'biz-name', label: 'Business Name', placeholder: 'e.g., Mangalore Fish Market Association' },
@@ -235,30 +220,31 @@ export default function BusinessPage() {
             Next: Set Schedule →
           </button>
         </section>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
-      <button
-        type="button"
-        onClick={handleBackToSignup}
-        className="min-h-10 -ml-2 px-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-dark transition-colors duration-150 cursor-pointer rounded-lg"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-        Back
-      </button>
-
-      <section className="rounded-xl border border-border bg-white p-5 space-y-5">
-        <div className="pb-4 border-b border-border-light">
-          <h1 className="text-xl font-bold text-ink text-balance">Set Pickup Schedule</h1>
-          <p className="text-xs text-muted text-pretty mt-1">
-            Choose how often you'd like us to pick up your plastic waste.
-          </p>
-        </div>
+    <div>
+      {!embedded && <PageTopBar title="Set Pickup Schedule" />}
+      <div className={cn('max-w-lg mx-auto space-y-5 animate-fade-in-up', !embedded && 'px-4 py-6')}>
+        <section className="rounded-xl border border-border bg-white p-5 space-y-5">
+          <div className="pb-4 border-b border-border-light flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-ink text-balance">Set Pickup Schedule</h2>
+              <p className="text-xs text-muted text-pretty mt-1">
+                Choose how often you'd like us to pick up your plastic waste.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleBackToSignup}
+              className="min-h-9 px-3 rounded-lg bg-sunken hover:bg-border/60 text-xs font-semibold text-ink transition-colors duration-150 cursor-pointer shrink-0"
+            >
+              Edit Info
+            </button>
+          </div>
 
         <div>
           <span className="block text-xs font-semibold text-ink mb-2">
@@ -380,6 +366,7 @@ export default function BusinessPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

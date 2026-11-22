@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import PageTopBar from '../components/layout/PageTopBar';
 import { plasticTypes, commonlyConfused, localCoastalContent } from '../data/learnContent';
 import { cn } from '../utils/cn';
 
@@ -14,17 +16,17 @@ const RECYCLABLE_BADGE = {
  * LearnPage — Editorial Material Segregation Reference & Local Coastal Guide.
  */
 export default function LearnPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
-    <div className="w-full max-w-full mx-auto pb-12 space-y-10 animate-fade-in-up overflow-x-hidden">
-      <div className="px-4 sm:px-6 lg:px-8 pt-6 md:pt-8 max-w-5xl mx-auto">
-        <div className="pb-5 border-b border-border">
-          <h1 className="text-2xl font-bold text-ink text-balance">Learn & Segregate</h1>
-          <p className="text-sm text-muted text-pretty mt-2 max-w-2xl leading-relaxed">
-            Identify resin codes and separate plastic waste accurately for Dakshina Kannada collection routes and drop-off centers.
-          </p>
-        </div>
+    <div className="w-full max-w-full mx-auto pb-12 space-y-8 animate-fade-in-up overflow-x-hidden">
+      <PageTopBar title={t('learnAndSegregate')} />
+
+      <div className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <p className="text-sm text-muted text-pretty max-w-2xl leading-relaxed">
+          Identify resin codes and separate plastic waste accurately for Dakshina Kannada collection routes and drop-off centers.
+        </p>
       </div>
 
       {/* SECTION 1: KNOW YOUR PLASTIC */}

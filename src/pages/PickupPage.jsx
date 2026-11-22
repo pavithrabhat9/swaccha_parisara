@@ -9,6 +9,7 @@ import { aiApi, AI_PLASTIC_TYPES } from '../services/aiApi';
 import { webApiAdapter } from '../services/storageAdapter';
 import ActivePickupCard from '../components/pickup/ActivePickupCard';
 import TrashBankTab from '../components/pickup/TrashBankTab';
+import PageTopBar from '../components/layout/PageTopBar';
 import { PickupIllustration } from '../components/onboarding/OnboardingIllustrations';
 import BusinessPage from './BusinessPage';
 import PermissionAlert from '../components/ui/PermissionAlert';
@@ -186,40 +187,39 @@ export default function PickupPage() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
-      {/* === HEADER + SEGMENTED SERVICE SWITCH === */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">
-          {t('pickup')}
-        </h1>
+    <div>
+      <PageTopBar title={t('pickup')} />
 
-        <div
-          role="tablist"
-          aria-label={t('pickup')}
-          className="inline-flex w-full sm:w-auto p-1 rounded-2xl bg-sunken"
-        >
-          {segments.map(seg => {
-            const active = activeSegment === seg.id;
-            return (
-              <button
-                key={seg.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSegment(seg.id)}
-                className={cn(
-                  'flex-1 sm:flex-initial min-h-9 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer',
-                  active
-                    ? 'bg-white text-ink shadow-xs'
-                    : 'text-muted hover:text-ink'
-                )}
-              >
-                {seg.label}
-              </button>
-            );
-          })}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+        {/* === SEGMENTED SERVICE SWITCH === */}
+        <div className="flex items-center justify-start">
+          <div
+            role="tablist"
+            aria-label={t('pickup')}
+            className="inline-flex w-full sm:w-auto p-1 rounded-2xl bg-sunken"
+          >
+            {segments.map(seg => {
+              const active = activeSegment === seg.id;
+              return (
+                <button
+                  key={seg.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setSegment(seg.id)}
+                  className={cn(
+                    'flex-1 sm:flex-initial min-h-9 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer',
+                    active
+                      ? 'bg-white text-ink shadow-xs'
+                      : 'text-muted hover:text-ink'
+                  )}
+                >
+                  {seg.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
       {/* === SEGMENT 1: HOME PICKUP === */}
       {activeSegment === 'home' && (
@@ -654,7 +654,7 @@ export default function PickupPage() {
 
       {/* === SEGMENT 3: BUSINESS === */}
       {activeSegment === 'business' && isBusinessAccount && (
-        <BusinessPage />
+        <BusinessPage embedded />
       )}
 
       {showSuccessModal && (
@@ -669,6 +669,7 @@ export default function PickupPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

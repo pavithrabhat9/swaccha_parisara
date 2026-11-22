@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PageTopBar from '../components/layout/PageTopBar';
 
@@ -8,7 +7,6 @@ import PageTopBar from '../components/layout/PageTopBar';
  */
 export default function LegalPage({ docType = 'privacy' }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const isPrivacy = docType === 'privacy';
 
   const title = isPrivacy ? t('profile_row_privacy_title') : t('profile_row_terms_title');
@@ -19,7 +17,7 @@ export default function LegalPage({ docType = 'privacy' }) {
 
   return (
     <div className="pb-12">
-      <PageTopBar title={title} onBack={() => navigate('/profile')} />
+      <PageTopBar title={title} />
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         <section className="rounded-xl bg-white border border-border p-6 space-y-4">

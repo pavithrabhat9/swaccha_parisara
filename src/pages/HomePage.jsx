@@ -49,7 +49,10 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div
+        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-6 md:py-8"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1.25rem)' }}
+      >
         <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-x-8 md:gap-y-6 md:items-start">
           {/* 1. Resident Greeting Row */}
           <div className="md:col-span-12">

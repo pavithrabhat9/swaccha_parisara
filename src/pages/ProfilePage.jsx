@@ -9,6 +9,7 @@ import { useBusinessSubscription } from '../hooks/useBusinessSubscription';
 import { useProfilePreferences } from '../hooks/useProfilePreferences';
 import { useToast } from '../components/ui/Toast';
 import PageTopBar from '../components/layout/PageTopBar';
+import { useShellActions } from '../components/layout/shellContext';
 import {
   EditProfileView,
   MyActivityView,
@@ -33,6 +34,7 @@ import {
   BookIcon,
   LeafIcon,
   TruckIcon,
+  ChatBubbleIcon,
 } from '../components/ui/Icons';
 
 function ProfileRow({ Icon, title, subtitle, onClick, destructive = false }) {
@@ -75,6 +77,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { showToast } = useToast();
+  const { openAsk } = useShellActions();
 
   const { user, updateProfile, logout } = useAuth();
   const { reports, loading: reportsLoading } = useReports();
@@ -128,10 +131,7 @@ export default function ProfilePage() {
   if (activeSection && sectionTitles[activeSection]) {
     return (
       <div className="pb-12">
-        <PageTopBar
-          title={sectionTitles[activeSection]}
-          onBack={() => openSection(null)}
-        />
+        <PageTopBar title={sectionTitles[activeSection]} />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
           {activeSection === 'edit' && (
@@ -273,11 +273,9 @@ export default function ProfilePage() {
 
   return (
     <div className="pb-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">{t('profile_title')}</h1>
-        </div>
+      <PageTopBar title={t('profile_title')} />
 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
           <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-5">
             {profileCardElement}
@@ -348,6 +346,12 @@ export default function ProfilePage() {
                   title={t('profile_row_language_title')}
                   subtitle={currentLanguageLabel}
                   onClick={() => setLangSheetOpen(true)}
+                />
+                <ProfileRow
+                  Icon={ChatBubbleIcon}
+                  title={t('ask_title')}
+                  subtitle={t('ask_subtitle')}
+                  onClick={openAsk}
                 />
                 <ProfileRow
                   Icon={BookIcon}

@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { getSafeReturnPath } from '../utils/authUtils';
+import PageTopBar from '../components/layout/PageTopBar';
 import LoginFlow from '../components/auth/LoginFlow';
 
 /**
@@ -21,16 +22,19 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto px-4 py-6 md:py-10 space-y-3">
-      <LoginFlow authHook={authHook} />
-      <div className="text-center">
-        <button
-          type="button"
-          onClick={() => navigate('/map')}
-          className="min-h-11 px-4 text-sm font-semibold text-primary hover:text-primary-dark hover:underline underline-offset-4 cursor-pointer"
-        >
-          {t('auth_explore_map')}
-        </button>
+    <div>
+      <PageTopBar title={t('auth_title')} />
+      <div className="w-full max-w-sm mx-auto px-4 py-6 md:py-10 space-y-3">
+        <LoginFlow authHook={authHook} />
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => navigate('/map')}
+            className="min-h-11 px-4 text-sm font-semibold text-primary hover:text-primary-dark hover:underline underline-offset-4 cursor-pointer"
+          >
+            {t('auth_explore_map')}
+          </button>
+        </div>
       </div>
     </div>
   );

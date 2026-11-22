@@ -1,43 +1,34 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { ArrowLeftIcon } from '../ui/Icons';
+import { cn } from '../../utils/cn';
 
 /**
- * PageTopBar — Sub-page contextual breadcrumb/header bar below the global utility header.
+ * PageTopBar — Reusable mobile-first page header (clean title bar, no back button).
  */
-export default function PageTopBar({ title, onBack }) {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-      return;
-    }
-    if (typeof window !== 'undefined' && window.history.length > 2) {
-      navigate(-1);
-    } else {
-      navigate('/home');
-    }
-  };
-
+export default function PageTopBar({
+  title,
+  rightSlot = null,
+  as: HeadingTag = 'h1',
+  className = '',
+}) {
   return (
-    <div className="bg-white border-b border-border px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto h-12 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={handleBack}
-          aria-label={t('profile_back_aria')}
-          className="size-9 -ml-1.5 rounded-lg text-ink hover:bg-sunken flex items-center justify-center transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          <ArrowLeftIcon className="size-4" />
-        </button>
-
-        <h1 className="text-sm font-bold text-ink text-balance truncate">
+    <header
+      className={cn(
+        'sticky top-0 z-30 bg-white/95 glass border-b border-border/80 px-4 sm:px-6 lg:px-8',
+        className
+      )}
+      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+    >
+      <div className="max-w-5xl mx-auto h-14 flex items-center justify-between gap-3">
+        <HeadingTag className="text-base sm:text-lg font-extrabold text-ink text-balance truncate">
           {title}
-        </h1>
+        </HeadingTag>
+
+        {rightSlot && (
+          <div className="flex items-center gap-2 shrink-0">
+            {rightSlot}
+          </div>
+        )}
       </div>
-    </div>
+    </header>
   );
 }

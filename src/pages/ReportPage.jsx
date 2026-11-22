@@ -10,8 +10,9 @@ import SuccessState from '../components/ui/SuccessState';
 import ErrorState from '../components/ui/ErrorState';
 import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
 import PermissionAlert from '../components/ui/PermissionAlert';
+import PageTopBar from '../components/layout/PageTopBar';
 import { useNetworkStatus } from '../components/ui/OfflineBanner';
-import { ArrowLeftIcon, CameraIcon, XIcon } from '../components/ui/Icons';
+import { CameraIcon, XIcon } from '../components/ui/Icons';
 import { WASTE_TYPE_OPTIONS } from '../data/mockReports';
 import { cn } from '../utils/cn';
 import 'leaflet/dist/leaflet.css';
@@ -163,69 +164,68 @@ export default function ReportPage() {
 
   if (step === 'offlineSaved') {
     return (
-      <SuccessState
-        title={t('report_offline_saved_title')}
-        description={t('report_offline_saved_description')}
-        actionLabel={t('reportAnother')}
-        onAction={resetForm}
-      />
+      <div>
+        <PageTopBar title={t('reportPlasticWaste')} />
+        <SuccessState
+          title={t('report_offline_saved_title')}
+          description={t('report_offline_saved_description')}
+          actionLabel={t('reportAnother')}
+          onAction={resetForm}
+        />
+      </div>
     );
   }
 
   if (step === 'success') {
     return (
-      <SuccessState
-        title={t('reportAdded')}
-        description={t('reportConfirmation')}
-        actionLabel={t('reportAnother')}
-        onAction={resetForm}
-        secondaryActionLabel={t('map')}
-        onSecondaryAction={() => navigate('/map')}
-      >
-        {photoPreview && (
-          <img
-            src={photoPreview}
-            alt="Reported waste"
-            className="w-full max-w-xs h-40 object-cover rounded-xl border border-border mb-4 mx-auto"
-          />
-        )}
+      <div>
+        <PageTopBar title={t('reportPlasticWaste')} />
+        <SuccessState
+          title={t('reportAdded')}
+          description={t('reportConfirmation')}
+          actionLabel={t('reportAnother')}
+          onAction={resetForm}
+          secondaryActionLabel={t('map')}
+          onSecondaryAction={() => navigate('/map')}
+        >
+          {photoPreview && (
+            <img
+              src={photoPreview}
+              alt="Reported waste"
+              className="w-full max-w-xs h-40 object-cover rounded-xl border border-border mb-4 mx-auto"
+            />
+          )}
 
-        <div className="bg-white rounded-xl border border-border divide-y divide-border-light w-full max-w-xs mx-auto">
-          <div className="flex justify-between items-center px-4 py-2.5">
-            <span className="text-xs text-muted">{t('report_detail_type')}</span>
-            <span className="text-xs font-semibold text-ink">{wasteType}</span>
+          <div className="bg-white rounded-xl border border-border divide-y divide-border-light w-full max-w-xs mx-auto">
+            <div className="flex justify-between items-center px-4 py-2.5">
+              <span className="text-xs text-muted">{t('report_detail_type')}</span>
+              <span className="text-xs font-semibold text-ink">{wasteType}</span>
+            </div>
+            <div className="flex justify-between items-center px-4 py-2.5">
+              <span className="text-xs text-muted">{t('report_detail_status')}</span>
+              <span className="text-xs font-semibold text-primary">{t('addedToMap')}</span>
+            </div>
+            <div className="flex justify-between items-center px-4 py-2.5">
+              <span className="text-xs text-muted">{t('report_detail_location')}</span>
+              <span className="font-mono-data text-xs font-semibold text-ink">
+                {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'Mangaluru'}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-between items-center px-4 py-2.5">
-            <span className="text-xs text-muted">{t('report_detail_status')}</span>
-            <span className="text-xs font-semibold text-primary">{t('addedToMap')}</span>
-          </div>
-          <div className="flex justify-between items-center px-4 py-2.5">
-            <span className="text-xs text-muted">{t('report_detail_location')}</span>
-            <span className="font-mono-data text-xs font-semibold text-ink">
-              {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'Mangaluru'}
-            </span>
-          </div>
-        </div>
-      </SuccessState>
+        </SuccessState>
+      </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
-      <button
-        type="button"
-        onClick={() => navigate('/map')}
-        className="min-h-10 -ml-2 px-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-dark transition-colors duration-150 cursor-pointer rounded-lg"
-      >
-        <ArrowLeftIcon className="size-4" />
-        <span>{t('map')}</span>
-      </button>
+    <div>
+      <PageTopBar title={t('reportPlasticWaste')} />
 
-      <section className="rounded-xl border border-border bg-white p-5 space-y-5">
-        <div className="pb-4 border-b border-border-light">
-          <h1 className="text-xl font-bold text-ink text-balance">{t('reportPlasticWaste')}</h1>
-          <p className="text-xs text-muted text-pretty mt-1">{t('reportDescription')}</p>
-        </div>
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-5 animate-fade-in-up">
+        <section className="rounded-2xl card-elevated p-5 space-y-5">
+          <div className="pb-3 border-b border-border-light">
+            <p className="text-xs text-muted text-pretty">{t('reportDescription')}</p>
+          </div>
 
         {/* PHOTO */}
         <div>
@@ -409,6 +409,7 @@ export default function ReportPage() {
           )}
         </button>
       </section>
+      </div>
     </div>
   );
 }

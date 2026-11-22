@@ -16,8 +16,9 @@ const isItemActive = (item, pathname) =>
   pathname === item.path || (item.alsoActiveOn || []).includes(pathname);
 
 /**
- * BottomNav — Warm, tactile consumer mobile tab bar (<768px).
- * Frosted white dock with soft ambient lift and emerald active icon capsule.
+ * BottomNav — Primary 5-tab navigation dock.
+ * - Mobile (<768px): full-width bottom bar with safe-area padding.
+ * - Desktop (>=768px): floating bottom pill dock so all tabs remain accessible without a global top bar.
  */
 export default function BottomNav() {
   const location = useLocation();
@@ -29,10 +30,10 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white shadow-nav select-none"
+      className="fixed bottom-0 inset-x-0 md:bottom-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-[460px] md:rounded-2xl md:border md:border-border/80 z-40 bg-white/96 glass shadow-nav md:shadow-elevated select-none"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="grid grid-cols-5 h-16 px-1">
+      <div className="grid grid-cols-5 h-16 px-1.5">
         {NAV_ITEMS.map(item => {
           const active = isItemActive(item, location.pathname);
           const label = t(item.labelKey);

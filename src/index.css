@@ -123,6 +123,8 @@ html {
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  background-color: var(--color-cream);
+  overscroll-behavior-y: none;
   accent-color: var(--color-primary);
   caret-color: var(--color-primary);
 }
@@ -134,6 +136,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
   line-height: 1.55;
 }
 

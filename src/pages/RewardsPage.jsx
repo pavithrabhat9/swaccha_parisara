@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRewards } from '../hooks/useRewards';
 import { useToast } from '../components/ui/Toast';
+import PageTopBar from '../components/layout/PageTopBar';
 import PointsSummaryCard from '../components/rewards/PointsSummaryCard';
 import { BADGE_CATEGORIES, DONATION_AMOUNTS } from '../data/mockRewards';
 import { formatShortDate } from '../utils/dateUtils';
@@ -47,11 +48,14 @@ export default function RewardsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6" aria-busy="true">
-        <SkeletonHero />
-        <div className="grid md:grid-cols-2 gap-6">
-          <SkeletonCard />
-          <SkeletonCard />
+      <div>
+        <PageTopBar title={t('rewards')} />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6" aria-busy="true">
+          <SkeletonHero />
+          <div className="grid md:grid-cols-2 gap-6">
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
         </div>
       </div>
     );
@@ -59,13 +63,16 @@ export default function RewardsPage() {
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <ErrorState
-          title={t('ui_error_default_title')}
-          description={error}
-          retryLabel={t('ui_error_try_again')}
-          onRetry={reloadRewards}
-        />
+      <div>
+        <PageTopBar title={t('rewards')} />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+          <ErrorState
+            title={t('ui_error_default_title')}
+            description={error}
+            retryLabel={t('ui_error_try_again')}
+            onRetry={reloadRewards}
+          />
+        </div>
       </div>
     );
   }
@@ -96,12 +103,11 @@ export default function RewardsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold text-ink tracking-tight text-balance">{t('rewards')}</h1>
-      </div>
+    <div>
+      <PageTopBar title={t('rewards')} />
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* LEFT COLUMN */}
         <div className="md:col-span-5 space-y-6">
           <PointsSummaryCard points={points} tierProgress={tierProgress} />
@@ -451,6 +457,7 @@ export default function RewardsPage() {
             )}
           </section>
         </div>
+      </div>
       </div>
     </div>
   );

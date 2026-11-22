@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import PageTopBar from '../layout/PageTopBar';
 import { CheckCircleIcon, LockIcon } from '../ui/Icons';
 import {
   PickupIllustration,
@@ -24,8 +25,21 @@ export default function LoginGate({ featureKey }) {
         ? PickupIllustration
         : ReportIllustration;
 
+  const pageTitle = featureKey ? t(featureKey) : t('gate_title');
+
   return (
-    <div className="max-w-md mx-auto px-4 sm:px-6 py-8 md:py-12">
+    <div>
+      {featureKey && featureKey !== 'home' && (
+        <PageTopBar title={pageTitle} />
+      )}
+      <div
+        className="max-w-md mx-auto px-4 sm:px-6 py-8 md:py-12"
+        style={
+          featureKey === 'home'
+            ? { paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1.5rem)' }
+            : undefined
+        }
+      >
       <section className="rounded-2xl card-elevated overflow-hidden">
         <div
           className="w-full aspect-[4/3] bg-white border-b border-border/70"
@@ -73,6 +87,7 @@ export default function LoginGate({ featureKey }) {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }
