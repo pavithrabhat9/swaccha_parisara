@@ -1,4 +1,5 @@
-export { storageAdapter, webApiAdapter, STORAGE_KEYS } from './storageAdapter';
+export { storageAdapter, webApiAdapter, STORAGE_KEYS, DEMO_USER_KEY } from './storageAdapter';
+export { devControls } from './devControls';
 export { authApi, accountKeyFor } from './authApi';
 export { onboardingApi } from './onboardingApi';
 export { pickupApi } from './pickupApi';
@@ -6,8 +7,9 @@ export { reportApi } from './reportApi';
 export { businessApi } from './businessApi';
 export { addressesApi } from './addressesApi';
 export { rewardsApi } from './rewardsApi';
+export { notificationApi } from './notificationApi';
+export { learnApi } from './learnApi';
 export { homeApi } from './homeApi';
 export { preferencesApi } from './preferencesApi';
 export { dropPointApi } from './dropPointApi';
 export { aiApi, AI_PLASTIC_TYPES } from './aiApi';
-

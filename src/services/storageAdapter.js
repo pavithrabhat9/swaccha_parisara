@@ -1,9 +1,9 @@
 /**
  * StorageAdapter & WebApiAdapter — Hexagonal Ports & Adapters Layer (`architecture-patterns`).
  *
- * Centralizes all browser persistence (`localStorage`) and Web APIs (`navigator.geolocation`,
- * `navigator.permissions`, `navigator.onLine`, `FileReader`) behind a resilient, testable
- * port with automatic in-memory fallback when `localStorage` is unavailable or quota-exceeded.
+ * Centralizes all browser persistence (`localStorage`), cross-service reactive change events,
+ * and Web APIs (`navigator.geolocation`, `navigator.permissions`, `navigator.onLine`, `FileReader`)
+ * behind a resilient, testable port that works seamlessly in both browsers and Node (`node --test`).
  */
 
 export const STORAGE_KEYS = Object.freeze({
@@ -17,12 +17,16 @@ export const STORAGE_KEYS = Object.freeze({
   BUSINESS: 'swachha_business',
   ADDRESSES: 'swachha_addresses',
   DONATIONS: 'swachha_donations',
+  NOTIFICATIONS_STATE: 'swachha_notifications_state',
   NOTIFICATIONS_READ: 'swachha_notifications_read',
   NOTIFICATION_PREFS: 'swachha_notification_prefs',
   LANGUAGE: 'swachha_lang',
 });
 
+export const DEMO_USER_KEY = '9876543210';
+
 const memoryFallbackStore = new Map();
+const changeListeners = new Set();
 
 function hasLocalStorage() {
   try {
@@ -41,14 +45,20 @@ export const storageAdapter = {
       if (hasLocalStorage()) {
         const raw = window.localStorage.getItem(key);
         if (raw === null || raw === undefined) {
-          return memoryFallbackStore.has(key) ? memoryFallbackStore.get(key) : fallback;
+          if (!memoryFallbackStore.has(key)) return fallback;
+          const memVal = memoryFallbackStore.get(key);
+          return typeof memVal === 'string' ? JSON.parse(memVal) : memVal;
         }
         return JSON.parse(raw);
       }
+      if (memoryFallbackStore.has(key)) {
+        const memVal = memoryFallbackStore.get(key);
+        return typeof memVal === 'string' ? JSON.parse(memVal) : memVal;
+      }
     } catch {
-      // Fallback to in-memory store or default value
+      // Corrupted JSON falls back cleanly to default value
     }
-    return memoryFallbackStore.has(key) ? memoryFallbackStore.get(key) : fallback;
+    return fallback;
   },
 
   /**
@@ -78,6 +88,7 @@ export const storageAdapter = {
     } catch {
       // QuotaExceededError or private-browsing block — safely retained in memoryFallbackStore
     }
+    this.emitChange(key);
     return value;
   },
 
@@ -93,6 +104,7 @@ export const storageAdapter = {
     } catch {
       // Retained in memoryFallbackStore
     }
+    this.emitChange(key);
     return rawString;
   },
 
@@ -108,24 +120,77 @@ export const storageAdapter = {
     } catch {
       // Ignore removal error
     }
+    this.emitChange(key);
   },
 
   /**
-   * Subscribe to cross-tab storage updates for a specific key.
+   * Clear all keys (used by test runner and dev reset).
    */
-  subscribe(key, callback) {
-    if (typeof window === 'undefined') return () => {};
-    const handler = (event) => {
-      if (event.key === key) {
-        try {
-          callback(event.newValue ? JSON.parse(event.newValue) : null);
-        } catch {
-          callback(event.newValue);
-        }
+  clear() {
+    memoryFallbackStore.clear();
+    try {
+      if (hasLocalStorage()) {
+        window.localStorage.clear();
+      }
+    } catch {
+      // Ignore clear error
+    }
+    this.emitChange('*');
+  },
+
+  /**
+   * Notify in-tab subscribers when any service mutates persisted data.
+   */
+  emitChange(key = '*') {
+    changeListeners.forEach((fn) => {
+      try {
+        fn(key);
+      } catch {
+        // Ignore listener error
+      }
+    });
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      try {
+        window.dispatchEvent(new CustomEvent('swachha:data-changed', { detail: { key } }));
+      } catch {
+        // Ignore event error
+      }
+    }
+  },
+
+  /**
+   * Subscribe to any in-tab or cross-tab data changes.
+   */
+  subscribeChanges(callback) {
+    changeListeners.add(callback);
+    const onStorage = (event) => callback(event?.key || '*');
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('storage', onStorage);
+    }
+    return () => {
+      changeListeners.delete(callback);
+      if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+        window.removeEventListener('storage', onStorage);
       }
     };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
+  },
+
+  /**
+   * Resolve the active user's storage scope key from the current session.
+   */
+  getCurrentUserKey() {
+    const user = this.get(STORAGE_KEYS.AUTH_SESSION, null);
+    if (!user) return DEMO_USER_KEY;
+    if (user.provider === 'google') return 'google:mock';
+    return user.phone || DEMO_USER_KEY;
+  },
+
+  /**
+   * Build a user-scoped storage key (`<baseKey>:<userKey>`).
+   */
+  scopedKey(baseKey) {
+    const userKey = this.getCurrentUserKey();
+    return `${baseKey}:${userKey}`;
   },
 };
 
@@ -175,4 +240,3 @@ export const webApiAdapter = {
     });
   },
 };
-

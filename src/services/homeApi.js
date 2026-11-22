@@ -1,68 +1,67 @@
 import { pickupApi } from './pickupApi';
 import { reportApi } from './reportApi';
 import { businessApi } from './businessApi';
-import { storageAdapter, STORAGE_KEYS } from './storageAdapter';
-import { MOCK_NOTIFICATIONS, LEARN_HIGHLIGHTS } from '../data/mockHome';
+import { rewardsApi } from './rewardsApi';
+import { notificationApi } from './notificationApi';
+import { learnApi } from './learnApi';
+import { storageAdapter } from './storageAdapter';
+import { devControls } from './devControls';
 import {
   buildContributionSummary,
   buildUpcomingPickups,
   isNewContributor,
 } from '../utils/homeUtils';
-import { delay } from '../utils/asyncUtils';
-
-// STUB: sample figure for "kg this month" until a backend aggregate exists.
-const SAMPLE_KG_THIS_MONTH = 6.4;
-
-const readReadIds = () => {
-  const list = storageAdapter.get(STORAGE_KEYS.NOTIFICATIONS_READ, []);
-  return new Set(Array.isArray(list) ? list : []);
-};
 
 /**
- * Home screen data.
- * Reuses the existing pickup, report and business services and adds sample notifications
- * and Learn highlights. Swap the bodies for backend calls later; the shapes stay the same.
+ * Home screen orchestration service.
+ * Aggregates `pickupApi`, `rewardsApi` (single source of truth for points), `reportApi`,
+ * `businessApi`, `notificationApi`, and `learnApi` (isolated so a Learn error does not break Home).
  */
 export const homeApi = {
   getOverview: async () => {
-    await delay(300);
+    await devControls.applyServiceSimulation('home', 180);
+    const userKey = storageAdapter.getCurrentUserKey();
 
-    const [pickups, profile, reports, business] = await Promise.all([
+    const [pickups, balance, reports, business, notifications] = await Promise.all([
       pickupApi.getPickups(),
-      pickupApi.getProfile(),
+      rewardsApi.getBalance(),
       reportApi.getReports(),
       businessApi.getSubscription(),
+      notificationApi.list(),
     ]);
 
-    const base = buildContributionSummary({ pickups, profile, reports });
-    const isNewUser = isNewContributor(base);
-    const summary = { ...base, kgThisMonth: isNewUser ? 0 : SAMPLE_KG_THIS_MONTH };
+    let learn = [];
+    let learnError = false;
+    try {
+      learn = await learnApi.getHighlights();
+    } catch {
+      learnError = true;
+      learn = [];
+    }
 
-    // Brand-new users have nothing in their inbox yet
-    const readIds = readReadIds();
-    const notifications = isNewUser
-      ? []
-      : MOCK_NOTIFICATIONS.map(n => ({
-          id: n.id,
-          type: n.type,
-          title: n.title,
-          body: n.body,
-          createdAt: new Date(Date.now() - n.hoursAgo * 3600 * 1000).toISOString(),
-          unread: n.unread && !readIds.has(n.id),
-        }));
+    const summary = buildContributionSummary({
+      pickups,
+      reports,
+      points: balance.points,
+      userKey,
+    });
+    const isNewUser = isNewContributor(summary);
 
     return {
       summary,
       upcoming: buildUpcomingPickups({ pickups, business, dropOffs: [] }),
-      notifications,
-      learn: LEARN_HIGHLIGHTS.map(item => ({ ...item })),
+      notifications: isNewUser ? [] : notifications,
+      learn,
+      learnError,
       isNewUser,
     };
   },
 
   markNotificationsRead: async (ids) => {
-    const readIds = readReadIds();
-    ids.forEach(id => readIds.add(id));
-    storageAdapter.set(STORAGE_KEYS.NOTIFICATIONS_READ, [...readIds]);
+    return notificationApi.markRead(ids);
+  },
+
+  deleteNotification: async (id) => {
+    return notificationApi.deleteNotification(id);
   },
 };

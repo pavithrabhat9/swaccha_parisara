@@ -1,11 +1,12 @@
 import { plasticTypes, commonlyConfused, localCoastalContent } from './learnContent';
 
-// STUB: sample inbox. Replace with a notifications endpoint later.
-// `hoursAgo` is turned into a real timestamp when the data is loaded.
+// STUB: sample inbox for the returning demo resident (`9876543210`).
+// `hoursAgo` is turned into a real timestamp when the data is seeded.
 export const MOCK_NOTIFICATIONS = [
   {
     id: 'n-pickup-scheduled',
     type: 'pickup',
+    targetId: 'PU-006',
     title: 'Pickup scheduled',
     body: 'Your Medium Bag pickup in Kadri is scheduled. Keep the plastic clean and dry.',
     hoursAgo: 2,
@@ -14,22 +15,25 @@ export const MOCK_NOTIFICATIONS = [
   {
     id: 'n-points-credited',
     type: 'points',
+    targetId: 'PU-001',
     title: '250 points credited',
-    body: 'Your Large Bag from Kadri was weighed at 8.2 kg. Thank you for recycling!',
+    body: 'Your Large Bag from Kadri was weighed at 3.4 kg. Thank you for recycling!',
     hoursAgo: 20,
     unread: true,
   },
   {
     id: 'n-report-reviewed',
     type: 'report',
+    targetId: 'RPT-0002',
     title: 'Report status updated',
-    body: 'Your report at Panambur Beach (PET Bottles) is now Being Reviewed.',
+    body: 'Your report at Panambur Beach (Beach/Coastal Debris) is now Being Reviewed.',
     hoursAgo: 30,
     unread: true,
   },
   {
     id: 'n-report-cleared',
     type: 'report',
+    targetId: 'RPT-0006',
     title: 'Spot cleared',
     body: 'The waste spot you reported near Kadri Park was marked Cleared.',
     hoursAgo: 72,
@@ -38,6 +42,7 @@ export const MOCK_NOTIFICATIONS = [
   {
     id: 'n-pickup-reminder',
     type: 'pickup',
+    targetId: 'PU-007',
     title: 'Pickup reminder',
     body: 'Rinse bottles and remove caps before the collector arrives.',
     hoursAgo: 96,

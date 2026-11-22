@@ -10,6 +10,12 @@ export const reportApi = {
     return [...initialMockReports];
   },
 
+  getReportById: async (reportId) => {
+    if (!reportId) return null;
+    const list = await reportApi.getReports();
+    return list.find((r) => r.id === reportId) || null;
+  },
+
   saveReports: async (reports) => {
     return storageAdapter.set(STORAGE_KEYS.REPORTS, reports);
   },
