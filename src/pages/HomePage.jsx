@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useHome } from '../hooks/useHome';
+import { useToast } from '../components/ui/Toast';
+import { pickupApi } from '../services/pickupApi';
+import { reportApi } from '../services/reportApi';
 import HomeGreetingRow from '../components/home/HomeGreetingRow';
 import ContributionCard from '../components/home/ContributionCard';
 import ScheduledPickupCard from '../components/home/ScheduledPickupCard';
@@ -34,18 +37,54 @@ function SectionHeader({ id, title, actionLabel, onAction }) {
 export default function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const home = useHome();
   const [activeVideo, setActiveVideo] = useState(null);
 
   const visiblePickups = home.upcoming.slice(0, 2);
 
-  const handleOpenLearnItem = (item) => {
+  const handleOpenLearnItem = useCallback((item) => {
     if (item.kind === 'video') {
       setActiveVideo(item);
     } else {
-      navigate('/learn');
+      navigate(`/learn?guide=${encodeURIComponent(item.id)}`);
     }
-  };
+  }, [navigate]);
+
+  const handleSelectNotification = useCallback(async (notif) => {
+    if (!notif) return;
+    if (notif.type === 'points') {
+      navigate('/rewards');
+      return;
+    }
+    if (notif.type === 'pickup') {
+      if (notif.targetId) {
+        const existing = await pickupApi.getPickupById(notif.targetId);
+        if (!existing || existing.status === 'Cancelled') {
+          showToast(t('home_notif_target_missing'), 'info', 3000);
+          navigate('/pickup?tab=home');
+          return;
+        }
+        navigate(`/pickup?tab=home&pickupId=${encodeURIComponent(notif.targetId)}`);
+        return;
+      }
+      navigate('/pickup?tab=home');
+      return;
+    }
+    if (notif.type === 'report') {
+      if (notif.targetId) {
+        const existing = await reportApi.getReportById(notif.targetId);
+        if (!existing) {
+          showToast(t('home_notif_target_missing'), 'info', 3000);
+          navigate('/map');
+          return;
+        }
+        navigate(`/map?report=${encodeURIComponent(notif.targetId)}`);
+        return;
+      }
+      navigate('/map');
+    }
+  }, [navigate, showToast, t]);
 
   return (
     <>
@@ -60,11 +99,14 @@ export default function HomePage() {
               greetingKey={home.greetingKey}
               firstName={home.firstName}
               initials={home.initials}
+              avatarUrl={home.avatarUrl}
               points={home.summary?.points ?? 0}
               notifications={home.notifications}
               unreadCount={home.unreadCount}
               onMarkAllRead={home.markAllRead}
               onMarkRead={home.markRead}
+              onDeleteNotification={home.deleteNotification}
+              onSelectNotification={handleSelectNotification}
             />
           </div>
 
@@ -106,7 +148,7 @@ export default function HomePage() {
 
                   {visiblePickups.length > 0 ? (
                     <div className="space-y-2.5">
-                      {visiblePickups.map(item => (
+                      {visiblePickups.map((item) => (
                         <ScheduledPickupCard key={item.id} item={item} />
                       ))}
                     </div>
@@ -121,7 +163,7 @@ export default function HomePage() {
                 </section>
               </div>
 
-              {/* 4. Reference & Segregation Guides */}
+              {/* 4. Reference & Segregation Guides (fault-isolated) */}
               <section aria-labelledby="home-learn-title" className="md:col-span-5 space-y-3">
                 <SectionHeader
                   id="home-learn-title"
@@ -129,7 +171,16 @@ export default function HomePage() {
                   actionLabel={t('home_view_all')}
                   onAction={() => navigate('/learn')}
                 />
-                <LearnCarousel items={home.learn} onOpenItem={handleOpenLearnItem} />
+                {home.learnError ? (
+                  <ErrorState
+                    title={t('ui_error_default_title')}
+                    description={t('ui_error_default_description')}
+                    retryLabel={t('ui_error_try_again')}
+                    onRetry={home.retry}
+                  />
+                ) : (
+                  <LearnCarousel items={home.learn} onOpenItem={handleOpenLearnItem} />
+                )}
               </section>
 
               <p className="md:col-span-12 pt-2 border-t border-border-light text-center font-mono-data text-[11px] text-muted-light">

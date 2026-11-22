@@ -6,7 +6,8 @@ let simulationConfig = {
   delayMs: null, // null uses default service delay; 0 skips delay in tests
 };
 
-const isNodeTest = typeof process !== 'undefined' && Boolean(process.env?.NODE_TEST_CONTEXT);
+const isNodeTest =
+  typeof globalThis !== 'undefined' && Boolean(globalThis.process?.env?.NODE_TEST_CONTEXT);
 
 export const devControls = {
   setSimulation(next = {}) {

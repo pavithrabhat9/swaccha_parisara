@@ -47,6 +47,7 @@ export default function PickupPage() {
   const tabParam = searchParams.get('tab');
   const centerParam = searchParams.get('center');
   const startParam = searchParams.get('start');
+  const pickupIdParam = searchParams.get('pickupId');
 
   const activeSegment =
     tabParam === 'trash-bank'
@@ -171,8 +172,9 @@ export default function PickupPage() {
   };
 
   const completedCount = pickups.filter(p => p.status === 'Completed').length;
-  const pendingCount = pickups.filter(p => p.status !== 'Completed').length;
-  const activePickup = getActivePickup(pickups);
+  const pendingCount = pickups.filter(p => p.status !== 'Completed' && p.status !== 'Cancelled').length;
+  const focusedPickup = pickupIdParam ? pickups.find(p => p.id === pickupIdParam) : null;
+  const activePickup = focusedPickup || getActivePickup(pickups);
 
   const filteredPickups = pickups.filter(p => {
     if (historyFilter === 'completed') return p.status === 'Completed';

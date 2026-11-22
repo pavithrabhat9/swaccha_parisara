@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatShortDate } from '../../utils/dateUtils';
@@ -12,22 +12,35 @@ const STATUS_TITLE_KEYS = {
 };
 
 /**
- * ScheduledPickupCard — Tactile full-card interactive pickup row
- * (like Urban Company / Swiggy order cards — no repetitive Track > wireframe buttons).
+ * ScheduledPickupCard — Tactile full-card interactive pickup row.
+ * Tapping navigates to the Pickup tab focused on this exact pickup (`?tab=home&pickupId=<id>`).
  */
 export default function ScheduledPickupCard({ item }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const navigatingRef = useRef(false);
 
   const titleKey = STATUS_TITLE_KEYS[item.status] || 'home_pickup_card_scheduled';
-  const targetPath = item.kind === 'business' ? '/pickup?tab=business' : '/pickup?tab=home';
+  const targetPath =
+    item.kind === 'business'
+      ? '/pickup?tab=business'
+      : `/pickup?tab=home&pickupId=${encodeURIComponent(item.id)}`;
   const isOnWay = item.status === 'On the way';
+
+  const handleOpen = () => {
+    if (navigatingRef.current) return;
+    navigatingRef.current = true;
+    navigate(targetPath);
+    setTimeout(() => {
+      navigatingRef.current = false;
+    }, 300);
+  };
 
   return (
     <button
       type="button"
-      onClick={() => navigate(targetPath)}
-      aria-label={`${t(titleKey)} — ${formatShortDate(item.date)}`}
+      onClick={handleOpen}
+      aria-label={`${t(titleKey)} — ${formatShortDate(item.date, i18n.language)}`}
       className="w-full text-left rounded-2xl card-interactive px-4 py-3.5 flex items-center justify-between gap-3 cursor-pointer"
     >
       <div className="flex items-center gap-3.5 min-w-0">
@@ -49,7 +62,7 @@ export default function ScheduledPickupCard({ item }) {
             <StatusBadge status={item.status} />
           </div>
           <span className="block tabular text-xs font-medium text-muted truncate mt-0.5">
-            {formatShortDate(item.date)}
+            {formatShortDate(item.date, i18n.language)}
           </span>
         </div>
       </div>

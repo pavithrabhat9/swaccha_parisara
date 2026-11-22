@@ -535,5 +535,8 @@
   "profile_lang_coming_soon": "Coming Soon",
   "profile_signout_confirm_title": "Sign out of Swaccha Parisara?",
   "profile_signout_confirm_desc": "You can sign back in anytime with your phone number or Google account.",
-  "profile_back_aria": "Go back"
+  "profile_back_aria": "Go back",
+  "home_default_resident": "Resident",
+  "home_inbox_delete_aria": "Delete notification",
+  "home_notif_target_missing": "That item is no longer available."
 }

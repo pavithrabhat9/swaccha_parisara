@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -117,9 +117,10 @@ function MapController({ onDismiss }) {
 export default function MapPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { reports, filteredReports, loading, filters, setFilters } = useReports();
   const [userLocation, setUserLocation] = useState(null);
-  const [selectedReportId, setSelectedReportId] = useState(null);
+  const [selectedReportId, setSelectedReportId] = useState(() => searchParams.get('report'));
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {

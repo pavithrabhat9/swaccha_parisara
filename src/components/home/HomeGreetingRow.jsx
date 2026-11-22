@@ -6,18 +6,21 @@ import { BellIcon, StarIcon } from '../ui/Icons';
 
 /**
  * HomeGreetingRow — Warm consumer greeting header.
- * Left: soft emerald monogram avatar + greeting + resident name.
- * Right: sunlit marigold rewards points chip (StarIcon, zero fake dots) + elevated bell.
+ * Left: tappable emerald monogram / profile photo avatar (-> /profile) + greeting + resident name.
+ * Right: sunlit marigold rewards points chip (StarIcon -> /rewards) + elevated bell.
  */
 export default function HomeGreetingRow({
   greetingKey,
   firstName,
   initials,
+  avatarUrl,
   points,
   notifications,
   unreadCount,
   onMarkAllRead,
   onMarkRead,
+  onDeleteNotification,
+  onSelectNotification,
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -41,12 +44,18 @@ export default function HomeGreetingRow({
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
-        <span
-          aria-hidden="true"
-          className="size-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white text-sm font-extrabold flex items-center justify-center shrink-0 shadow-xs"
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+          aria-label={t('profile')}
+          className="size-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white text-sm font-extrabold flex items-center justify-center shrink-0 shadow-xs overflow-hidden cursor-pointer press-scale"
         >
-          {initials}
-        </span>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <span aria-hidden="true">{initials}</span>
+          )}
+        </button>
         <div className="min-w-0 leading-tight">
           <p className="text-xs font-medium text-muted">{t(greetingKey)}</p>
           <h1 className="text-lg sm:text-xl font-extrabold text-ink truncate tracking-tight mt-0.5">
@@ -101,6 +110,8 @@ export default function HomeGreetingRow({
         notifications={notifications}
         onMarkAllRead={onMarkAllRead}
         onMarkRead={onMarkRead}
+        onDelete={onDeleteNotification}
+        onSelectNotification={onSelectNotification}
       />
     </div>
   );

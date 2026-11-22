@@ -1,9 +1,16 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PageTopBar from '../components/layout/PageTopBar';
 import { plasticTypes, commonlyConfused, localCoastalContent } from '../data/learnContent';
 import { cn } from '../utils/cn';
+
+const GUIDE_SECTION_MAP = {
+  'g-prepare': 'learn-kyp-heading',
+  'g-points': 'learn-kyp-heading',
+  'g-confused': 'learn-confused-heading',
+  'g-coast': 'learn-coastal-heading',
+};
 
 const RECYCLABLE_BADGE = {
   yes: 'bg-primary-light text-primary-dark border-primary/25',
@@ -18,6 +25,18 @@ const RECYCLABLE_BADGE = {
 export default function LearnPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const guideParam = searchParams.get('guide');
+
+  useEffect(() => {
+    if (!guideParam) return;
+    const targetId = GUIDE_SECTION_MAP[guideParam];
+    if (!targetId || typeof document === 'undefined') return;
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [guideParam]);
 
   return (
     <div className="w-full max-w-full mx-auto pb-12 space-y-8 animate-fade-in-up overflow-x-hidden">

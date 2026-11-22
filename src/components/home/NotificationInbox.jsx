@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import EmptyState from '../ui/EmptyState';
-import { TruckIcon, GiftIcon, MapPinIcon, XIcon } from '../ui/Icons';
+import { TruckIcon, GiftIcon, MapPinIcon, TrashIcon, XIcon } from '../ui/Icons';
 import { formatTimeAgo } from '../../utils/homeUtils';
 import { cn } from '../../utils/cn';
 
@@ -10,6 +10,8 @@ const TYPE_ICONS = { pickup: TruckIcon, points: GiftIcon, report: MapPinIcon };
 
 /**
  * NotificationInbox — Tactile consumer notifications sheet / desktop popover.
+ * - Tapping a notification marks it read, closes the inbox, and navigates to the target.
+ * - Includes a 44px TrashIcon delete tap target with zero row layout shift and double-tap protection.
  */
 export default function NotificationInbox({
   open,
@@ -18,9 +20,12 @@ export default function NotificationInbox({
   notifications,
   onMarkAllRead,
   onMarkRead,
+  onDelete,
+  onSelectNotification,
 }) {
   const { t, i18n } = useTranslation();
   const panelRef = useRef(null);
+  const busyIdsRef = useRef(new Set());
 
   useEffect(() => {
     if (!open) return undefined;
@@ -34,7 +39,34 @@ export default function NotificationInbox({
 
   if (!open) return null;
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const handleRowTap = async (n) => {
+    const lockKey = `tap:${n.id}`;
+    if (busyIdsRef.current.has(lockKey)) return;
+    busyIdsRef.current.add(lockKey);
+    try {
+      await onMarkRead?.(n.id);
+      if (onSelectNotification) {
+        onClose();
+        await onSelectNotification(n);
+      }
+    } finally {
+      busyIdsRef.current.delete(lockKey);
+    }
+  };
+
+  const handleDeleteTap = async (e, n) => {
+    e.stopPropagation();
+    const lockKey = `del:${n.id}`;
+    if (busyIdsRef.current.has(lockKey)) return;
+    busyIdsRef.current.add(lockKey);
+    try {
+      await onDelete?.(n.id);
+    } finally {
+      busyIdsRef.current.delete(lockKey);
+    }
+  };
 
   return createPortal(
     <div
@@ -99,44 +131,59 @@ export default function NotificationInbox({
             </div>
           ) : (
             <ul className="divide-y divide-border-light">
-              {notifications.map(n => {
+              {notifications.map((n) => {
                 const Icon = TYPE_ICONS[n.type] || TruckIcon;
                 return (
                   <li key={n.id}>
-                    <button
-                      type="button"
-                      onClick={() => onMarkRead(n.id)}
+                    <div
                       className={cn(
-                        'w-full min-h-11 px-5 py-3.5 flex items-start gap-3 text-left cursor-pointer transition-colors duration-150',
+                        'w-full min-h-11 pl-5 pr-2 py-2.5 flex items-start gap-2 transition-colors duration-150',
                         n.unread ? 'bg-primary-lighter/80' : 'bg-white hover:bg-sunken/60'
                       )}
                     >
-                      <span
-                        className={cn(
-                          'size-10 rounded-xl flex items-center justify-center shrink-0',
-                          n.unread ? 'bg-primary text-white' : 'bg-sunken text-primary'
-                        )}
-                        aria-hidden="true"
+                      <button
+                        type="button"
+                        onClick={() => handleRowTap(n)}
+                        className="min-w-0 flex-1 py-1 flex items-start gap-3 text-left cursor-pointer"
                       >
-                        <Icon className="size-4" />
-                      </span>
-                      <span className="min-w-0 flex-1 space-y-0.5">
-                        <span className="flex items-center justify-between gap-2">
-                          <span className={cn('text-sm text-ink truncate', n.unread ? 'font-extrabold' : 'font-semibold')}>
-                            {n.title}
-                          </span>
-                          {n.unread && (
-                            <span className="px-2 py-0.5 rounded-md bg-primary-light text-primary-dark text-[10px] font-bold shrink-0">
-                              {t('home_inbox_unread')}
-                            </span>
+                        <span
+                          className={cn(
+                            'size-10 rounded-xl flex items-center justify-center shrink-0',
+                            n.unread ? 'bg-primary text-white' : 'bg-sunken text-primary'
                           )}
+                          aria-hidden="true"
+                        >
+                          <Icon className="size-4" />
                         </span>
-                        <span className="block text-xs text-muted text-pretty leading-snug">{n.body}</span>
-                        <span className="block tabular text-[11px] text-muted-light">
-                          {formatTimeAgo(n.createdAt, i18n.language)}
+                        <span className="min-w-0 flex-1 space-y-0.5">
+                          <span className="flex items-center justify-between gap-2">
+                            <span className={cn('text-sm text-ink truncate', n.unread ? 'font-extrabold' : 'font-semibold')}>
+                              {n.title}
+                            </span>
+                            {n.unread && (
+                              <span className="px-2 py-0.5 rounded-md bg-primary-light text-primary-dark text-[10px] font-bold shrink-0">
+                                {t('home_inbox_unread')}
+                              </span>
+                            )}
+                          </span>
+                          <span className="block text-xs text-muted text-pretty leading-snug">{n.body}</span>
+                          <span className="block tabular text-[11px] text-muted-light">
+                            {formatTimeAgo(n.createdAt, i18n.language)}
+                          </span>
                         </span>
-                      </span>
-                    </button>
+                      </button>
+
+                      {onDelete && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteTap(e, n)}
+                          aria-label={t('home_inbox_delete_aria', { defaultValue: 'Delete notification' })}
+                          className="touch-target size-11 rounded-xl text-muted hover:text-orange-red-dark hover:bg-sunken flex items-center justify-center shrink-0 cursor-pointer transition-colors duration-150"
+                        >
+                          <TrashIcon className="size-4" />
+                        </button>
+                      )}
+                    </div>
                   </li>
                 );
               })}

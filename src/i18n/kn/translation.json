@@ -535,5 +535,8 @@
   "profile_lang_coming_soon": "[KN] Coming Soon",
   "profile_signout_confirm_title": "[KN] Sign out of Swaccha Parisara?",
   "profile_signout_confirm_desc": "[KN] You can sign back in anytime with your phone number or Google account.",
-  "profile_back_aria": "[KN] Go back"
+  "profile_back_aria": "[KN] Go back",
+  "home_default_resident": "[KN] Resident",
+  "home_inbox_delete_aria": "[KN] Delete notification",
+  "home_notif_target_missing": "[KN] That item is no longer available."
 }

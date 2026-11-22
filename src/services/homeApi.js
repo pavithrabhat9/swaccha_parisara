@@ -30,7 +30,7 @@ export const homeApi = {
       notificationApi.list(),
     ]);
 
-    let learn = [];
+    let learn;
     let learnError = false;
     try {
       learn = await learnApi.getHighlights();
