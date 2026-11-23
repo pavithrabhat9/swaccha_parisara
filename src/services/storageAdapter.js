@@ -8,6 +8,7 @@
 
 export const STORAGE_KEYS = Object.freeze({
   AUTH_SESSION: 'swachha_auth',
+  AUTH_GUEST_MODE: 'swachha_guest_mode',
   ACCOUNTS: 'swachha_accounts',
   ONBOARDING_SEEN: 'swachha_onboarding_seen',
   PICKUPS: 'swachha_pickups',

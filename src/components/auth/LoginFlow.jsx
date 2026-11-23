@@ -14,16 +14,10 @@ const PRIMARY_BUTTON =
   'w-full min-h-11 py-2.5 bg-primary text-white font-semibold rounded-lg text-sm ' +
   'hover:bg-primary-dark transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer';
 
-const ACCOUNT_TYPES = [
-  { id: 'individual', labelKey: 'auth_account_individual' },
-  { id: 'business', labelKey: 'auth_account_business' },
-];
-
 function SetupStep({ user, onSubmit }) {
   const { t } = useTranslation();
   const [name, setName] = useState(user?.name || '');
   const [locality, setLocality] = useState('');
-  const [accountType, setAccountType] = useState('individual');
 
   return (
     <div className="w-full space-y-4">
@@ -55,35 +49,9 @@ function SetupStep({ user, onSubmit }) {
         </select>
       </div>
 
-      <div>
-        <span className={LABEL_CLASS}>{t('auth_account_type')}</span>
-        <div role="radiogroup" aria-label={t('auth_account_type')} className="grid grid-cols-2 gap-2">
-          {ACCOUNT_TYPES.map(type => {
-            const selected = accountType === type.id;
-            return (
-              <button
-                key={type.id}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                onClick={() => setAccountType(type.id)}
-                className={cn(
-                  'min-h-11 py-2.5 px-3 rounded-lg border text-xs font-semibold transition-colors duration-150 cursor-pointer',
-                  selected
-                    ? 'border-primary text-primary bg-primary-lighter'
-                    : 'border-border bg-white text-ink hover:border-primary/40'
-                )}
-              >
-                {t(type.labelKey)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       <button
         type="button"
-        onClick={() => onSubmit(name, locality, accountType)}
+        onClick={() => onSubmit(name, locality)}
         disabled={!name.trim() || !locality}
         className={PRIMARY_BUTTON}
       >
@@ -134,9 +102,9 @@ export default function LoginFlow({ authHook }) {
     if (!result.success) setError(result.error);
   };
 
-  const handleSetup = (name, locality, accountType) => {
+  const handleSetup = (name, locality) => {
     setError('');
-    const result = completeSetup(name, locality, accountType);
+    const result = completeSetup(name, locality);
     if (!result.success) setError(result.error);
   };
 

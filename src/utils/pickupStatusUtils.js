@@ -27,3 +27,8 @@ export function getActivePickup(pickups = []) {
   return active[0] || null;
 }
 
+/** Resolves the Pickup page tab from `?tab=` query param, falling back to 'home' for removed/unknown values. */
+export function resolvePickupTab(tabParam) {
+  return tabParam === 'business' ? 'business' : 'home';
+}
+

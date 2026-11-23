@@ -24,7 +24,7 @@ export default function PageTopBar({
     return (
       <header
         className={cn(
-          'sticky top-0 z-30 bg-white/95 glass border-b border-border/80 px-4 sm:px-6 lg:px-8 shrink-0',
+          'sticky top-0 z-30 bg-cream/95 glass border-b border-border/80 px-4 sm:px-6 lg:px-8 shrink-0',
           className
         )}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
@@ -44,7 +44,7 @@ export default function PageTopBar({
           </div>
 
           <div className="min-w-0 text-center leading-tight">
-            <HeadingTag className="text-base sm:text-lg font-extrabold text-ink text-balance truncate">
+            <HeadingTag className="text-lg sm:text-xl font-extrabold text-ink text-balance truncate">
               {title}
             </HeadingTag>
             {subtitle && (
@@ -65,7 +65,7 @@ export default function PageTopBar({
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 bg-white/95 glass border-b border-border/80 px-4 sm:px-6 lg:px-8 shrink-0',
+        'sticky top-0 z-30 bg-cream/95 glass border-b border-border/80 px-4 sm:px-6 lg:px-8 shrink-0',
         className
       )}
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
@@ -83,7 +83,7 @@ export default function PageTopBar({
             </button>
           )}
           <div className="min-w-0 leading-tight">
-            <HeadingTag className="text-base sm:text-lg font-extrabold text-ink text-balance truncate">
+            <HeadingTag className="text-lg sm:text-xl font-extrabold text-ink text-balance truncate">
               {title}
             </HeadingTag>
             {subtitle && (

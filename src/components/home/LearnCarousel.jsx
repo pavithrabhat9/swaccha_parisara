@@ -137,8 +137,8 @@ export default function LearnCarousel({ items, onOpenItem }) {
           aria-label={t('home_quick_guides_title')}
           tabIndex={0}
           className="
-            flex gap-3.5 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-4 px-4 pb-2
-            sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pb-0 md:grid md:grid-cols-2 md:overflow-visible
+            flex gap-3.5 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-4 px-4 scroll-px-4 pb-2
+            sm:-mx-6 sm:px-6 sm:scroll-px-6 md:mx-0 md:px-0 md:scroll-px-0 md:pb-0 md:grid md:grid-cols-2 md:overflow-visible
             hide-scrollbar
           "
         >

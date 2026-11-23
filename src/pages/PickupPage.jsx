@@ -8,7 +8,6 @@ import { useToast } from '../components/ui/Toast';
 import { aiApi, AI_PLASTIC_TYPES } from '../services/aiApi';
 import { webApiAdapter } from '../services/storageAdapter';
 import ActivePickupCard from '../components/pickup/ActivePickupCard';
-import TrashBankTab from '../components/pickup/TrashBankTab';
 import PageTopBar from '../components/layout/PageTopBar';
 import { PickupIllustration } from '../components/onboarding/OnboardingIllustrations';
 import BusinessPage from './BusinessPage';
@@ -21,7 +20,7 @@ import SuccessState from '../components/ui/SuccessState';
 import SlowNetworkAlert from '../components/ui/SlowNetworkAlert';
 import ErrorState from '../components/ui/ErrorState';
 import { QUANTITY_TIERS, TIME_WINDOWS } from '../data/mockPickups';
-import { getActivePickup } from '../utils/pickupStatusUtils';
+import { getActivePickup, resolvePickupTab } from '../utils/pickupStatusUtils';
 import { getBagDetails } from '../utils/pickupUtils';
 import { formatShortDate } from '../utils/dateUtils';
 import { cn } from '../utils/cn';
@@ -33,31 +32,26 @@ import {
 } from '../components/ui/Icons';
 
 /**
- * PickupPage — Collection Logistics Hub (Home Pickup | Trash Bank | Business).
+ * PickupPage — Collection Logistics Hub (Home pickup | Business pickup).
  */
 export default function PickupPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user, isBusinessAccount } = useAuth();
+  const { user } = useAuth();
   const { pickups, loading, requestPickup } = usePickups();
   const { addresses, defaultAddress } = useAddresses();
   const { showToast } = useToast();
 
   const tabParam = searchParams.get('tab');
-  const centerParam = searchParams.get('center');
   const startParam = searchParams.get('start');
   const pickupIdParam = searchParams.get('pickupId');
 
-  const activeSegment =
-    tabParam === 'trash-bank'
-      ? 'trash-bank'
-      : tabParam === 'business' && isBusinessAccount
-        ? 'business'
-        : 'home';
+  const activeSegment = resolvePickupTab(tabParam);
 
   const setSegment = (nextTab) => {
-    setSearchParams(nextTab === 'home' ? {} : { tab: nextTab });
+    if (nextTab === activeSegment) return;
+    setSearchParams(nextTab === 'home' ? { tab: 'home' } : { tab: 'business' });
   };
 
   const [showRequestForm, setShowRequestForm] = useState(() => startParam === '1');
@@ -184,8 +178,7 @@ export default function PickupPage() {
 
   const segments = [
     { id: 'home', label: t('pickup_tab_home') },
-    { id: 'trash-bank', label: t('pickup_tab_trash_bank') },
-    ...(isBusinessAccount ? [{ id: 'business', label: t('pickup_tab_business') }] : []),
+    { id: 'business', label: t('pickup_tab_business') },
   ];
 
   return (
@@ -632,7 +625,7 @@ export default function PickupPage() {
                                   </p>
                                 ) : (
                                   <p className="text-[11px] font-medium text-muted">
-                                    {t('trash_bank_awaiting_weigh')}
+                                    {t('rewards_awaiting_weigh')}
                                   </p>
                                 )}
                               </div>
@@ -649,13 +642,8 @@ export default function PickupPage() {
         </>
       )}
 
-      {/* === SEGMENT 2: TRASH BANK === */}
-      {activeSegment === 'trash-bank' && (
-        <TrashBankTab key={centerParam || 'list'} initialCenterId={centerParam} />
-      )}
-
-      {/* === SEGMENT 3: BUSINESS === */}
-      {activeSegment === 'business' && isBusinessAccount && (
+      {/* === SEGMENT 2: BUSINESS PICKUP === */}
+      {activeSegment === 'business' && (
         <BusinessPage embedded />
       )}
 

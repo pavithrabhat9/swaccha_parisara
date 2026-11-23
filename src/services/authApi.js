@@ -20,11 +20,26 @@ export const authApi = {
     return storageAdapter.get(STORAGE_KEYS.AUTH_SESSION, null);
   },
 
+  /** Whether the user previously skipped login to continue as a guest. */
+  getGuestMode: async () => {
+    return storageAdapter.getRaw(STORAGE_KEYS.AUTH_GUEST_MODE) === '1';
+  },
+
+  /** Remembers or clears the user's guest-mode skip choice. */
+  setGuestMode: async (enabled) => {
+    if (enabled) {
+      storageAdapter.setRaw(STORAGE_KEYS.AUTH_GUEST_MODE, '1');
+    } else {
+      storageAdapter.remove(STORAGE_KEYS.AUTH_GUEST_MODE);
+    }
+  },
+
   /**
    * Saves the session user and, once the profile is complete, remembers the account
    * so logging in again with the same phone / Google identity restores it.
    */
   saveUser: async (user) => {
+    storageAdapter.remove(STORAGE_KEYS.AUTH_GUEST_MODE);
     storageAdapter.set(STORAGE_KEYS.AUTH_SESSION, user);
     const key = accountKeyFor(user);
     if (key && user?.name) {
@@ -41,8 +56,9 @@ export const authApi = {
     return readAccounts()[key] || null;
   },
 
-  /** Ends the session only; the account stays registered for the next login. */
+  /** Ends the session and clears guest mode so sign-out returns to the login screen. */
   removeUser: async () => {
     storageAdapter.remove(STORAGE_KEYS.AUTH_SESSION);
+    storageAdapter.remove(STORAGE_KEYS.AUTH_GUEST_MODE);
   },
 };

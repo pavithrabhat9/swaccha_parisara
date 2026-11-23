@@ -21,19 +21,26 @@ const GOOGLE_STUB_KEY = 'google:mock';
 export function useAuthState() {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [authStep, setAuthStep] = useState('phone'); // 'phone' | 'otp' | 'setup' | 'done'
 
-  // Restore the persisted session on first load
+  // Restore the persisted session or guest-mode choice on first load
   useEffect(() => {
     let mounted = true;
     const init = async () => {
-      const stored = await authApi.getUser();
+      const [stored, guestMode] = await Promise.all([
+        authApi.getUser(),
+        authApi.getGuestMode(),
+      ]);
       if (!mounted) return;
       if (stored && stored.name && stored.locality) {
         setUser(stored);
         setIsLoggedIn(true);
+        setIsGuest(false);
         setAuthStep('done');
+      } else if (guestMode) {
+        setIsGuest(true);
       }
       setAuthLoading(false);
     };
@@ -44,8 +51,17 @@ export function useAuthState() {
   const startSession = useCallback(async (account) => {
     setUser(account);
     setIsLoggedIn(true);
+    setIsGuest(false);
     setAuthStep('done');
     await authApi.saveUser(account);
+  }, []);
+
+  const skipAuth = useCallback(async () => {
+    setUser(null);
+    setIsLoggedIn(false);
+    setIsGuest(true);
+    setAuthStep('phone');
+    await authApi.setGuestMode(true);
   }, []);
 
   // STUB: "sends" an OTP, only validates the number and advances the step
@@ -129,6 +145,7 @@ export function useAuthState() {
   const logout = useCallback(() => {
     setUser(null);
     setIsLoggedIn(false);
+    setIsGuest(false);
     setAuthStep('phone');
     authApi.removeUser();
   }, []);
@@ -138,6 +155,7 @@ export function useAuthState() {
   return {
     user,
     isLoggedIn,
+    isGuest,
     authLoading,
     authStep,
     setAuthStep,
@@ -147,6 +165,7 @@ export function useAuthState() {
     verifyOtp,
     signInWithGoogle,
     completeSetup,
+    skipAuth,
     updateProfile,
     logout,
   };

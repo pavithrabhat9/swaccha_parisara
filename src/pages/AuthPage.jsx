@@ -21,19 +21,29 @@ export default function AuthPage() {
     return <Navigate to={getSafeReturnPath(location.state?.from)} replace />;
   }
 
+  const handleSkip = async () => {
+    await authHook.skipAuth();
+    navigate('/home', { replace: true });
+  };
+
   return (
-    <div>
-      <PageTopBar title={t('auth_title')} />
-      <div className="w-full max-w-sm mx-auto px-4 py-6 md:py-10 space-y-3">
-        <LoginFlow authHook={authHook} />
-        <div className="text-center">
+    <div className="min-h-[calc(100dvh-2.5rem)] flex flex-col">
+      <PageTopBar
+        title={t('auth_title')}
+        rightSlot={
           <button
             type="button"
-            onClick={() => navigate('/map')}
-            className="min-h-11 px-4 text-sm font-semibold text-primary hover:text-primary-dark hover:underline underline-offset-4 cursor-pointer"
+            onClick={handleSkip}
+            aria-label={t('auth_skip_aria')}
+            className="touch-target min-h-11 px-3 -mr-1.5 rounded-xl text-sm font-semibold text-muted hover:text-ink hover:bg-sunken transition-colors duration-150 cursor-pointer"
           >
-            {t('auth_explore_map')}
+            {t('auth_skip')}
           </button>
+        }
+      />
+      <div className="flex-1 flex items-center justify-center w-full max-w-sm mx-auto px-4 py-6">
+        <div className="w-full">
+          <LoginFlow authHook={authHook} />
         </div>
       </div>
     </div>

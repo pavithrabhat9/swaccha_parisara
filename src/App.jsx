@@ -24,10 +24,11 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const LegalPage = lazy(() => import('./pages/LegalPage'));
 
-/** Landing redirect based on the session. */
+/** Landing redirect based on the session or remembered guest skip choice. */
 function Landing() {
-  const { isLoggedIn } = useAuth();
-  return <Navigate to={isLoggedIn ? ROUTES.HOME : ROUTES.MAP} replace />;
+  const { isLoggedIn, isGuest } = useAuth();
+  if (isLoggedIn || isGuest) return <Navigate to={ROUTES.HOME} replace />;
+  return <Navigate to={ROUTES.AUTH} replace />;
 }
 
 /** Shown for a moment while the saved session / onboarding flag or route chunk loads. */
@@ -76,19 +77,19 @@ function AppRoutes() {
             <Route path={ROUTES.ROOT} element={<Landing />} />
             <Route path={ROUTES.AUTH} element={<AuthPage />} />
 
-            {/* Public routes */}
+            {/* Public routes (accessible to both logged-in users and guests) */}
+            <Route path={ROUTES.HOME} element={<HomePage />} />
             <Route path={ROUTES.MAP} element={<MapPage />} />
             <Route path={ROUTES.REPORT} element={<ReportPage />} />
+            <Route path={ROUTES.PICKUP} element={<PickupPage />} />
+            <Route path={ROUTES.REWARDS} element={<RewardsPage />} />
             <Route path={ROUTES.LEARN} element={<LearnPage />} />
             <Route path={ROUTES.PLASTIC_TYPES} element={<PlasticTypesPage />} />
             <Route path={ROUTES.BUSINESS} element={<BusinessPage />} />
             <Route path={ROUTES.PRIVACY} element={<LegalPage docType="privacy" />} />
             <Route path={ROUTES.TERMS} element={<LegalPage docType="terms" />} />
 
-            {/* Members-only routes: guests see the "Log in to use this" gate at the same URL */}
-            <Route path={ROUTES.HOME} element={<RequireAuth featureKey="home"><HomePage /></RequireAuth>} />
-            <Route path={ROUTES.PICKUP} element={<RequireAuth featureKey="pickup"><PickupPage /></RequireAuth>} />
-            <Route path={ROUTES.REWARDS} element={<RequireAuth featureKey="rewards"><RewardsPage /></RequireAuth>} />
+            {/* Members-only route: guests see the "Log in to use this" gate on Profile */}
             <Route path={ROUTES.PROFILE} element={<RequireAuth featureKey="profile"><ProfilePage /></RequireAuth>} />
 
             <Route path="*" element={<Landing />} />

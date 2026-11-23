@@ -200,6 +200,7 @@ export default function ProfilePage() {
               onDeletedSignOut={() => {
                 openSection(null);
                 logout();
+                navigate('/auth', { replace: true });
               }}
             />
           )}
@@ -381,6 +382,7 @@ export default function ProfilePage() {
         onConfirm={() => {
           setSignOutConfirmOpen(false);
           logout();
+          navigate('/auth', { replace: true });
         }}
       />
     </div>
