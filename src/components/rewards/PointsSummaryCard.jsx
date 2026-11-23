@@ -5,43 +5,48 @@ import { BadgeMedal, StarIcon } from '../ui/Icons';
 import { cn } from '../../utils/cn';
 
 /**
- * PointsSummaryCard — Expressive sunlit emerald & marigold rewards hero card.
+ * PointsSummaryCard — Minimal emerald points & tier summary matching Home's ContributionCard.
  */
 export default function PointsSummaryCard({ points, tierProgress, className = '' }) {
   const { t } = useTranslation();
   const { tier, nextTier, progressPercent, pointsToNext } = tierProgress;
+  const clampedPercent = Math.max(0, Math.min(100, progressPercent));
 
   return (
-    <section className={cn('relative rounded-2xl surface-hero-emerald text-white overflow-hidden', className)}>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-12 -right-10 size-44 rounded-full bg-yellow/20 blur-2xl"
-      />
-
-      <div className="relative p-5 sm:p-6 space-y-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold text-white/80 inline-flex items-center gap-1.5">
-              <StarIcon className="size-3.5 text-yellow" />
-              {t('yourPoints')}
+    <section
+      aria-label={t('yourPoints')}
+      className={cn(
+        'rounded-2xl surface-hero-emerald text-white overflow-hidden',
+        className
+      )}
+    >
+      <div className="p-5 sm:p-6 space-y-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-white/85 inline-flex items-center gap-1.5">
+              <StarIcon className="size-3.5 text-yellow shrink-0" />
+              <span>{t('yourPoints')}</span>
             </p>
-            <p className="tabular text-4xl font-extrabold text-white mt-1.5 tracking-tight leading-none">
-              <CountUp value={points} />
+            <p className="mt-1.5 flex items-baseline gap-2 flex-wrap">
+              <span className="font-[family-name:var(--font-brand)] tabular text-[40px] sm:text-[48px] leading-none font-extrabold text-white tracking-[-0.025em]">
+                <CountUp value={points} />
+              </span>
+              <span className="text-sm font-bold text-[#a7f3d0]">pts</span>
             </p>
           </div>
 
-          <div className="rounded-xl bg-white/14 px-3 py-2 flex items-center gap-2 shrink-0">
-            <BadgeMedal id={tier.id} className="size-6 shrink-0" />
-            <div className="text-left leading-tight">
-              <p className="text-[10px] font-medium text-white/75">{t('tier_label')}</p>
-              <p className="text-xs font-extrabold text-white mt-0.5">{tier.label}</p>
+          <div className="rounded-xl bg-white/12 px-3 py-2 flex items-center gap-2.5 shrink-0">
+            <BadgeMedal id={tier.id} className="size-7 shrink-0" />
+            <div className="leading-tight">
+              <p className="text-[11px] font-medium text-white/75">{t('tier_label')}</p>
+              <p className="text-xs font-bold text-white mt-0.5">{tier.label}</p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl bg-white/12 px-4 py-3 space-y-2">
+        <div className="pt-4 border-t border-white/15 space-y-2">
           <div className="flex items-center justify-between gap-2 text-xs">
-            <span className="font-semibold text-white/90 tabular">
+            <span className="font-medium text-white/90 tabular">
               {nextTier
                 ? t('tier_points_to_next', {
                     points: pointsToNext.toLocaleString('en-IN'),
@@ -49,19 +54,22 @@ export default function PointsSummaryCard({ points, tierProgress, className = ''
                   })
                 : t('tier_top_reached')}
             </span>
-            <span className="tabular text-yellow font-extrabold shrink-0">{progressPercent}%</span>
+            <span className="tabular font-bold text-[#a7f3d0] shrink-0">
+              {clampedPercent}%
+            </span>
           </div>
+
           <div
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={progressPercent}
+            aria-valuenow={clampedPercent}
             aria-label={t('tier_label')}
-            className="w-full h-2 bg-white/20 rounded-full overflow-hidden"
+            className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden"
           >
             <div
               className="h-full w-full bg-yellow origin-left rounded-full transition-transform duration-300 ease-out"
-              style={{ transform: `scaleX(${Math.max(0, Math.min(100, progressPercent)) / 100})` }}
+              style={{ transform: `scaleX(${clampedPercent / 100})` }}
             />
           </div>
         </div>
