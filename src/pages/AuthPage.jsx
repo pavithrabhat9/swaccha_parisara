@@ -3,13 +3,11 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { getSafeReturnPath } from '../utils/authUtils';
-import PageTopBar from '../components/layout/PageTopBar';
 import LoginFlow from '../components/auth/LoginFlow';
 
 /**
- * AuthPage — "Sign up / Log in" screen (route /auth).
- * Reached after onboarding or from the login gate. After a successful login the user is
- * sent back to the tab they originally tapped (location.state.from), otherwise to Home.
+ * AuthPage — Clean, distraction-free Login / Sign up / Forgot Password screen (route /auth).
+ * No redundant page title bar: only a minimal top-right Skip action and the centered auth card.
  */
 export default function AuthPage() {
   const { t } = useTranslation();
@@ -28,20 +26,21 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-[calc(100dvh-2.5rem)] flex flex-col">
-      <PageTopBar
-        title={t('auth_title')}
-        rightSlot={
-          <button
-            type="button"
-            onClick={handleSkip}
-            aria-label={t('auth_skip_aria')}
-            className="touch-target min-h-11 px-3 -mr-1.5 rounded-xl text-sm font-semibold text-muted hover:text-ink hover:bg-sunken transition-colors duration-150 cursor-pointer"
-          >
-            {t('auth_skip')}
-          </button>
-        }
-      />
-      <div className="flex-1 flex items-center justify-center w-full max-w-sm mx-auto px-4 py-6">
+      <header
+        className="w-full max-w-md mx-auto px-4 pt-3 flex items-center justify-end"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
+      >
+        <button
+          type="button"
+          onClick={handleSkip}
+          aria-label={t('auth_skip_aria')}
+          className="touch-target min-h-11 px-3 -mr-1.5 rounded-xl text-sm font-semibold text-muted hover:text-ink hover:bg-sunken transition-colors duration-150 cursor-pointer"
+        >
+          {t('auth_skip')}
+        </button>
+      </header>
+
+      <div className="flex-1 flex items-center justify-center w-full max-w-md mx-auto px-4 pb-6 pt-2">
         <div className="w-full">
           <LoginFlow authHook={authHook} />
         </div>

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { authApi } from '../services/authApi';
+import { validateIdentifier, validatePassword } from '../utils/authUtils';
 
 // STUB: simulated Google account. No real Google sign-in or token exchange happens anywhere.
 const GOOGLE_STUB_USER = {
@@ -100,7 +101,89 @@ export function useAuthState() {
     return { success: true, isReturning: false };
   }, [startSession]);
 
-  // Complete first-time sign-up
+  // Credential login (phone or email + password)
+  const loginWithCredentials = useCallback(async (identifier, password) => {
+    const idCheck = validateIdentifier(identifier);
+    if (!idCheck.valid) {
+      return { success: false, error: idCheck.error };
+    }
+    const pwCheck = validatePassword(password);
+    if (!pwCheck.valid) {
+      return { success: false, error: pwCheck.error };
+    }
+    const result = await authApi.authenticateAccount(idCheck.normalized, password);
+    if (!result.success) {
+      return result;
+    }
+    setUser(result.user);
+    setIsLoggedIn(true);
+    setIsGuest(false);
+    setAuthStep('done');
+    return { success: true, user: result.user };
+  }, []);
+
+  // Credential sign-up (name, phone, optional email, locality, password)
+  const signUpWithCredentials = useCallback(async ({ name, phone, email, locality, password }) => {
+    if (!name?.trim()) {
+      return { success: false, error: 'auth_name_required' };
+    }
+    const phoneCheck = validateIdentifier(phone);
+    if (!phoneCheck.valid || phoneCheck.kind !== 'phone') {
+      return { success: false, error: 'auth_valid_phone_error' };
+    }
+    if (email && email.trim()) {
+      const emailCheck = validateIdentifier(email);
+      if (!emailCheck.valid || emailCheck.kind !== 'email') {
+        return { success: false, error: 'auth_email_invalid' };
+      }
+    }
+    if (!locality) {
+      return { success: false, error: 'auth_locality_required' };
+    }
+    const pwCheck = validatePassword(password);
+    if (!pwCheck.valid) {
+      return { success: false, error: pwCheck.error };
+    }
+    const result = await authApi.registerAccount({
+      name: name.trim(),
+      phone: phoneCheck.normalized,
+      email: email?.trim() || '',
+      locality,
+      password,
+    });
+    if (!result.success) {
+      return result;
+    }
+    setUser(result.user);
+    setIsLoggedIn(true);
+    setIsGuest(false);
+    setAuthStep('done');
+    return { success: true, user: result.user };
+  }, []);
+
+  // Forgot password step 1: verify account exists
+  const checkAccountExists = useCallback(async (identifier) => {
+    const idCheck = validateIdentifier(identifier);
+    if (!idCheck.valid) {
+      return { success: false, error: idCheck.error };
+    }
+    const account = await authApi.findAccount(idCheck.normalized);
+    if (!account) {
+      return { success: false, error: 'auth_account_not_found' };
+    }
+    return { success: true, identifier: idCheck.normalized };
+  }, []);
+
+  // Forgot password step 2: set new password
+  const resetPassword = useCallback(async (identifier, newPassword) => {
+    const pwCheck = validatePassword(newPassword);
+    if (!pwCheck.valid) {
+      return { success: false, error: pwCheck.error };
+    }
+    return authApi.resetPassword(identifier, newPassword);
+  }, []);
+
+  // Complete first-time sign-up (Google setup step)
   const completeSetup = useCallback((name, locality, accountType = 'individual') => {
     if (!name?.trim()) {
       return { success: false, error: 'auth_name_required' };
@@ -164,6 +247,10 @@ export function useAuthState() {
     sendOtp,
     verifyOtp,
     signInWithGoogle,
+    loginWithCredentials,
+    signUpWithCredentials,
+    checkAccountExists,
+    resetPassword,
     completeSetup,
     skipAuth,
     updateProfile,
